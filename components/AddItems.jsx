@@ -1,7 +1,7 @@
 import { AddItemContext } from '@/context'
 import { MaterialIcons } from '@expo/vector-icons'
 import React, { useContext, useState, useRef } from 'react'
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView } from 'react-native'
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView, Pressable } from 'react-native'
 import NewItemsView from './NewItemsView'
 import uuid from 'react-native-uuid';
 import NoItems from './NoItems'
@@ -17,6 +17,9 @@ const AddItems = ({ personData, setUtang, utang }) => {
   // text input Variables
   const [productName, setProductName] = useState('');
   const [price, setPrice] = useState('');
+
+  const [icon, setIcon] = useState('add-box')
+  const [ableToEdit, setAbleToEdit] = useState(true)
 
   const { isAddingItem, setIsAddingItem } = useContext(AddItemContext)
 
@@ -34,6 +37,7 @@ const AddItems = ({ personData, setUtang, utang }) => {
     setItems([{ id: id, product: productName, price: Number(price) }, ...items])
     setProductName('')
     setPrice('')
+
 
     setIsEditing(false)
     setEditingId(null)
@@ -83,6 +87,7 @@ const AddItems = ({ personData, setUtang, utang }) => {
               onPress={() => {
                 setItems([]);
                 setIsAddingItem(!isAddingItem)
+                setIcon('add-box')
               }}
             >
               < MaterialIcons name="exit-to-app" size={30} color="white" />
@@ -100,6 +105,7 @@ const AddItems = ({ personData, setUtang, utang }) => {
               value={productName}
               onChangeText={setProductName}
               autoFocus={true}
+              editable={ableToEdit}
             />
 
             <TextInput style={styles.textInputPrice}
@@ -107,22 +113,31 @@ const AddItems = ({ personData, setUtang, utang }) => {
               keyboardType='numeric'
               value={price}
               onChangeText={setPrice}
+              editable={ableToEdit}
             />
 
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity
 
-              isEditing
-                ? saveEditedItem(editingItemId)
-                : newItem()
-              // Return the focus to Product Textinput
-              productInputRef.current?.focus()
-            }
+              onLongPress={() => { setIcon('mic'); setAbleToEdit(false) } }
 
-            } >
+              onPress={() => {
 
+                if (icon === 'mic') {
+                  setIcon('add-box')
+                  setAbleToEdit(true)
+                  return
+                }
 
+                isEditing
+                  ? saveEditedItem(editingItemId)
+                  : newItem()
+                // Return the focus to Product Textinput
+                productInputRef.current?.focus()
+              }
 
-              <MaterialIcons name="add-box" size={50} color='#5959B2' />
+              } >
+
+              <MaterialIcons name={icon} size={50} color='#5959B2' />
             </TouchableOpacity>
 
           </View>
