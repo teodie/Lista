@@ -1,12 +1,13 @@
 import { AddItemContext } from '@/context'
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useContext, useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView, Pressable } from 'react-native'
-import NewItemsView from './NewItemsView'
+import NewItemsView from './NewItemsView';
 import uuid from 'react-native-uuid';
-import NoItems from './NoItems'
+import NoItems from './NoItems';
+import { MODE } from '../constants/mode';
 
-const AddItems = ({ personData, setUtang, utang }) => {
+const AddItems = ({ personData, setUtang, utang, setMode }) => {
 
   const [items, setItems] = useState([]);
 
@@ -21,7 +22,6 @@ const AddItems = ({ personData, setUtang, utang }) => {
   const [icon, setIcon] = useState('add-box')
   const [ableToEdit, setAbleToEdit] = useState(true)
 
-  const { isAddingItem, setIsAddingItem } = useContext(AddItemContext)
 
   const newItem = () => {
     const generateNewId = uuid.v4()
@@ -38,7 +38,6 @@ const AddItems = ({ personData, setUtang, utang }) => {
     setProductName('')
     setPrice('')
 
-
     setIsEditing(false)
     setEditingId(null)
 
@@ -52,7 +51,7 @@ const AddItems = ({ personData, setUtang, utang }) => {
 
     deleteItem(id)
     setProductName(item.product)
-    setPrice(item.price)
+    setPrice(String(item.price))
   }
 
   const deleteItem = (id) => {
@@ -67,7 +66,7 @@ const AddItems = ({ personData, setUtang, utang }) => {
 
     items.length === 0
       ? Alert.alert("Emty Items!")
-      : setIsAddingItem(!isAddingItem)
+      : setMode(MODE.IDLE)
 
     setProductName('')
     setPrice('')
@@ -86,7 +85,7 @@ const AddItems = ({ personData, setUtang, utang }) => {
             <TouchableOpacity style={styles.exitBtn}
               onPress={() => {
                 setItems([]);
-                setIsAddingItem(!isAddingItem)
+                setMode(MODE.IDLE)
                 setIcon('add-box')
               }}
             >

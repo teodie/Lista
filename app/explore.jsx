@@ -7,17 +7,13 @@ import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
 import * as FileSystem from 'expo-file-system'
 import { utangData } from '../constants/utangList';
 import { router } from 'expo-router';
-import { AddItemContext } from '../context'
 import AddItems from '@/components/AddItems';
-
+import { MODE } from '../constants/mode';
 
 const explore = () => {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [mode, setMode] = useState(MODE.IDLE)
+
   const [isRecording, setIsRecording] = useState(false);
-  // For conditional rendering
-  const [isAddingName, setisAddingName] = useState(false);
-  const [isUpdatingName, setisUpdatingName] = useState(false);
-  const [isAddingItem, setIsAddingItem] = useState(false);
 
   const [currentPersonData, setcurrentPersonData] = useState(null);
   const [id, setId] = useState(null);
@@ -71,32 +67,24 @@ const explore = () => {
           <Text style={{ fontSize: 25, fontWeight: "bold", color: "green" }} >{totalBalance}</Text>
         </View>
 
-        <Pressable
+        <TouchableOpacity
           style={{ width: 50, marginRight: 10 }}
           onPress={() => {
-            setisUpdatingName(!isUpdatingName)
+            setMode(MODE.EDIT_NAME)
             onChangeName(person.name)
             setId(person.id)
           }}
         >
-          <MaterialIcons
-            // name="chevron-right"
-            name="edit-document"
-            size={40}
-            color="#5959B2"
-          />
-        </Pressable>
+          <MaterialIcons name="edit-document" size={40} color="#5959B2" />
+
+        </TouchableOpacity>
 
         <Pressable
           style={{ width: 50 }}
           onPress={() => { deleteName(person.id) }}
         >
-          <MaterialIcons
-            // name="chevron-right"
-            name="delete"
-            size={40}
-            color="#5959B2"
-          />
+          <MaterialIcons name="delete" size={40} color="#5959B2" />
+
         </Pressable>
 
 
@@ -104,16 +92,12 @@ const explore = () => {
           style={{ height: 40, width: 40, backgroundColor: "#5959B2", borderRadius: '50%', marginRight: 10 }}
           onPress={() => {
             setcurrentPersonData(person);
-            setIsAddingItem(!isAddingItem)
+            setMode(MODE.ADD_ITEM)
           }}
         >
-          <MaterialIcons
-            name='add'
-            size={40}
-            color="#E8E8E8"
-          />
+          <MaterialIcons name='add' size={40} color="#E8E8E8" />
+          
         </TouchableOpacity>
-
 
       </View>
 
@@ -185,7 +169,7 @@ const explore = () => {
 
   const sendToWhisper = async (audioUri) => {
     try {
-      setIsProcessing(true);
+      setMode(MODE.PROCESSING);
 
       // Read the audio file as base64
       const audioBase64 = await FileSystem.readAsStringAsync(audioUri, {
@@ -226,13 +210,13 @@ const explore = () => {
       console.error('Error sending to Whisper:', error);
       handleApiError(error);
     } finally {
-      setIsProcessing(false);
+      setMode(MODE.IDLE);
     }
   };
 
   const parseTranscription = async (text) => {
     try {
-      setIsProcessing(true);
+      setMode(MODE.PROCESSING);
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -290,7 +274,7 @@ const explore = () => {
       console.error('Error parsing with GPT:', error);
       handleApiError(error);
     } finally {
-      setIsProcessing(false);
+      setMode(MODE.IDLE);
     }
   };
 
@@ -333,12 +317,7 @@ const explore = () => {
             onPress={() => searchName()}
             style={{ borderWidth: 1, borderTopRightRadius: 5, borderBottomRightRadius: 5, justifyContent: "center" }}
           >
-            <MaterialIcons
-              style={{}}
-              name="search"
-              size={30}
-              color="#E8E8E8"
-            />
+            <MaterialIcons style={{}} name="search" size={30} color="#E8E8E8" />
           </TouchableOpacity>
 
         </View>
@@ -351,24 +330,23 @@ const explore = () => {
         showsVerticalScrollIndicator={false}
       />
 
-      {isProcessing && (
+      {mode === MODE.PROCESSING && (
         <View style={styles.processingOverlay}>
           <ActivityIndicator size="large" color="#5959B2" />
           <Text style={styles.processingText}>Processing your request...</Text>
         </View>
       )}
 
-      {isAddingItem && currentPersonData &&
-        <AddItemContext.Provider value={{ isAddingItem, setIsAddingItem }}>
+      {mode === MODE.ADD_ITEM && currentPersonData &&
           < AddItems
             personData={currentPersonData}
             utang={utang}
             setUtang={setUtang}
-         />
-        </AddItemContext.Provider >
+            setMode={setMode}
+          />
       }
 
-      {(isAddingName || isUpdatingName) && (
+      {(mode === MODE.ADD_NAME || mode === MODE.EDIT_NAME) && (
         <View style={styles.processingOverlay}>
 
           <TextInput
@@ -383,13 +361,13 @@ const explore = () => {
             style={styles.recordButton}
             onPress={() => {
 
-              if (isAddingName) {
-                setisAddingName(!isAddingName)
+              if (mode === MODE.ADD_NAME) {
+                setMode(MODE.IDLE)
                 createName()
               }
 
-              if (isUpdatingName) {
-                setisUpdatingName(!isUpdatingName)
+              if (mode === MODE.EDIT_NAME) {
+                setMode(MODE.IDLE)
                 updateName(id)
                 onChangeName('')
                 setId(null)
@@ -397,11 +375,9 @@ const explore = () => {
 
             }}
           >
-            <MaterialIcons
-              name='add'
-              size={40}
-              color="#E8E8E8"
-            />
+
+          <MaterialIcons name='add' size={40} color="white" />
+
           </TouchableOpacity>
 
         </View>
@@ -409,27 +385,21 @@ const explore = () => {
 
       <View style={{ flexDirection: "row", justifyContent: "center" }}>
         <TouchableOpacity
-          style={[styles.recordButton, isProcessing && styles.disabledButton]}
+          style={[styles.recordButton, mode === MODE.PROCESSING && styles.disabledButton]}
           onPress={handleRecordPress}
-          disabled={isProcessing}
+          disabled={mode === MODE.PROCESSING}
         >
-          <MaterialIcons
-            name={isRecording ? "stop" : "mic"}
-            size={40}
-            color="#E8E8E8"
+          <MaterialIcons name={isRecording ? "stop" : "mic"} size={40} color="#E8E8E8"
           />
         </TouchableOpacity>
 
 
         <TouchableOpacity
           style={styles.recordButton}
-          onPress={() => { setisAddingName(!isAddingName) }}
+          onPress={() => { setMode(MODE.ADD_NAME) }}
         >
-          <MaterialIcons
-            name='add'
-            size={40}
-            color="#E8E8E8"
-          />
+          <MaterialIcons name='add' size={40} color="#E8E8E8" />
+
         </TouchableOpacity>
 
       </View>
