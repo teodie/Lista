@@ -1,29 +1,27 @@
 import {
   View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, TextInput, Image, FlatList, Pressable, Platform
 } from 'react-native'
-import React, { useEffect, useMemo, useState, useRef } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
 import * as FileSystem from 'expo-file-system'
 import { utangData } from '../constants/utangList';
-import { router } from 'expo-router';
 import AddItems from '@/components/AddItems';
 import { MODE } from '../constants/mode';
+import UtangOverView from '@/components/UtangOverView';
 
 const explore = () => {
   const [mode, setMode] = useState(MODE.IDLE)
-
   const [isRecording, setIsRecording] = useState(false);
+  const [parsedData, setParsedData] = useState(null);
+  const [utang, setUtang] = useState(utangData.sort((a, b) => b.id - a.id));
+  const [transcribedText, setTranscribedText] = useState('');
 
   const [currentPersonData, setcurrentPersonData] = useState(null);
   const [id, setId] = useState(null);
-  const [parsedData, setParsedData] = useState(null);
-
-  const [utang, setUtang] = useState(utangData.sort((a, b) => b.id - a.id));
 
   const [search, onChangeSearch] = useState('');
   const [name, onChangeName] = useState('');
-  const [transcribedText, setTranscribedText] = useState('');
 
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
@@ -44,73 +42,11 @@ const explore = () => {
     getPermission();
   }, []);
 
-  const Utang = ({ person }) => {
-    const totalBalance = person.items.reduce((sum, item) => sum + item.price, 0);
-
-    return (
-
-      <View style={{ margin: 8, borderRadius: 10, height: 80, flexDirection: "row", justifyContent: "flex-end", boxShadow: "0px 0px 10px 10px rgba(2, 1, 1, 0.1)", alignItems: "center" }}>
-
-
-        <View style={{ flex: 1, justifyContent: 'center', width: '100%', alignItems: 'center', height: '100%' }}>
-          <TouchableOpacity
-            onPress={() => router.navigate({ pathname: '/items', params: { data: JSON.stringify(person), total: totalBalance } })}>
-            <Text
-              style={{ fontSize: 15, fontWeight: "bold" }}>
-              {person.name}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ width: 100, alignItems: "center", marginRight: 20 }} >
-          <Text style={{ fontSize: 15, fontWeight: "300" }}>Balance:</Text>
-          <Text style={{ fontSize: 25, fontWeight: "bold", color: "green" }} >{totalBalance}</Text>
-        </View>
-
-        <TouchableOpacity
-          style={{ width: 50, marginRight: 10 }}
-          onPress={() => {
-            setMode(MODE.EDIT_NAME)
-            onChangeName(person.name)
-            setId(person.id)
-          }}
-        >
-          <MaterialIcons name="edit-document" size={40} color="#5959B2" />
-
-        </TouchableOpacity>
-
-        <Pressable
-          style={{ width: 50 }}
-          onPress={() => { deleteName(person.id) }}
-        >
-          <MaterialIcons name="delete" size={40} color="#5959B2" />
-
-        </Pressable>
-
-
-        <TouchableOpacity
-          style={{ height: 40, width: 40, backgroundColor: "#5959B2", borderRadius: '50%', marginRight: 10 }}
-          onPress={() => {
-            setcurrentPersonData(person);
-            setMode(MODE.ADD_ITEM)
-          }}
-        >
-          <MaterialIcons name='add' size={40} color="#E8E8E8" />
-          
-        </TouchableOpacity>
-
-      </View>
-
-    );
-  };
-
-  // CRUD Testing
   const createName = () => {
     if (name.trim()) {
       const newId = utang.length > 0 ? utang[0].id + 1 : 1;
       setUtang([{ id: newId, name: name, items: [] }, ...utang])
       onChangeName('')
-      console.log(newId)
     }
   };
 
@@ -325,7 +261,15 @@ const explore = () => {
 
       <FlatList
         data={filterName}
-        renderItem={({ item }) => <Utang person={item} />}
+        renderItem={({ item }) =>
+          <UtangOverView
+            person={item}
+            setMode={setMode}
+            setId={setId}
+            onChangeName={onChangeName}
+            deleteName={deleteName}
+            setcurrentPersonData={setcurrentPersonData}
+          />}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
       />
@@ -338,45 +282,45 @@ const explore = () => {
       )}
 
       {mode === MODE.ADD_ITEM && currentPersonData &&
-          < AddItems
-            personData={currentPersonData}
-            utang={utang}
-            setUtang={setUtang}
-            setMode={setMode}
-          />
+        < AddItems
+          personData={currentPersonData}
+          utang={utang}
+          setUtang={setUtang}
+          setMode={setMode}
+        />
       }
 
       {(mode === MODE.ADD_NAME || mode === MODE.EDIT_NAME) && (
         <View style={styles.processingOverlay}>
-
-          <TextInput
-            style={{ height: 'auto', borderWidth: 1, borderColor: 'black', width: "70%", borderRadius: 5 }}
+          <TextInput style={{ height: 'auto', borderWidth: 1, borderColor: 'black', width: "70%", borderRadius: 5 }}
             onChangeText={onChangeName}
             placeholder='Type the name here....'
             value={name}
             autoFocus={true}
           />
 
-          <TouchableOpacity
-            style={styles.recordButton}
+          <TouchableOpacity style={styles.recordButton}
             onPress={() => {
 
-              if (mode === MODE.ADD_NAME) {
-                setMode(MODE.IDLE)
-                createName()
-              }
-
-              if (mode === MODE.EDIT_NAME) {
-                setMode(MODE.IDLE)
-                updateName(id)
-                onChangeName('')
-                setId(null)
+              switch (mode) {
+                case MODE.ADD_NAME:
+                  setMode(MODE.IDLE)
+                  createName()
+                  break;
+                case MODE.EDIT_NAME:
+                  setMode(MODE.IDLE)
+                  updateName(id)
+                  onChangeName('')
+                  setId(null)
+                  break;
+                default:
+                  console.log("Unexpected Mode" + mode)
               }
 
             }}
           >
 
-          <MaterialIcons name='add' size={40} color="white" />
+            <MaterialIcons name='add' size={40} color="white" />
 
           </TouchableOpacity>
 
