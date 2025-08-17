@@ -50,24 +50,28 @@ const explore = () => {
     }
   };
 
-  const searchName = () => {
-    setUtang(utang.filter(item =>
-      search.toLowerCase() === ''
-        ? item.name
-        : item.name.toLowerCase().includes(search)))
-
-  };
-
   const updateName = (id) => {
-    setUtang(utang.map(utang => utang.id === id ? { ...utang, name: name } : utang))
+    setUtang(utang.map(item => item.id === id ? { ...item, name: name } : item))
     console.log(id.toString() + " Has been Updated.")
   };
 
   const deleteName = (id) => {
-    setUtang(utang.filter(utang => utang.id !== id))
+    setUtang(utang.filter(item => item.id !== id))
     console.log(id.toString() + " Has been deleted!")
   };
 
+  
+  const startRecording = async () => {
+    try {
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Failed to start recording:', err);
+      Alert.alert('Error', 'Failed to start recording');
+    }
+  };
+  
   const handleApiError = (error) => {
     if (error.response?.status === 429) {
       Alert.alert(
@@ -89,17 +93,6 @@ const explore = () => {
         'Error',
         'An unexpected error occurred. Please try again later.'
       );
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      await audioRecorder.prepareToRecordAsync();
-      audioRecorder.record();
-      setIsRecording(true);
-    } catch (err) {
-      console.error('Failed to start recording:', err);
-      Alert.alert('Error', 'Failed to start recording');
     }
   };
 
@@ -236,11 +229,31 @@ const explore = () => {
     }
   };
 
+  const handleAddPress = () => {
+
+    switch (mode) {
+      case MODE.ADD_NAME:
+        setMode(MODE.IDLE)
+        createName()
+        break;
+      case MODE.EDIT_NAME:
+        setMode(MODE.IDLE)
+        updateName(id)
+        onChangeName('')
+        setId(null)
+        break;
+      default:
+        console.log("Unexpected Mode" + mode)
+    }
+
+  }
+
   return (
     <View style={styles.container}>
 
       <View style={styles.headerContainer}>
-        <Text style={{ fontSize: 40, marginLeft: 15, fontWeight: "bold", color: "white" }}>Lista</Text>
+
+        <Text style={styles.titleTxt}>Lista</Text>
 
         <View style={{ flexDirection: "row", margin: 10 }}>
           <TextInput
@@ -249,14 +262,8 @@ const explore = () => {
             placeholder='Search Here...'
             value={search}
           />
-          <TouchableOpacity
-            onPress={() => searchName()}
-            style={{ borderWidth: 1, borderTopRightRadius: 5, borderBottomRightRadius: 5, justifyContent: "center" }}
-          >
-            <MaterialIcons style={{}} name="search" size={30} color="#E8E8E8" />
-          </TouchableOpacity>
-
         </View>
+        
       </View>
 
       <FlatList
@@ -299,29 +306,8 @@ const explore = () => {
             autoFocus={true}
           />
 
-          <TouchableOpacity style={styles.recordButton}
-            onPress={() => {
-
-              switch (mode) {
-                case MODE.ADD_NAME:
-                  setMode(MODE.IDLE)
-                  createName()
-                  break;
-                case MODE.EDIT_NAME:
-                  setMode(MODE.IDLE)
-                  updateName(id)
-                  onChangeName('')
-                  setId(null)
-                  break;
-                default:
-                  console.log("Unexpected Mode" + mode)
-              }
-
-            }}
-          >
-
+          <TouchableOpacity style={styles.recordButton} onPress={handleAddPress} >
             <MaterialIcons name='add' size={40} color="white" />
-
           </TouchableOpacity>
 
         </View>
@@ -333,10 +319,8 @@ const explore = () => {
           onPress={handleRecordPress}
           disabled={mode === MODE.PROCESSING}
         >
-          <MaterialIcons name={isRecording ? "stop" : "mic"} size={40} color="#E8E8E8"
-          />
+          <MaterialIcons name={isRecording ? "stop" : "mic"} size={40} color="#E8E8E8" />
         </TouchableOpacity>
-
 
         <TouchableOpacity
           style={styles.recordButton}
@@ -436,8 +420,13 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
     padding: 10,
     backgroundColor: "white",
-    borderTopLeftRadius: 5,
-    borderBottomLeftRadius: 5,
+    borderRadius: 5,
+  },
+  titleTxt: {
+    fontSize: 40,
+    marginLeft: 15,
+    fontWeight: "bold",
+    color: "white"
   }
 
 })
