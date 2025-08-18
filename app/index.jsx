@@ -9,6 +9,7 @@ import { utangData } from '../constants/utangList';
 import AddItems from '@/components/AddItems';
 import { MODE } from '../constants/mode';
 import UtangOverView from '@/components/UtangOverView';
+import { router } from 'expo-router';
 
 const explore = () => {
   const [mode, setMode] = useState(MODE.IDLE)
@@ -329,6 +330,12 @@ const explore = () => {
           <MaterialIcons name='add' size={40} color="#E8E8E8" />
 
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={ () => { router.navigate({pathname: '/transcribe' }) } } >
+          <MaterialIcons name='chevron-left' size={40} color="e8e8e8" />
+        </TouchableOpacity>
+
+        
 
       </View>
 
