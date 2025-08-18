@@ -12,6 +12,7 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
   const [items, setItems] = useState([]);
 
   const productInputRef = useRef(null);
+  const priceInputRef = useRef(null);
 
   const [editingItemId, setEditingId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -30,6 +31,8 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
     setItems([{ "id": generateNewId, product: productName, price: Number(price) }, ...items])
     setProductName('')
     setPrice('')
+
+    productInputRef.current?.focus()
   }
 
   const saveEditedItem = (id) => {
@@ -105,14 +108,17 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
               onChangeText={setProductName}
               autoFocus={true}
               editable={ableToEdit}
+              onSubmitEditing={() => priceInputRef.current?.focus()}
             />
 
             <TextInput style={styles.textInputPrice}
+            ref={priceInputRef}
               placeholder='Price'
               keyboardType='numeric'
               value={price}
               onChangeText={setPrice}
               editable={ableToEdit}
+              onSubmitEditing={() => newItem()}
             />
 
             <TouchableOpacity
@@ -130,8 +136,8 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
                 isEditing
                   ? saveEditedItem(editingItemId)
                   : newItem()
-                // Return the focus to Product Textinput
-                productInputRef.current?.focus()
+                
+                
               }
 
               } >
