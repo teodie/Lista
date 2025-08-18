@@ -307,7 +307,7 @@ const explore = () => {
             autoFocus={true}
           />
 
-          <TouchableOpacity style={styles.recordButton} onPress={handleAddPress} >
+          <TouchableOpacity style={styles.iconStyle} onPress={handleAddPress} >
             <MaterialIcons name='add' size={40} color="white" />
           </TouchableOpacity>
 
@@ -315,27 +315,22 @@ const explore = () => {
       )}
 
       <View style={{ flexDirection: "row", justifyContent: "center" }}>
+        
         <TouchableOpacity
-          style={[styles.recordButton, mode === MODE.PROCESSING && styles.disabledButton]}
+          style={[styles.iconStyle, mode === MODE.PROCESSING && styles.disabledButton]}
           onPress={handleRecordPress}
           disabled={mode === MODE.PROCESSING}
         >
           <MaterialIcons name={isRecording ? "stop" : "mic"} size={40} color="#E8E8E8" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.recordButton}
-          onPress={() => { setMode(MODE.ADD_NAME) }}
-        >
+        <TouchableOpacity style={styles.iconStyle} onPress={() => { setMode(MODE.ADD_NAME) }} >
           <MaterialIcons name='add' size={40} color="#E8E8E8" />
-
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={ () => { router.navigate({pathname: '/transcribe' }) } } >
-          <MaterialIcons name='chevron-left' size={40} color="e8e8e8" />
+        <TouchableOpacity style={styles.iconStyle} onPress={ () => { router.navigate({pathname: '/transcribe' }) } } >
+          <MaterialIcons name='chevron-left' size={40} color="#e8e8e8" />
         </TouchableOpacity>
-
-        
 
       </View>
 
@@ -366,7 +361,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'left',
   },
-  recordButton: {
+  iconStyle: {
     backgroundColor: '#5959B2',
     width: 60,
     height: 60,
