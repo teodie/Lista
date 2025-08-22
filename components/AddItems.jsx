@@ -1,4 +1,4 @@
-import { AddItemContext } from '@/context'
+
 import { MaterialIcons } from '@expo/vector-icons'
 import React, { useState, useRef } from 'react'
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView, Pressable } from 'react-native'
@@ -6,6 +6,7 @@ import NewItemsView from './NewItemsView';
 import uuid from 'react-native-uuid';
 import NoItems from './NoItems';
 import { MODE } from '../constants/mode';
+import {converToObj} from '../app/transcribe'
 
 const AddItems = ({ personData, setUtang, utang, setMode }) => {
 
@@ -23,6 +24,8 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
   const [icon, setIcon] = useState('add-box')
   const [ableToEdit, setAbleToEdit] = useState(true)
 
+  const [transcribeTxt, setTranscribeTxt] = useState('')
+
 
   const newItem = () => {
     const generateNewId = uuid.v4()
@@ -33,6 +36,13 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
     setPrice('')
 
     productInputRef.current?.focus()
+  }
+
+  const transcribeItems = (text) => {
+    const newItems = converToObj(text)
+
+    setItems([...newItems, ...items])
+
   }
 
   const saveEditedItem = (id) => {
@@ -99,6 +109,24 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
 
             <Text style={styles.headerTxt} >{new Date().toLocaleDateString()}</Text>
           </View>
+
+          <View style={{ marginTop: 10, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', position: 'relative' }} >
+            <TextInput
+              style={styles.transcribeInput}
+              onChangeText={setTranscribeTxt}
+              value={transcribeTxt}
+              multiline={true}
+              placeholder='Voice Typing here...'
+            />
+            <TouchableOpacity
+              style={{ position: 'absolute' }}
+              onPress={() => transcribeItems(transcribeTxt)}
+            >
+              <MaterialIcons name='add-circle' size={40} color='#5959B2' />
+            </TouchableOpacity>
+          </View>
+
+
           <View style={styles.textInputContainer}>
 
             <TextInput style={styles.textInputProduct}
@@ -112,7 +140,7 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
             />
 
             <TextInput style={styles.textInputPrice}
-            ref={priceInputRef}
+              ref={priceInputRef}
               placeholder='Price'
               keyboardType='numeric'
               value={price}
@@ -123,7 +151,7 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
 
             <TouchableOpacity
 
-              onLongPress={() => { setIcon('mic'); setAbleToEdit(false) } }
+              onLongPress={() => { setIcon('mic'); setAbleToEdit(false) }}
 
               onPress={() => {
 
@@ -136,8 +164,8 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
                 isEditing
                   ? saveEditedItem(editingItemId)
                   : newItem()
-                
-                
+
+
               }
 
               } >
@@ -254,6 +282,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: 600,
+  },
+  transcribeInput: {
+    borderWidth: 1,
+    width: 300,
+    borderRadius: 20,
   }
 
 })
