@@ -3,10 +3,9 @@ import { useLocalSearchParams } from 'expo-router';
 
 
 const items = () => {
-  const { data, total } = useLocalSearchParams();
+const { data, total } = useLocalSearchParams(); 
   const person = JSON.parse(data)
   const items = person.items
-
 
   return (
     <View style={styles.container}>

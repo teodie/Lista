@@ -1,70 +1,31 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView, Pressable } from 'react-native'
 import NewItemsView from './NewItemsView';
-import uuid from 'react-native-uuid';
 import NoItems from './NoItems';
 import { MODE } from '../constants/mode';
-import {converToObj} from '../app/transcribe'
+import VoiceTyping from './VoiceTyping';
+import ManualInput from './ManualInput';
+import Toggle, { SwitchVoiceTyping } from './Toggle';
+
 
 const AddItems = ({ personData, setUtang, utang, setMode }) => {
 
   const [items, setItems] = useState([]);
-
-  const productInputRef = useRef(null);
-  const priceInputRef = useRef(null);
-
-  const [editingItemId, setEditingId] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [enableVoiceType, setEnableVoiceType] = useState(true);
   // text input Variables
   const [productName, setProductName] = useState('');
   const [price, setPrice] = useState('');
 
-  const [icon, setIcon] = useState('add-box')
-  const [ableToEdit, setAbleToEdit] = useState(true)
-
-  const [transcribeTxt, setTranscribeTxt] = useState('')
-
-
-  const newItem = () => {
-    const generateNewId = uuid.v4()
-    if (!productName || !price) return Alert.alert('Product name or Price is empty');
-
-    setItems([{ "id": generateNewId, product: productName, price: Number(price) }, ...items])
-    setProductName('')
-    setPrice('')
-
-    productInputRef.current?.focus()
-  }
-
-  const transcribeItems = (text) => {
-    const newItems = converToObj(text)
-
-    setItems([...newItems, ...items])
-
-  }
-
-  const saveEditedItem = (id) => {
-
-    setItems([{ id: id, product: productName, price: Number(price) }, ...items])
-    setProductName('')
-    setPrice('')
-
-    setIsEditing(false)
-    setEditingId(null)
-
-  }
 
   const editItem = (id) => {
-    setIsEditing(true)
-    setEditingId(id)
-
+    setEnableVoiceType(false)
+    console.log(id)
     const item = items.find((item) => item.id === id)
-
-    deleteItem(id)
     setProductName(item.product)
     setPrice(String(item.price))
+    deleteItem(id)
   }
 
   const deleteItem = (id) => {
@@ -72,6 +33,7 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
   }
 
   const saveItems = (personId) => {
+
     setUtang(utang.map((item) =>
       item.id == personId
         ? { ...item, items: [...(item.items || []), ...items] }
@@ -81,11 +43,16 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
       ? Alert.alert("Emty Items!")
       : setMode(MODE.IDLE)
 
-    setProductName('')
-    setPrice('')
     setItems([])
 
   }
+
+  const handleExitPress = () => {
+    setItems([]);
+    setMode(MODE.IDLE)
+  }
+
+
 
   return (
     <View style={styles.processingOverlay}>
@@ -95,85 +62,24 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
 
           <View style={styles.header} >
 
-            <TouchableOpacity style={styles.exitBtn}
-              onPress={() => {
-                setItems([]);
-                setMode(MODE.IDLE)
-                setIcon('add-box')
-              }}
-            >
+            <TouchableOpacity style={styles.exitBtn} onPress={handleExitPress} >
               < MaterialIcons name="exit-to-app" size={30} color="white" />
             </TouchableOpacity>
 
             <Text style={styles.headerTxt}>{personData.name}</Text>
 
-            <Text style={styles.headerTxt} >{new Date().toLocaleDateString()}</Text>
-          </View>
-
-          <View style={{ marginTop: 10, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', position: 'relative' }} >
-            <TextInput
-              style={styles.transcribeInput}
-              onChangeText={setTranscribeTxt}
-              value={transcribeTxt}
-              multiline={true}
-              placeholder='Voice Typing here...'
-            />
-            <TouchableOpacity
-              style={{ position: 'absolute' }}
-              onPress={() => transcribeItems(transcribeTxt)}
-            >
-              <MaterialIcons name='add-circle' size={40} color='#5959B2' />
-            </TouchableOpacity>
-          </View>
-
-
-          <View style={styles.textInputContainer}>
-
-            <TextInput style={styles.textInputProduct}
-              ref={productInputRef}
-              placeholder='Product Name'
-              value={productName}
-              onChangeText={setProductName}
-              autoFocus={true}
-              editable={ableToEdit}
-              onSubmitEditing={() => priceInputRef.current?.focus()}
-            />
-
-            <TextInput style={styles.textInputPrice}
-              ref={priceInputRef}
-              placeholder='Price'
-              keyboardType='numeric'
-              value={price}
-              onChangeText={setPrice}
-              editable={ableToEdit}
-              onSubmitEditing={() => newItem()}
-            />
-
-            <TouchableOpacity
-
-              onLongPress={() => { setIcon('mic'); setAbleToEdit(false) }}
-
-              onPress={() => {
-
-                if (icon === 'mic') {
-                  setIcon('add-box')
-                  setAbleToEdit(true)
-                  return
-                }
-
-                isEditing
-                  ? saveEditedItem(editingItemId)
-                  : newItem()
-
-
-              }
-
-              } >
-
-              <MaterialIcons name={icon} size={50} color='#5959B2' />
-            </TouchableOpacity>
+            <Toggle enableVoiceType={enableVoiceType} setEnableVoiceType={setEnableVoiceType} />
 
           </View>
+
+          {enableVoiceType
+            ? <VoiceTyping setItems={setItems} items={items} />
+            : <ManualInput
+              productName={productName} setProductName={setProductName}
+              price={price} setPrice={setPrice}
+              setItems={setItems} items={items}
+            />
+          }
 
           {items.length === 0
             ? <NoItems />
@@ -183,24 +89,17 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
               keyExtractor={item => item.id}
             />
           }
-
+          <Text>{new Date().toLocaleDateString()}</Text>
         </View>
 
 
         <View style={styles.saveBtn} >
-          <TouchableOpacity
-            onPress={() => saveItems(personData.id)}
-          >
-            <Text style={styles.saveTxt} >
-              Save
-            </Text>
+          <TouchableOpacity onPress={() => saveItems(personData.id)} >
+            <Text style={styles.saveTxt} > Save </Text>
           </TouchableOpacity>
         </View>
 
-
-
       </KeyboardAvoidingView>
-
 
     </View>
   )
@@ -216,7 +115,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    // backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
@@ -230,25 +128,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'white',
   },
-  textInputProduct: {
-    borderWidth: 1,
-    flex: 2,
-    borderRadius: 10,
-  },
-  textInputPrice: {
-    borderWidth: 1,
-    flex: 1,
-    borderRadius: 10,
-    borderColor: 'black'
-  },
-  textInputContainer: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 10,
-    alignItems: 'center',
-    padding: 10,
-    // borderWidth: 1,
-  },
+
+
   exitBtn: {
     transform: [{ rotate: '180deg' }],
   },
@@ -283,10 +164,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 600,
   },
-  transcribeInput: {
-    borderWidth: 1,
-    width: 300,
-    borderRadius: 20,
-  }
+
 
 })

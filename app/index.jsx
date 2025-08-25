@@ -328,10 +328,6 @@ const explore = () => {
           <MaterialIcons name='add' size={40} color="#E8E8E8" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.iconStyle} onPress={ () => { router.navigate({pathname: '/transcribe' }) } } >
-          <MaterialIcons name='chevron-left' size={40} color="#e8e8e8" />
-        </TouchableOpacity>
-
       </View>
 
 
