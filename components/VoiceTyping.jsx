@@ -8,11 +8,21 @@ const converToObj = (txt) => {
   const txtArr = txt.split(' ')
 
   const item = []
+  let words = []
 
-  for (let i = 0; i < txtArr.length; i += 2) {
-    if (txtArr[i] && txtArr[i + 1]) {
-      item.push({ id: uuid.v4(), product: txtArr[i], price: Number(txtArr[i + 1]) })
+  for (let i = 0; i < txtArr.length; i += 1) {
+
+    const currentItem = txtArr[i]
+
+    if (Number.isNaN(Number(currentItem))) {
+      words.push(currentItem)
+    } else {
+      item.push({ id: uuid.v4(), product: words.toString().replaceAll(",", " "), price: Number(currentItem) })
+      words = []
     }
+
+
+
   }
 
   return item
@@ -53,10 +63,10 @@ const VoiceTyping = ({ setItems, items }) => {
       />
 
       <Pressable
-      opacity={transcribeTxt.length === 0 ? 0.7 : 1}
-      disabled={transcribeTxt.length === 0 ? true : false}
-      onPress={() => {voiceTypingRef.current?.blur(); transcribeItems(transcribeTxt) } } >
-        <MaterialIcons name='add-circle' size={40} color= '#5959B2' />
+        opacity={transcribeTxt.length === 0 ? 0.7 : 1}
+        disabled={transcribeTxt.length === 0 ? true : false}
+        onPress={() => { voiceTypingRef.current?.blur(); transcribeItems(transcribeTxt) }} >
+        <MaterialIcons name='add-circle' size={40} color='#5959B2' />
       </Pressable>
     </Animated.View>
   )
