@@ -21,7 +21,6 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
 
   const editItem = (id) => {
     setEnableVoiceType(false)
-    console.log(id)
     const item = items.find((item) => item.id === id)
     setProductName(item.product)
     setPrice(String(item.price))

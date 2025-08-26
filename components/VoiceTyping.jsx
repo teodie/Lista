@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
   voiceTypingContainer: {
     flexDirection: 'row',
     marginTop: 10,
+    marginBottom: 10,
     paddingLeft: 10,
     paddingRight: 10,
   },

@@ -9,13 +9,14 @@ import { utangData } from '../constants/utangList';
 import AddItems from '@/components/AddItems';
 import { MODE } from '../constants/mode';
 import UtangOverView from '@/components/UtangOverView';
-import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const explore = () => {
   const [mode, setMode] = useState(MODE.IDLE)
   const [isRecording, setIsRecording] = useState(false);
   const [parsedData, setParsedData] = useState(null);
-  const [utang, setUtang] = useState(utangData.sort((a, b) => b.id - a.id));
+  const [utang, setUtang] = useState([]);
   const [transcribedText, setTranscribedText] = useState('');
 
   const [currentPersonData, setcurrentPersonData] = useState(null);
@@ -29,6 +30,22 @@ const explore = () => {
   const filterName = useMemo(() => utang.filter(items => search.toLowerCase() === '' ? items.name : items.name.toLowerCase().includes(search.toLowerCase())), [utang, search])
 
   useEffect(() => {
+    const getData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('Listahan');
+        const storageUtang = jsonValue != null ? JSON.parse(jsonValue) : null;
+        if (storageUtang && storageUtang.length) {
+          setUtang(storageUtang.sort((a, b) => b.id - a.id))
+        } else {
+          setUtang(utangData.sort((a, b) => b.id - a.id))
+        }
+
+      } catch (e) {
+        console.error('Error retrieving the data erro: ', e)
+      }
+    };
+
+
     const getPermission = async () => {
       try {
         const status = await AudioModule.requestRecordingPermissionsAsync();
@@ -40,8 +57,25 @@ const explore = () => {
       }
     };
 
+    getData()
     getPermission();
   }, []);
+
+
+  useEffect(() => {
+    const storeData = async (value) => {
+      try {
+        const jsonValue = JSON.stringify(value);
+        await AsyncStorage.setItem('Listahan', jsonValue);
+      } catch (e) {
+        console.log('Error saving the data with error: ', e)
+      }
+    };
+
+    storeData(utang)
+  }, [utang])
+
+
 
   const createName = () => {
     if (name.trim()) {
@@ -57,11 +91,27 @@ const explore = () => {
   };
 
   const deleteName = (id) => {
-    setUtang(utang.filter(item => item.id !== id))
-    console.log(id.toString() + " Has been deleted!")
+    Alert.alert(
+      'Deleting Client Data',
+      'Client Data will be permanently deleted\nStill want to delete this client data?',
+      [{ text: 'Cancel', style: 'cancel' }, {
+        text: "Delete", onPress: () => {
+          Alert.alert('Sure na Sure?', '', [
+            { text: 'Hinde', style: 'cancel' },
+            {
+              text: 'Oo',
+              onPress: () => {
+                setUtang(utang.filter(item => item.id !== id))
+              }, style: 'destructive'
+            }])
+        }, style: 'default'
+      }],
+      {cancelable: true},
+    )
+
   };
 
-  
+
   const startRecording = async () => {
     try {
       await audioRecorder.prepareToRecordAsync();
@@ -72,7 +122,7 @@ const explore = () => {
       Alert.alert('Error', 'Failed to start recording');
     }
   };
-  
+
   const handleApiError = (error) => {
     if (error.response?.status === 429) {
       Alert.alert(
@@ -264,7 +314,7 @@ const explore = () => {
             value={search}
           />
         </View>
-        
+
       </View>
 
       <FlatList
@@ -315,7 +365,7 @@ const explore = () => {
       )}
 
       <View style={{ flexDirection: "row", justifyContent: "center" }}>
-        
+
         <TouchableOpacity
           style={[styles.iconStyle, mode === MODE.PROCESSING && styles.disabledButton]}
           onPress={handleRecordPress}
