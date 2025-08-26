@@ -1,7 +1,7 @@
 import {
   View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, TextInput, Image, FlatList, Pressable, Platform
 } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
 import * as FileSystem from 'expo-file-system'
@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const explore = () => {
+  const searchInputref = useRef(null)
   const [mode, setMode] = useState(MODE.IDLE)
   const [isRecording, setIsRecording] = useState(false);
   const [parsedData, setParsedData] = useState(null);
@@ -105,7 +106,7 @@ const explore = () => {
             }])
         }, style: 'default'
       }],
-      {cancelable: true},
+      { cancelable: true },
     )
 
   };
@@ -280,7 +281,7 @@ const explore = () => {
   };
 
   const handleAddPress = () => {
-
+  
     switch (mode) {
       case MODE.ADD_NAME:
         setMode(MODE.IDLE)
@@ -296,6 +297,7 @@ const explore = () => {
         console.log("Unexpected Mode" + mode)
     }
 
+
   }
 
   return (
@@ -307,10 +309,12 @@ const explore = () => {
 
         <View style={{ flexDirection: "row", margin: 10 }}>
           <TextInput
+            ref={searchInputref}
             style={styles.searchInput}
             onChangeText={onChangeSearch}
             placeholder='Search Here...'
             value={search}
+            autoFocus={false}
           />
         </View>
 

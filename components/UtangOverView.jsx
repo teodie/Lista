@@ -1,10 +1,13 @@
 import { StyleSheet, Text, View, TouchableOpacity, Pressable } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { MODE } from '@/constants/mode';
+import Animated, { withTiming, FadeIn, FadeInRight, LinearTransition, FadeOut } from 'react-native-reanimated';
+
 
 const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcurrentPersonData }) => {
+    const [longPressed, setLongPressed] = useState(false)
 
     const totalBalance = person.items.reduce((sum, item) => sum + item.price, 0);
 
@@ -22,6 +25,7 @@ const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcu
         setMode(MODE.EDIT_NAME)
         onChangeName(person.name)
         setId(person.id)
+        setLongPressed(false)
     };
 
     const handleAddItems = () => {
@@ -30,32 +34,41 @@ const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcu
     };
 
     return (
-        <View style={styles.container}>
+        <Animated.View style={styles.container} layout={LinearTransition.springify()}>
 
-            <View style={styles.headerTxtContainer}>
+            <Animated.View style={styles.headerTxtContainer} layout={LinearTransition.springify()} >
                 <TouchableOpacity onPress={handleNamePress}>
                     <Text style={styles.headerTxt}> {person.name} </Text>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
 
-            <View style={styles.balanceContainer} >
+            <Animated.View style={styles.balanceContainer} layout={LinearTransition.springify()} >
                 <Text style={styles.balanceTxt} > Balance: </Text>
                 <Text style={styles.totalBalanceTxt} >{totalBalance}</Text>
-            </View>
+            </Animated.View>
 
-            <TouchableOpacity style={styles.editIcon} onPress={handleEditPress} >
-                <MaterialIcons name="edit-document" size={40} color="#5959B2" />
-            </TouchableOpacity>
+                {longPressed &&
+                    (
+                        <View style={styles.hiddenIconContainer} layout={LinearTransition.springify()} exiting={FadeOut} entering={FadeIn} >
+                            <TouchableOpacity style={styles.editIcon} onPress={handleEditPress} >
+                                <MaterialIcons name="edit-document" size={40} color="#5959B2" />
+                            </TouchableOpacity>
 
-            <Pressable style={{ width: 50 }} onPress={() => { deleteName(person.id) }} >
-                <MaterialIcons name="delete" size={40} color="#5959B2" />
-            </Pressable>
+                            <Pressable style={{ width: 50 }} onPress={() => { deleteName(person.id) }} >
+                                <MaterialIcons name="delete" size={40} color="#5959B2" />
+                            </Pressable>
+                        </View>
+                    )
+                }
 
-            <TouchableOpacity style={styles.addIcon} onPress={handleAddItems} >
-                <MaterialIcons name='add' size={40} color="#E8E8E8" />
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.addIcon} onPress={() => handleAddItems()} onLongPress={() => setLongPressed(prev => !prev)} >
+                    <MaterialIcons name='add' size={40} color="#E8E8E8" />
+                </TouchableOpacity>
 
-        </View>
+
+
+
+        </Animated.View>
     )
 }
 
@@ -64,28 +77,31 @@ export default UtangOverView
 const styles = StyleSheet.create({
     container: {
         margin: 8,
-        borderRadius: 10,
-        height: 80,
+        padding: 10,
+        paddingLeft: 30,
+        borderRadius: 20,
+        height: 70,
         flexDirection: "row",
-        justifyContent: "flex-end",
+        justifyContent: 'flex-end',
         boxShadow: "0px 0px 10px 10px rgba(2, 1, 1, 0.1)",
         alignItems: "center"
     },
     headerTxtContainer: {
-        flex: 1,
+        flex: 2,
         justifyContent: 'center',
-        width: '100%',
         alignItems: 'center',
-        height: '100%'
+        height: '100%',
+
     },
     headerTxt: {
         fontSize: 15,
-        fontWeight: "bold"
+        fontWeight: "bold",
+
     },
     balanceContainer: {
+        flex: 2,
         width: 100,
         alignItems: "center",
-        marginRight: 20
     },
     balanceTxt: {
         fontSize: 15,
@@ -98,14 +114,15 @@ const styles = StyleSheet.create({
     },
     editIcon: {
         width: 50,
-        marginRight: 10
     },
     addIcon: {
         height: 40,
         width: 40,
         backgroundColor: "#5959B2",
         borderRadius: '50%',
-        marginRight: 10
+    },
+    hiddenIconContainer: {
+        flexDirection: 'row'
     },
 
 
