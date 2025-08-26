@@ -76,11 +76,10 @@ const explore = () => {
   }, [utang])
 
 
-
   const createName = () => {
     if (name.trim()) {
       const newId = utang.length > 0 ? utang[0].id + 1 : 1;
-      setUtang([{ id: newId, name: name, items: [] }, ...utang])
+      setUtang([{ id: newId, name: name.toUpperCase(), items: [] }, ...utang])
       onChangeName('')
     }
   };
