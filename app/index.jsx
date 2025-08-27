@@ -283,8 +283,8 @@ const explore = () => {
   };
 
   const handleAddPress = () => {
-    const nameAlreadyExist = utang.find( (item) => item.name === name.toUpperCase())
-    if(nameAlreadyExist){ return Alert.alert('Name already exist!') } 
+    const nameAlreadyExist = utang.find((item) => item.name === name.toUpperCase())
+    if (nameAlreadyExist) { return Alert.alert('Name already exist!') }
 
     switch (mode) {
       case MODE.ADD_NAME:
@@ -320,6 +320,10 @@ const explore = () => {
             autoFocus={false}
           />
         </View>
+
+        <TouchableOpacity style={styles.clearSearch} onPress={() => onChangeSearch('') }>
+          <MaterialIcons name='clear' size={30} color='gray' />
+        </TouchableOpacity>
 
       </View>
 
@@ -480,7 +484,8 @@ const styles = StyleSheet.create({
     fontSize: 40,
     marginLeft: 15,
     fontWeight: "bold",
-    color: "white"
+    color: "white",
+    position: 'relative',
   },
   modalView: {
     alignItems: 'stretch',
@@ -505,10 +510,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   addInput: {
-     borderWidth: 1, 
-     borderColor: 'black', 
-     width: '90%', 
-     borderRadius: 5 
-    }
+    borderWidth: 1,
+    borderColor: 'black',
+    width: '90%',
+    borderRadius: 5
+  },
+  clearSearch: {
+    position: 'absolute',
+    right: 10,
+    bottom: 15,
+  }
 
 })
