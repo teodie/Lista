@@ -1,5 +1,6 @@
 import {
-  View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, TextInput, Image, FlatList, Pressable, Platform
+  View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, TextInput, FlatList, Modal,
+  ScrollView
 } from 'react-native'
 import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
@@ -27,6 +28,7 @@ const explore = () => {
   const [name, onChangeName] = useState('');
 
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+
 
   const filterName = useMemo(() => utang.filter(items => search.toLowerCase() === '' ? items.name : items.name.toLowerCase().includes(search.toLowerCase())), [utang, search])
 
@@ -281,7 +283,9 @@ const explore = () => {
   };
 
   const handleAddPress = () => {
-  
+    const nameAlreadyExist = utang.find( (item) => item.name === name.toUpperCase())
+    if(nameAlreadyExist){ return Alert.alert('Name already exist!') } 
+
     switch (mode) {
       case MODE.ADD_NAME:
         setMode(MODE.IDLE)
@@ -296,7 +300,6 @@ const explore = () => {
       default:
         console.log("Unexpected Mode" + mode)
     }
-
 
   }
 
@@ -335,13 +338,6 @@ const explore = () => {
         showsVerticalScrollIndicator={false}
       />
 
-      {mode === MODE.PROCESSING && (
-        <View style={styles.processingOverlay}>
-          <ActivityIndicator size="large" color="#5959B2" />
-          <Text style={styles.processingText}>Processing your request...</Text>
-        </View>
-      )}
-
       {mode === MODE.ADD_ITEM && currentPersonData &&
         < AddItems
           personData={currentPersonData}
@@ -352,18 +348,36 @@ const explore = () => {
       }
 
       {(mode === MODE.ADD_NAME || mode === MODE.EDIT_NAME) && (
-        <View style={styles.processingOverlay}>
-          <TextInput style={{ height: 'auto', borderWidth: 1, borderColor: 'black', width: "70%", borderRadius: 5 }}
-            onChangeText={onChangeName}
-            placeholder='Type the name here....'
-            value={name}
-            autoFocus={true}
-          />
+        <Modal animationType="slide" transparent={true} visible={mode === MODE.ADD_NAME || mode === MODE.EDIT_NAME} >
 
-          <TouchableOpacity style={styles.iconStyle} onPress={handleAddPress} >
-            <MaterialIcons name='add' size={40} color="white" />
-          </TouchableOpacity>
+          <View style={styles.modalWrapper}>
+            <View style={styles.modalView}>
 
+              <TextInput style={styles.addInput}
+                onChangeText={onChangeName}
+                placeholder='Type the name here....'
+                value={name}
+                autoFocus={true}
+              />
+
+              <TouchableOpacity style={styles.iconStyle} onPress={handleAddPress} >
+                <MaterialIcons name='add' size={40} color="white" />
+              </TouchableOpacity>
+            </View>
+
+          </View>
+
+        </Modal>
+      )}
+
+      {transcribedText && (
+        <View style={styles.resultContainer}>
+          <Text style={styles.transcribedText}>{transcribedText}</Text>
+          {parsedData && (
+            <Text style={styles.parsedData}>
+              {JSON.stringify(parsedData, null, 2)}
+            </Text>
+          )}
         </View>
       )}
 
@@ -383,17 +397,6 @@ const explore = () => {
 
       </View>
 
-
-      {transcribedText ? (
-        <View style={styles.resultContainer}>
-          <Text style={styles.transcribedText}>{transcribedText}</Text>
-          {parsedData && (
-            <Text style={styles.parsedData}>
-              {JSON.stringify(parsedData, null, 2)}
-            </Text>
-          )}
-        </View>
-      ) : null}
     </View>
   )
 }
@@ -478,6 +481,34 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontWeight: "bold",
     color: "white"
-  }
+  },
+  modalView: {
+    alignItems: 'stretch',
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: 'center',
+  },
+  modalWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  },
+  addInput: {
+     borderWidth: 1, 
+     borderColor: 'black', 
+     width: '90%', 
+     borderRadius: 5 
+    }
 
 })

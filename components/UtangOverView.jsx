@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { MODE } from '@/constants/mode';
-import Animated, { withTiming, FadeIn, FadeInRight, LinearTransition, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn, LinearTransition, FadeOut } from 'react-native-reanimated';
 
 
 const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcurrentPersonData }) => {
@@ -54,9 +54,9 @@ const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcu
                                 <MaterialIcons name="edit-document" size={40} color="#5959B2" />
                             </TouchableOpacity>
 
-                            <Pressable style={{ width: 50 }} onPress={() => { deleteName(person.id) }} >
+                            <TouchableOpacity style={{ width: 50 }} onPress={() => { deleteName(person.id) }} >
                                 <MaterialIcons name="delete" size={40} color="#5959B2" />
-                            </Pressable>
+                            </TouchableOpacity>
                         </View>
                     )
                 }
@@ -64,8 +64,6 @@ const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcu
                 <TouchableOpacity style={styles.addIcon} onPress={() => handleAddItems()} onLongPress={() => setLongPressed(prev => !prev)} >
                     <MaterialIcons name='add' size={40} color="#E8E8E8" />
                 </TouchableOpacity>
-
-
 
 
         </Animated.View>
