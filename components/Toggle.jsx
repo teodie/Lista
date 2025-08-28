@@ -16,7 +16,7 @@ const Toggle = ({ enableVoiceType, setEnableVoiceType }) => {
     const startAnimation = useAnimatedStyle(() => {
         return {
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-end',
             backgroundColor: '#5959B2',
             borderWidth: 1,
             borderColor: 'white',

@@ -12,21 +12,20 @@ const ManualInput = ({ setItems, items, productName, setProductName, price, setP
     const [editingItemId, setEditingId] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
 
-
+    const date = new Date().toLocaleDateString()
     const newItem = () => {
         const generateNewId = uuid.v4()
         if (!productName || !price) return Alert.alert('Product name or Price is empty');
 
-        setItems([{ "id": generateNewId, product: productName, price: Number(price) }, ...items])
+        setItems([{ id: generateNewId, product: productName, price: Number(price), date: date }, ...items])
         setProductName('')
         setPrice('')
     }
 
-
-
     const saveEditedItem = (id) => {
+        const foundPersonItem = items.find((element) => element.id === id)
+        setItems([{...foundPersonItem, product: productName, price: price}, ...items])
 
-        setItems([{ id: id, product: productName, price: Number(price) }, ...items])
         setProductName('')
         setPrice('')
 
@@ -53,7 +52,7 @@ const ManualInput = ({ setItems, items, productName, setProductName, price, setP
             })}
             exiting={FadeOut}
         >
-
+            
             <TextInput style={styles.textInputProduct}
                 ref={productInputRef}
                 placeholder='Product Name'

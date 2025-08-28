@@ -1,7 +1,8 @@
 export const utangData = [
   {
     "id": 1,
-    "name": "Maria Sample ",
+    "name": "Maria Sample",
+    "balance": 100,
     "items": [
       {"id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "product": "sardines", "price": 28},
       {"id": "b2c3d4e5-f6g7-8901-bcde-f23456789012", "product": "garlic", "price": 5},
@@ -12,6 +13,7 @@ export const utangData = [
   {
     "id": 2,
     "name": "Juan Sample",
+    "balance": 240,
     "items": [
       {"id": "e5f6g7h8-i9j0-1234-efab-567890123456", "product": "chicken", "price": 180},
       {"id": "f6g7h8i9-j0k1-2345-fabc-678901234567", "product": "tomatoes", "price": 25},
@@ -22,12 +24,12 @@ export const utangData = [
   {
     "id": 3,
     "name": "Ana Sample",
+    "balance": 190,
     "items": [
       {"id": "i9j0k1l2-m3n4-5678-cdef-901234567890", "product": "bread", "price": 35},
       {"id": "j0k1l2m3-n4o5-6789-defa-012345678901", "product": "eggs", "price": 60},
       {"id": "k1l2m3n4-o5p6-7890-efab-123456789012", "product": "milk", "price": 55},
       {"id": "l2m3n4o5-p6q7-8901-fabc-234567890123", "product": "butter", "price": 40}
     ]
-  },
-  
-]
+  }
+];

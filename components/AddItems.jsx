@@ -32,10 +32,14 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
   }
 
   const saveItems = (personId) => {
+    const date = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const dateString = date.toLocaleDateString('en-US', options);
+    const newItems = items.map((item) => { return { ...item, date: dateString } })
 
     setUtang(utang.map((item) =>
       item.id == personId
-        ? { ...item, items: [...(item.items || []), ...items] }
+        ? { ...item, items: [...(item.items || []), ...newItems] }
         : item))
 
     items.length === 0
@@ -50,8 +54,6 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
     setItems([]);
     setMode(MODE.IDLE)
   }
-
-
 
   return (
     <View style={styles.processingOverlay}>
@@ -88,7 +90,6 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
               keyExtractor={item => item.id}
             />
           }
-          <Text>{new Date().toLocaleDateString()}</Text>
         </View>
 
 

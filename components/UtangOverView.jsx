@@ -6,10 +6,10 @@ import { MODE } from '@/constants/mode';
 import Animated, { FadeIn, LinearTransition, FadeOut } from 'react-native-reanimated';
 
 
-const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcurrentPersonData }) => {
-    const [longPressed, setLongPressed] = useState(false)
 
-    const totalBalance = person.items.reduce((sum, item) => sum + item.price, 0);
+const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcurrentPersonData, balance }) => {
+    const [longPressed, setLongPressed] = useState(false)
+    const totalBalance = person.balance + person.items.reduce((sum, item) => sum + item.price, 0);
 
     const handleNamePress = () => {
         router.navigate({
@@ -37,7 +37,7 @@ const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcu
         <Animated.View style={styles.container} layout={LinearTransition.springify()}>
 
             <Animated.View style={styles.headerTxtContainer} layout={LinearTransition.springify()} >
-                <TouchableOpacity onPress={handleNamePress}>
+                <TouchableOpacity onPress={() => handleNamePress()}>
                     <Text style={styles.headerTxt}> {person.name} </Text>
                 </TouchableOpacity>
             </Animated.View>
