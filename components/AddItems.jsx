@@ -1,6 +1,6 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView, Pressable } from 'react-native'
 import NewItemsView from './NewItemsView';
 import NoItems from './NoItems';
@@ -8,10 +8,10 @@ import { MODE } from '../constants/mode';
 import VoiceTyping from './VoiceTyping';
 import ManualInput from './ManualInput';
 import Toggle, { SwitchVoiceTyping } from './Toggle';
+import { PersonDataContext } from '@/context';
 
-
-const AddItems = ({ personData, setUtang, utang, setMode }) => {
-
+const AddItems = () => {
+  const { personData, setUtang, utang, setMode } = useContext(PersonDataContext)
   const [items, setItems] = useState([]);
   const [enableVoiceType, setEnableVoiceType] = useState(true);
   // text input Variables
@@ -36,7 +36,6 @@ const AddItems = ({ personData, setUtang, utang, setMode }) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     const dateString = date.toLocaleDateString('en-US', options);
     const newItems = items.map((item) => { return { ...item, date: dateString } })
-
     setUtang(utang.map((item) =>
       item.id == personId
         ? { ...item, items: [...(item.items || []), ...newItems] }

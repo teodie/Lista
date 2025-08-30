@@ -2,7 +2,7 @@ import {
   View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, TextInput, FlatList, Modal,
   ScrollView
 } from 'react-native'
-import React, { useEffect, useMemo, useState, useRef } from 'react'
+import React, { useEffect, useMemo, useState, useRef, useContext } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
 import * as FileSystem from 'expo-file-system'
@@ -11,14 +11,15 @@ import AddItems from '@/components/AddItems';
 import { MODE } from '../constants/mode';
 import UtangOverView from '@/components/UtangOverView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import ModalContainer from '@/components/ModalContainer';
+import { PersonDataContext } from '@/context';
+import AddName from '@/components/AddName';
 
 const explore = () => {
   const searchInputref = useRef(null)
-  const [mode, setMode] = useState(MODE.IDLE)
+  const {mode, setMode, utang, setUtang} = useContext(PersonDataContext)
   const [isRecording, setIsRecording] = useState(false);
   const [parsedData, setParsedData] = useState(null);
-  const [utang, setUtang] = useState([]);
   const [transcribedText, setTranscribedText] = useState('');
 
   const [currentPersonData, setcurrentPersonData] = useState(null);
@@ -37,6 +38,7 @@ const explore = () => {
       try {
         const jsonValue = await AsyncStorage.getItem('Listahan');
         const storageUtang = jsonValue != null ? JSON.parse(jsonValue) : null;
+        
         if (storageUtang && storageUtang.length) {
           setUtang(storageUtang.sort((a, b) => b.id - a.id))
         } else {
@@ -82,7 +84,7 @@ const explore = () => {
   const createName = () => {
     if (name.trim()) {
       const newId = utang.length > 0 ? utang[0].id + 1 : 1;
-      setUtang([{ id: newId, name: name.toUpperCase(), items: [] }, ...utang])
+      setUtang([{ id: newId, name: name.toUpperCase(), balance: 0, items: [] }, ...utang])
       onChangeName('')
     }
   };
@@ -283,8 +285,6 @@ const explore = () => {
   };
 
   const handleAddPress = () => {
-    const nameAlreadyExist = utang.find((item) => item.name === name.toUpperCase())
-    if (nameAlreadyExist) { return Alert.alert('Name already exist!') }
 
     switch (mode) {
       case MODE.ADD_NAME:
@@ -321,7 +321,7 @@ const explore = () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.clearSearch} onPress={() => onChangeSearch('') }>
+        <TouchableOpacity style={styles.clearSearch} onPress={() => onChangeSearch('')}>
           <MaterialIcons name='clear' size={30} color='gray' />
         </TouchableOpacity>
 
@@ -332,47 +332,19 @@ const explore = () => {
         renderItem={({ item }) =>
           <UtangOverView
             person={item}
-            setMode={setMode}
             setId={setId}
             onChangeName={onChangeName}
             deleteName={deleteName}
+            setMode={setMode}
             setcurrentPersonData={setcurrentPersonData}
           />}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
       />
 
-      {mode === MODE.ADD_ITEM && currentPersonData &&
-        < AddItems
-          personData={currentPersonData}
-          utang={utang}
-          setUtang={setUtang}
-          setMode={setMode}
-        />
-      }
+      {mode === MODE.ADD_ITEM && currentPersonData && < AddItems /> }
 
-      {(mode === MODE.ADD_NAME || mode === MODE.EDIT_NAME) && (
-        <Modal animationType="slide" transparent={true} visible={mode === MODE.ADD_NAME || mode === MODE.EDIT_NAME} >
-
-          <View style={styles.modalWrapper}>
-            <View style={styles.modalView}>
-
-              <TextInput style={styles.addInput}
-                onChangeText={onChangeName}
-                placeholder='Type the name here....'
-                value={name}
-                autoFocus={true}
-              />
-
-              <TouchableOpacity style={styles.iconStyle} onPress={handleAddPress} >
-                <MaterialIcons name='add' size={40} color="white" />
-              </TouchableOpacity>
-            </View>
-
-          </View>
-
-        </Modal>
-      )}
+      <ModalContainer component={ <AddName /> } visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} />
 
       {transcribedText && (
         <View style={styles.resultContainer}>
@@ -509,12 +481,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
-  addInput: {
-    borderWidth: 1,
-    borderColor: 'black',
-    width: '90%',
-    borderRadius: 5
-  },
+
   clearSearch: {
     position: 'absolute',
     right: 10,

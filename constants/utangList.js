@@ -33,3 +33,58 @@ export const utangData = [
     ]
   }
 ];
+
+export const archieveData = [
+  {
+    "id": 1,
+    "name": "Maria Sample",
+    "balance": 1000,
+    "paidDate": '08/27/25',
+    "paidAmount": 300,
+    "items": [
+      {"id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "product": "sardines", "price": 28},
+      {"id": "b2c3d4e5-f6g7-8901-bcde-f23456789012", "product": "garlic", "price": 5},
+      {"id": "c3d4e5f6-g7h8-9012-cdef-345678901234", "product": "onion", "price": 12},
+      {"id": "d4e5f6g7-h8i9-0123-defa-456789012345", "product": "rice", "price": 45}
+    ]
+  },
+  {
+    "id": 1,
+    "name": "Maria Sample",
+    "balance": 600,
+    "paidDate": '08/28/25',
+    "paidAmount": 300,
+    "items": [
+      {"id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "product": "sardines", "price": 28},
+      {"id": "b2c3d4e5-f6g7-8901-bcde-f23456789012", "product": "garlic", "price": 5},
+      {"id": "c3d4e5f6-g7h8-9012-cdef-345678901234", "product": "onion", "price": 12},
+      {"id": "d4e5f6g7-h8i9-0123-defa-456789012345", "product": "rice", "price": 45}
+    ]
+  },
+  {
+    "id": 1,
+    "name": "Maria Sample",
+    "balance": 100,
+    "paidDate": '08/30/25',
+    "paidAmount": 300,
+    "items": [
+      {"id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "product": "sardines", "price": 28},
+      {"id": "b2c3d4e5-f6g7-8901-bcde-f23456789012", "product": "garlic", "price": 5},
+      {"id": "c3d4e5f6-g7h8-9012-cdef-345678901234", "product": "onion", "price": 12},
+      {"id": "d4e5f6g7-h8i9-0123-defa-456789012345", "product": "rice", "price": 45}
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Jack Sample",
+    "balance": 100,
+    "paidDate": '08/30/25',
+    "paidAmount": 300,
+    "items": [
+      {"id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "product": "sardines", "price": 28},
+      {"id": "b2c3d4e5-f6g7-8901-bcde-f23456789012", "product": "garlic", "price": 5},
+      {"id": "c3d4e5f6-g7h8-9012-cdef-345678901234", "product": "onion", "price": 12},
+      {"id": "d4e5f6g7-h8i9-0123-defa-456789012345", "product": "rice", "price": 45}
+    ]
+  },
+];

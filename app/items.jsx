@@ -1,6 +1,21 @@
-import { View, Text, StyleSheet, FlatList } from 'react-native'
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, StyleSheet, FlatList, SectionList, Button } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { archieveData } from '@/constants/utangList';
+import { useContext, useEffect, useState } from 'react';
+import { PersonDataContext } from '@/context';
 
+
+const fetchData = async () => {
+  // Fetching the data
+  console.log('Fetching Data....')
+  try {
+    const getJsonValue = await AsyncStorage.getItem('Archieve')
+    const archieveStorage = getJsonValue != null ? JSON.parse(getJsonValue) : null;
+    return archieveStorage ? archieveStorage : archieveData;
+  } catch (e) {
+    console.log(e)
+  }
+}
 
 const ProductOverview = ({ item }) => {
   return (
@@ -21,27 +36,77 @@ const Total = ({ title, amount }) => {
   );
 }
 
+const ArchieveView = ({ sectionData }) => {
+  return (
+    <>
+      <SectionList
+        sections={sectionData}
+        renderItem={({ item }) => (
+          <ProductOverview item={item} />
+        )}
+        renderSectionHeader={({ section: { date } }) => (
+          <Text>{date}</Text>
+        )}
+      />
+    </>
+  );
+}
+
+const PaymentView = ({ personData }) => {
+  return (
+    <>
+      <FlatList
+        data={personData.items}
+        renderItem={({ item }) => <ProductOverview item={item} />}
+      />
+    </>
+  );
+}
+
+
 
 const items = () => {
-  const { data, total } = useLocalSearchParams();
-  const person = JSON.parse(data)
-  const grandTotal = Number(total) + Number(person.balance)
+  const { personData, archieveVisible } = useContext(PersonDataContext)
+
+  const itemTotal = personData.items.reduce((acc, element) => acc + element.price, 0)
+  const grandTotal = personData.balance + itemTotal
+  const [sectionData, setSectionData] = useState([])
+
+  useEffect( () => {
+    const getArchieveData = async () => {
+      // Retrieve the data from the memory
+      const archieveData = await fetchData()
+      // filter the data for the specifict user
+      const filterData = archieveData.filter((element) => element.id === personData.id)
+  
+      // create a new array with just the needed data for section list
+      const secData = filterData.map((element) => { return { data: [...element.items], date: element.paidDate } })
+      setSectionData(secData)
+    }
+
+    getArchieveData();
+  } , [])
+
+
   return (
     <View style={styles.container}>
 
       <View style={styles.header}>
-        <Text style={styles.headerTxt}>{person.name}</Text>
-        <Total title="Balance" amount={person.balance} />
+        <Text style={styles.headerTxt}>{personData.name}</Text>
+        <Total title="Balance" amount={personData.balance} />
         <Total title="Total" amount={grandTotal} />
       </View>
 
+
       <View>
-        <FlatList
-          data={person.items}
-          renderItem={({ item }) => <ProductOverview item={item} />}
-        />
+        {archieveVisible
+          ? <ArchieveView sectionData={sectionData} />
+          : <PaymentView personData={personData} />
+        }
       </View>
-      <Text style={[ styles.headerTxt, {alignSelf: 'center', marginTop: 10}]} >{total}</Text>
+
+
+      <Text style={[styles.headerTxt, { alignSelf: 'center', marginTop: 10 }]} >{itemTotal}</Text>
     </View>
   )
 }
@@ -88,5 +153,5 @@ const styles = StyleSheet.create({
   },
   totalContainer: {
     alignItems: 'center'
-  }
+  },
 });
