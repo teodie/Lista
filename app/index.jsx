@@ -16,18 +16,11 @@ import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
 
 const explore = () => {
-  const { mode, setMode, utang, setUtang, personData, setPersonData } = useContext(PersonDataContext)
-  const [isRecording, setIsRecording] = useState(false);
-  const [parsedData, setParsedData] = useState(null);
-  const [transcribedText, setTranscribedText] = useState('');
-
+  const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
   const [id, setId] = useState(null);
 
   const [search, onChangeSearch] = useState('');
   const [name, onChangeName] = useState('');
-
-  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
-
 
   const filterName = useMemo(() => utang.filter(items => search.toLowerCase() === '' ? items.name : items.name.toLowerCase().includes(search.toLowerCase())), [utang, search])
 
@@ -100,177 +93,6 @@ const explore = () => {
 
   };
 
-
-  const startRecording = async () => {
-    try {
-      await audioRecorder.prepareToRecordAsync();
-      audioRecorder.record();
-      setIsRecording(true);
-    } catch (err) {
-      console.error('Failed to start recording:', err);
-      Alert.alert('Error', 'Failed to start recording');
-    }
-  };
-
-  const handleApiError = (error) => {
-    if (error.response?.status === 429) {
-      Alert.alert(
-        'Rate Limit Reached',
-        'You have reached your API quota limit. Please try again later.'
-      );
-    } else if (error.response?.status === 401) {
-      Alert.alert(
-        'Authentication Error',
-        'Invalid API key or authentication failed.'
-      );
-    } else if (error.response?.status === 400) {
-      Alert.alert(
-        'Invalid Request',
-        'There was a problem with the request. Please try again.'
-      );
-    } else {
-      Alert.alert(
-        'Error',
-        'An unexpected error occurred. Please try again later.'
-      );
-    }
-  };
-
-  const sendToWhisper = async (audioUri) => {
-    try {
-      setMode(MODE.PROCESSING);
-
-      // Read the audio file as base64
-      const audioBase64 = await FileSystem.readAsStringAsync(audioUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      const formData = new FormData();
-      formData.append('file', {
-        uri: audioUri,
-        type: 'audio/m4a',
-        name: 'recording.m4a',
-      });
-      formData.append('model', 'whisper-1');
-      formData.append('language', 'tl'); // Filipino/Tagalog
-
-      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${'api for whisper'}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw {
-          response: {
-            status: response.status,
-            data: errorData
-          }
-        };
-      }
-
-      const data = await response.json();
-      setTranscribedText(data.text);
-      await parseTranscription(data.text);
-    } catch (error) {
-      console.error('Error sending to Whisper:', error);
-      handleApiError(error);
-    } finally {
-      setMode(MODE.IDLE);
-    }
-  };
-
-  const parseTranscription = async (text) => {
-    try {
-      setMode(MODE.PROCESSING);
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${'api for whisper'}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{
-            role: "system",
-            content: "You are a helper that converts Filipino/Tagalog sari-sari store orders into structured JSON. Extract customer name and items with quantities."
-          }, {
-            role: "user",
-            content: text
-          }],
-          functions: [{
-            name: "process_order",
-            parameters: {
-              type: "object",
-              properties: {
-                customer_name: { type: "string" },
-                items: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      item: { type: "string" },
-                      quantity: { type: "number" }
-                    }
-                  }
-                }
-              }
-            }
-          }],
-          function_call: { name: "process_order" }
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw {
-          response: {
-            status: response.status,
-            data: errorData
-          }
-        };
-      }
-
-      const data = await response.json();
-      const parsedOrder = JSON.parse(data.choices[0].message.function_call.arguments);
-      setParsedData(parsedOrder);
-      console.log('Parsed order:', parsedOrder);
-    } catch (error) {
-      console.error('Error parsing with GPT:', error);
-      handleApiError(error);
-    } finally {
-      setMode(MODE.IDLE);
-    }
-  };
-
-  const stopRecording = async () => {
-    try {
-      await audioRecorder.stop();
-      setIsRecording(false);
-
-      console.log('Recording saved at:', audioRecorder.uri);
-      // Send to Whisper after recording stops
-      await sendToWhisper(audioRecorder.uri);
-    } catch (err) {
-      console.error('Failed to stop recording:', err);
-      Alert.alert('Error', 'Failed to stop recording');
-    }
-  };
-
-  const handleRecordPress = () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  };
-
-
-
   return (
     <View style={styles.container}>
 
@@ -314,32 +136,9 @@ const explore = () => {
 
       <ModalContainer component={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />} visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} />
 
-      {transcribedText && (
-        <View style={styles.resultContainer}>
-          <Text style={styles.transcribedText}>{transcribedText}</Text>
-          {parsedData && (
-            <Text style={styles.parsedData}>
-              {JSON.stringify(parsedData, null, 2)}
-            </Text>
-          )}
-        </View>
-      )}
-
-      <View style={{ flexDirection: "row", justifyContent: "center" }}>
-
-        <TouchableOpacity
-          style={[styles.iconStyle, mode === MODE.PROCESSING && styles.disabledButton]}
-          onPress={handleRecordPress}
-          disabled={mode === MODE.PROCESSING}
-        >
-          <MaterialIcons name={isRecording ? "stop" : "mic"} size={40} color="#E8E8E8" />
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.iconStyle} onPress={() => { setMode(MODE.ADD_NAME) }} >
           <MaterialIcons name='add' size={40} color="#E8E8E8" />
         </TouchableOpacity>
-
-      </View>
 
     </View>
   )
@@ -366,10 +165,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     margin: 20,
     elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    alignSelf: 'flex-end'
   },
   processingOverlay: {
     position: 'absolute',
@@ -457,7 +253,6 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 1,
-    borderWidth: 1,
     backgroundColor: '#f5f6fa',
     paddingVertical: 10,
   }

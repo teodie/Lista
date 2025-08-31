@@ -153,6 +153,6 @@ const styles = StyleSheet.create({
 [X] ask how much is the payment
 [X] subtract the payment to the total
 [X] save the data for archieving
-[ ] if there is a balance save that
-[ ] update the client data with blank items along with the balance
+[X] if there is a balance save that
+[X] update the client data with blank items along with the balance
 */
