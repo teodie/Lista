@@ -4,4 +4,5 @@ export const MODE = {
     EDIT_NAME: 'update-name',
     ADD_ITEM: 'add-item',
     PROCESSING: 'processing',
+    PAYING: 'paying',
   }

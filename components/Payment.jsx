@@ -13,6 +13,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { archieveData } from '@/constants/utangList';
+import { MODE } from '@/constants/mode';
 
 export const fetchData = async () => {
     // Fetching the data
@@ -74,9 +75,6 @@ const PaymentInput = ({ setPaying }) => {
                 placeholder='Amount'
                 onChangeText={(text) => (payment.current = text)}
             />
-            <TouchableOpacity style={styles.exit} onPress={() => setPaying(false) }>
-                <MaterialIcons name='clear' size={20} color='lightgray' />
-            </TouchableOpacity>
 
             <TouchableOpacity style={styles.paymentBtn} onPress={handlePaymentPress}>
                 <Text style={styles.paymentBtnTxt}>Pay</Text>
@@ -87,12 +85,11 @@ const PaymentInput = ({ setPaying }) => {
 
 
 const Payment = () => {
-    const [paying, setPaying] = useState(false)
-    const { setArchieveVisible } = useContext(PersonDataContext);
+    const { setArchieveVisible, mode, setMode } = useContext(PersonDataContext);
     
     const handlePaymentPress = () => {
         // Hide the modal for payment
-        setPaying(true)
+        setMode(MODE.PAYING)
     }
 
     const handleArchievePress = () => {
@@ -102,7 +99,9 @@ const Payment = () => {
 
     return (
         <View style={styles.paymentIcons}>
-            <ModalContainer component={<PaymentInput setPaying={setPaying} />} visible={paying} />
+
+            <ModalContainer children={<PaymentInput />} visible={mode === MODE.PAYING} />
+
             <TouchableOpacity onPress={handlePaymentPress}>
                 <FontAwesome6 name="coins" size={24} color="gold" />
             </TouchableOpacity>
@@ -116,14 +115,7 @@ const Payment = () => {
 export default Payment
 
 const styles = StyleSheet.create({
-    exit: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-        borderRadius: 15,
-        borderWidth: 1,
-        borderColor: 'lightgray',
-    },
+
     paymentInput: {
         borderWidth: 1,
         borderRadius: 10,

@@ -134,7 +134,10 @@ const explore = () => {
 
       {mode === MODE.ADD_ITEM && personData && < AddItems />}
 
-      <ModalContainer component={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />} visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} />
+      <ModalContainer 
+      children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />} 
+      visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} 
+      setMode={setMode} />
 
         <TouchableOpacity style={styles.iconStyle} onPress={() => { setMode(MODE.ADD_NAME) }} >
           <MaterialIcons name='add' size={40} color="#E8E8E8" />
