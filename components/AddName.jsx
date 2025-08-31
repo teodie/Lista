@@ -4,25 +4,49 @@ import { PersonDataContext } from '@/context'
 import { MaterialIcons } from '@expo/vector-icons'
 import { MODE } from '@/constants/mode'
 
-const AddName = () => {
-    const { setMode, utang, setUtang } = useContext(PersonDataContext)
-
-    const [name, onChangeName] = useState('')
+const AddName = ({ id, setId, onChangeName, name }) => {
+    const { mode, setMode, utang, setUtang } = useContext(PersonDataContext)
 
     const nameAlreadyExist = () => {
-        const nameAlreadyExist = utang.find((item) => item.name === name.toUpperCase())
+        const nameAlreadyExist = utang.find((item) => item.name.toUpperCase() === name.toUpperCase())
         return nameAlreadyExist ? true : false;
     }
 
     const createName = () => {
         if (!name.trim()) return Alert.alert('Name is blank!')
-        if (nameAlreadyExist) return Alert.alert('Name Already Exist')
+        if (nameAlreadyExist()) return Alert.alert('Name Already Exist')
 
         const newId = utang.length > 0 ? utang[0].id + 1 : 1;
         setUtang([{ id: newId, name: name.toUpperCase(), balance: 0, items: [] }, ...utang])
         onChangeName('')
         setMode(MODE.IDLE)
     };
+
+
+
+    const editName = (id) => {
+        setUtang(utang.map(item => item.id === id ? { ...item, name: name.toUpperCase() } : item))
+        console.log(id.toString() + " Has been Updated.")
+    };
+
+    const handleAddPress = () => {
+
+        switch (mode) {
+            case MODE.ADD_NAME:
+                setMode(MODE.IDLE)
+                createName()
+                break;
+            case MODE.EDIT_NAME:
+                setMode(MODE.IDLE)
+                editName(id)
+                onChangeName('')
+                setId(null)
+                break;
+            default:
+                console.log("Unexpected Mode" + mode)
+        }
+
+    }
 
     return (
         <>
@@ -33,7 +57,7 @@ const AddName = () => {
                 autoFocus={true}
             />
             <View style={styles.iconContainer}>
-                <TouchableOpacity style={styles.iconStyle} onPress={createName} >
+                <TouchableOpacity style={styles.iconStyle} onPress={handleAddPress} >
                     <MaterialIcons name='add' size={40} color="white" />
                 </TouchableOpacity>
 

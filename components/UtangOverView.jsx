@@ -6,13 +6,15 @@ import { MODE } from '@/constants/mode';
 import Animated, { FadeIn, LinearTransition, FadeOut } from 'react-native-reanimated';
 import { PersonDataContext } from '@/context';
 
-const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcurrentPersonData }) => {
-    const { personData, setPersonData } = useContext(PersonDataContext);
+const UtangOverView = ({ person, setId, onChangeName, deleteName }) => {
+    const { setPersonData, setMode, setArchieveVisible } = useContext(PersonDataContext);
 
     const [longPressed, setLongPressed] = useState(false)
     const totalBalance = person.balance + person.items.reduce((sum, item) => sum + item.price, 0);
 
     const handleNamePress = () => {
+        // set the archieve view false so that the default view will be payment view
+        setArchieveVisible(false)
         // Set the person data for usage off payment feature
         setPersonData(person)
         router.navigate({
@@ -32,7 +34,8 @@ const UtangOverView = ({ person, setMode, setId, onChangeName, deleteName, setcu
     };
 
     const handleAddItems = () => {
-        setcurrentPersonData(person);
+        console.log(person)
+        setPersonData(person);
         setMode(MODE.ADD_ITEM)
     };
 

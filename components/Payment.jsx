@@ -89,11 +89,14 @@ const PaymentInput = ({ setPaying }) => {
 const Payment = () => {
     const [paying, setPaying] = useState(false)
     const { setArchieveVisible } = useContext(PersonDataContext);
+    
     const handlePaymentPress = () => {
+        // Hide the modal for payment
         setPaying(true)
     }
 
     const handleArchievePress = () => {
+        //make the archive view show in the items.jsx
         setArchieveVisible(prev => !prev)
     }
 
@@ -149,7 +152,7 @@ const styles = StyleSheet.create({
 [X] load the person data in the componet
 [X] ask how much is the payment
 [X] subtract the payment to the total
-[ ] save the data for archieving
+[X] save the data for archieving
 [ ] if there is a balance save that
 [ ] update the client data with blank items along with the balance
 */

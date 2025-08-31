@@ -16,13 +16,11 @@ import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
 
 const explore = () => {
-  const searchInputref = useRef(null)
-  const {mode, setMode, utang, setUtang} = useContext(PersonDataContext)
+  const {mode, setMode, utang, setUtang, personData, setPersonData} = useContext(PersonDataContext)
   const [isRecording, setIsRecording] = useState(false);
   const [parsedData, setParsedData] = useState(null);
   const [transcribedText, setTranscribedText] = useState('');
 
-  const [currentPersonData, setcurrentPersonData] = useState(null);
   const [id, setId] = useState(null);
 
   const [search, onChangeSearch] = useState('');
@@ -80,19 +78,6 @@ const explore = () => {
     storeData(utang)
   }, [utang])
 
-
-  const createName = () => {
-    if (name.trim()) {
-      const newId = utang.length > 0 ? utang[0].id + 1 : 1;
-      setUtang([{ id: newId, name: name.toUpperCase(), balance: 0, items: [] }, ...utang])
-      onChangeName('')
-    }
-  };
-
-  const updateName = (id) => {
-    setUtang(utang.map(item => item.id === id ? { ...item, name: name } : item))
-    console.log(id.toString() + " Has been Updated.")
-  };
 
   const deleteName = (id) => {
     Alert.alert(
@@ -284,24 +269,7 @@ const explore = () => {
     }
   };
 
-  const handleAddPress = () => {
 
-    switch (mode) {
-      case MODE.ADD_NAME:
-        setMode(MODE.IDLE)
-        createName()
-        break;
-      case MODE.EDIT_NAME:
-        setMode(MODE.IDLE)
-        updateName(id)
-        onChangeName('')
-        setId(null)
-        break;
-      default:
-        console.log("Unexpected Mode" + mode)
-    }
-
-  }
 
   return (
     <View style={styles.container}>
@@ -312,7 +280,6 @@ const explore = () => {
 
         <View style={{ flexDirection: "row", margin: 10 }}>
           <TextInput
-            ref={searchInputref}
             style={styles.searchInput}
             onChangeText={onChangeSearch}
             placeholder='Search Here...'
@@ -335,16 +302,14 @@ const explore = () => {
             setId={setId}
             onChangeName={onChangeName}
             deleteName={deleteName}
-            setMode={setMode}
-            setcurrentPersonData={setcurrentPersonData}
           />}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
       />
 
-      {mode === MODE.ADD_ITEM && currentPersonData && < AddItems /> }
+      {mode === MODE.ADD_ITEM && personData && < AddItems /> }
 
-      <ModalContainer component={ <AddName /> } visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} />
+      <ModalContainer component={ <AddName id={id} setId={setId} name={name} onChangeName={onChangeName} /> } visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} />
 
       {transcribedText && (
         <View style={styles.resultContainer}>

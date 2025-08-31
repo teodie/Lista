@@ -39,26 +39,29 @@ const Total = ({ title, amount }) => {
 const ArchieveView = ({ sectionData }) => {
   return (
     <>
+      <Text style={[styles.headerTxt, {alignSelf: 'center'}]}>Paid Items</Text>
       <SectionList
         sections={sectionData}
-        renderItem={({ item }) => (
-          <ProductOverview item={item} />
-        )}
-        renderSectionHeader={({ section: { date } }) => (
-          <Text>{date}</Text>
-        )}
+        renderItem={({ item }) => ( <ProductOverview item={item} /> )}
+        renderSectionHeader={({ section: { date } }) => ( <Text>{date}</Text> )}
       />
     </>
   );
 }
 
-const PaymentView = ({ personData }) => {
+const PaymentView = ({ personData, grandTotal, itemTotal }) => {
   return (
     <>
+      <View style={styles.header}>
+        <Text style={styles.headerTxt}>{personData.name}</Text>
+        <Total title="Balance" amount={personData.balance} />
+        <Total title="Total" amount={grandTotal} />
+      </View>
       <FlatList
         data={personData.items}
         renderItem={({ item }) => <ProductOverview item={item} />}
       />
+      <Text style={[styles.headerTxt, { alignSelf: 'center', marginTop: 10 }]} >{itemTotal}</Text>
     </>
   );
 }
@@ -67,46 +70,36 @@ const PaymentView = ({ personData }) => {
 
 const items = () => {
   const { personData, archieveVisible } = useContext(PersonDataContext)
-
   const itemTotal = personData.items.reduce((acc, element) => acc + element.price, 0)
   const grandTotal = personData.balance + itemTotal
   const [sectionData, setSectionData] = useState([])
 
-  useEffect( () => {
+  useEffect(() => {
     const getArchieveData = async () => {
       // Retrieve the data from the memory
       const archieveData = await fetchData()
       // filter the data for the specifict user
       const filterData = archieveData.filter((element) => element.id === personData.id)
-  
+
       // create a new array with just the needed data for section list
       const secData = filterData.map((element) => { return { data: [...element.items], date: element.paidDate } })
       setSectionData(secData)
     }
 
     getArchieveData();
-  } , [])
+  }, [archieveVisible])
 
 
   return (
     <View style={styles.container}>
 
-      <View style={styles.header}>
-        <Text style={styles.headerTxt}>{personData.name}</Text>
-        <Total title="Balance" amount={personData.balance} />
-        <Total title="Total" amount={grandTotal} />
-      </View>
-
-
       <View>
         {archieveVisible
           ? <ArchieveView sectionData={sectionData} />
-          : <PaymentView personData={personData} />
+          : <PaymentView personData={personData} grandTotal={grandTotal} itemTotal={itemTotal} />
         }
       </View>
 
-
-      <Text style={[styles.headerTxt, { alignSelf: 'center', marginTop: 10 }]} >{itemTotal}</Text>
     </View>
   )
 }

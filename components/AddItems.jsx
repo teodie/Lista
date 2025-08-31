@@ -31,11 +31,16 @@ const AddItems = () => {
     setItems(items.filter(item => item.id !== id))
   }
 
-  const saveItems = (personId) => {
-    const date = new Date();
+  const genDate = () => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const dateString = date.toLocaleDateString('en-US', options);
-    const newItems = items.map((item) => { return { ...item, date: dateString } })
+    const dateString = new Date().toLocaleDateString('en-US', options);
+    return dateString
+  }
+
+  const saveItems = (personId) => {
+    const date = genDate()
+    
+    const newItems = items.map((item) => { return { ...item, date: date } })
     setUtang(utang.map((item) =>
       item.id == personId
         ? { ...item, items: [...(item.items || []), ...newItems] }
