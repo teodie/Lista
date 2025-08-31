@@ -80,15 +80,18 @@ export default UtangOverView
 
 const styles = StyleSheet.create({
     container: {
-        margin: 8,
-        padding: 10,
-        paddingLeft: 30,
-        borderRadius: 20,
-        height: 70,
+        flex: 1,
         flexDirection: "row",
-        justifyContent: 'flex-end',
-        boxShadow: "0px 0px 10px 10px rgba(2, 1, 1, 0.1)",
-        alignItems: "center"
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        paddingVertical: 5,
+        paddingHorizontal: 14,
+        marginHorizontal: 10,
+        marginBottom: 10,
+        // borderWidth: 1,
+        
+        elevation: 4,
     },
     headerTxtContainer: {
         flex: 2,

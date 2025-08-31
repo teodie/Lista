@@ -16,7 +16,7 @@ import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
 
 const explore = () => {
-  const {mode, setMode, utang, setUtang, personData, setPersonData} = useContext(PersonDataContext)
+  const { mode, setMode, utang, setUtang, personData, setPersonData } = useContext(PersonDataContext)
   const [isRecording, setIsRecording] = useState(false);
   const [parsedData, setParsedData] = useState(null);
   const [transcribedText, setTranscribedText] = useState('');
@@ -36,7 +36,7 @@ const explore = () => {
       try {
         const jsonValue = await AsyncStorage.getItem('Listahan');
         const storageUtang = jsonValue != null ? JSON.parse(jsonValue) : null;
-        
+
         if (storageUtang && storageUtang.length) {
           setUtang(storageUtang.sort((a, b) => b.id - a.id))
         } else {
@@ -294,22 +294,25 @@ const explore = () => {
 
       </View>
 
-      <FlatList
-        data={filterName}
-        renderItem={({ item }) =>
-          <UtangOverView
-            person={item}
-            setId={setId}
-            onChangeName={onChangeName}
-            deleteName={deleteName}
-          />}
-        keyExtractor={item => item.id.toString()}
-        showsVerticalScrollIndicator={false}
-      />
+      <View style={styles.cardContainer}>
+        <FlatList
+          data={filterName}
+          renderItem={({ item }) =>
+            <UtangOverView
+              person={item}
+              setId={setId}
+              onChangeName={onChangeName}
+              deleteName={deleteName}
+            />}
+          keyExtractor={item => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
 
-      {mode === MODE.ADD_ITEM && personData && < AddItems /> }
 
-      <ModalContainer component={ <AddName id={id} setId={setId} name={name} onChangeName={onChangeName} /> } visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} />
+      {mode === MODE.ADD_ITEM && personData && < AddItems />}
+
+      <ModalContainer component={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />} visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} />
 
       {transcribedText && (
         <View style={styles.resultContainer}>
@@ -347,7 +350,7 @@ export default explore
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#f5f6fa',
   },
   text: {
     color: 'black',
@@ -451,6 +454,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 10,
     bottom: 15,
+  },
+  cardContainer: {
+    flex: 1,
+    borderWidth: 1,
+    backgroundColor: '#f5f6fa',
+    paddingVertical: 10,
   }
 
 })
