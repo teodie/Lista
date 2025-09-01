@@ -39,15 +39,23 @@ const Total = ({ title, amount }) => {
 const ArchieveView = ({ sectionData }) => {
   return (
     <>
-      <Text style={[styles.headerTxt, {alignSelf: 'center'}]}>Paid Items</Text>
+      <Text style={[styles.headerTxt, { alignSelf: 'center' }]}>Paid Items</Text>
       <SectionList
         sections={sectionData}
-        renderItem={({ item }) => ( <ProductOverview item={item} /> )}
-        renderSectionHeader={({ section: { date } }) => ( <Text>{date}</Text> )}
-      />
+        renderItem={({ item }) => (<ProductOverview item={item} />)}
+        renderSectionHeader={({ section }) => (
+          <View style={styles.sectionHeader}>
+            <Text>{section.header.date}</Text>
+            <Total title="P_Balance" amount={section.header.balance} />
+            <Total title="I_Total" amount={section.header.total} />
+            <Total title="Paid" amount={section.header.paidAmount} />
+            <Total title="Balance" amount={section.header.remainingBalance} />
+          </View>
+        )} />
     </>
   );
 }
+
 
 const PaymentView = ({ personData, grandTotal, itemTotal }) => {
   return (
@@ -80,25 +88,40 @@ const items = () => {
       const archieveData = await fetchData()
       // filter the data for the specifict user
       const filterData = archieveData.filter((element) => element.id === personData.id)
-
       // create a new array with just the needed data for section list
-      const secData = filterData.map((element) => { return { data: [...element.items], date: element.paidDate } })
+      const secData = filterData.map((element) => { return { data: [...element.items], header: { date: element.paidDate, paidAmount: element.paidAmount, remainingBalance: element.remainingBalance, total: element.total, balance: element.balance } } })
       setSectionData(secData)
     }
 
     getArchieveData();
   }, [archieveVisible])
 
+  const handleWipe = async () => {
+    try {
+      console.log("Wipping the data")
+      await AsyncStorage.removeItem('Archieve')
+    } catch (e) {
+      console.log(e)
+    }
+
+  }
+
 
   return (
     <View style={styles.container}>
 
-      <View>
+      <View >
         {archieveVisible
           ? <ArchieveView sectionData={sectionData} />
           : <PaymentView personData={personData} grandTotal={grandTotal} itemTotal={itemTotal} />
         }
       </View>
+      
+      <Button
+        disabled={false}
+        title='Wipe Data'
+        onPress={() => handleWipe()}
+      />
 
     </View>
   )
@@ -147,4 +170,13 @@ const styles = StyleSheet.create({
   totalContainer: {
     alignItems: 'center'
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 15,
+  },
+  archieveContainer: {
+    borderWidth: 1,
+  }
+
 });

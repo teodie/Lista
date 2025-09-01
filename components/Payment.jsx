@@ -28,11 +28,12 @@ export const fetchData = async () => {
 }
 
 const PaymentInput = ({ setPaying }) => {
-    const { personData, setPersonData, utang, setUtang } = useContext(PersonDataContext);
+    const { personData, setPersonData, utang, setUtang, setMode } = useContext(PersonDataContext);
     const total = personData.balance + personData.items.reduce((sum, item) => sum + item.price, 0);
-    const payment = useRef('')
+    const payment = useRef('0')
 
     const handlePaymentPress = async () => {
+        setMode(MODE.IDLE)
         const prevData = await fetchData()
         saveData(prevData)
         updatePersonData()
@@ -43,12 +44,13 @@ const PaymentInput = ({ setPaying }) => {
 
     const saveData = async (prevData) => {
         console.log('Saving Data....')
-
+        const remainingBalance = total - Number(payment.current)
+        
         const date = new Date();
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const dateString = date.toLocaleDateString('en-US', options);
         //Saving the data
-        const dataToSave = [...(prevData || []), { ...personData, paidDate: dateString, amountPaid: payment.current }]
+        const dataToSave = [...(prevData || []), { ...personData, paidDate: dateString, paidAmount: payment.current, remainingBalance: remainingBalance, total: total}]
         console.log(dataToSave)
         try {
             const saveJsonValue = JSON.stringify(dataToSave)
@@ -63,7 +65,8 @@ const PaymentInput = ({ setPaying }) => {
     const updatePersonData = () => {
         const remainingBalance = total - Number(payment.current)
         const newData = { ...personData, balance: remainingBalance, items: [] }
-        setUtang(utang.map((element) => element.id === personData.id ? newData : element))
+        setUtang(utang.map(element => element.id === personData.id ? newData : element))
+        // To remove the data when the items are payed
         setPersonData(newData)
     }
 
