@@ -1,21 +1,9 @@
 import { View, Text, StyleSheet, FlatList, SectionList, Button } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { archieveData } from '@/constants/utangList';
 import { useContext, useEffect, useState } from 'react';
 import { PersonDataContext } from '@/context';
-
-
-const fetchData = async () => {
-  // Fetching the data
-  console.log('Fetching Data....')
-  try {
-    const getJsonValue = await AsyncStorage.getItem('Archieve')
-    const archieveStorage = getJsonValue != null ? JSON.parse(getJsonValue) : null;
-    return archieveStorage ? archieveStorage : archieveData;
-  } catch (e) {
-    console.log(e)
-  }
-}
+import { fetchArchieveData, IndividualArchieveData } from '@/utils/fetchArchieveData';
+import { exportToCSV } from '@/utils/jsonToCsv';
 
 const ProductOverview = ({ item }) => {
   return (
@@ -36,7 +24,16 @@ const Total = ({ title, amount }) => {
   );
 }
 
-const ArchieveView = ({ sectionData }) => {
+const ArchieveView = ({ sectionData, id }) => {
+
+  const handleDownloadPress = async () => {
+    console.log("Fetching Individual data")
+    const personData = await IndividualArchieveData(id)
+    console.log(personData)
+    // save the individual data
+    exportToCSV(personData)
+  }
+
   return (
     <>
       <Text style={[styles.headerTxt, { alignSelf: 'center' }]}>Paid Items</Text>
@@ -52,6 +49,8 @@ const ArchieveView = ({ sectionData }) => {
             <Total title="Balance" amount={section.header.remainingBalance} />
           </View>
         )} />
+
+      <Button title='Download' onPress={handleDownloadPress} />
     </>
   );
 }
@@ -85,7 +84,7 @@ const items = () => {
   useEffect(() => {
     const getArchieveData = async () => {
       // Retrieve the data from the memory
-      const archieveData = await fetchData()
+      const archieveData = await fetchArchieveData()
       // filter the data for the specifict user
       const filterData = archieveData.filter((element) => element.id === personData.id)
       // create a new array with just the needed data for section list
@@ -103,7 +102,6 @@ const items = () => {
     } catch (e) {
       console.log(e)
     }
-
   }
 
 
@@ -112,16 +110,16 @@ const items = () => {
 
       <View >
         {archieveVisible
-          ? <ArchieveView sectionData={sectionData} />
+          ? <ArchieveView sectionData={sectionData} id={personData.id} />
           : <PaymentView personData={personData} grandTotal={grandTotal} itemTotal={itemTotal} />
         }
       </View>
-      
-      <Button
-        disabled={false}
+
+      {/* <Button
+        disabled={true}
         title='Wipe Data'
         onPress={() => handleWipe()}
-      />
+      /> */}
 
     </View>
   )

@@ -8,24 +8,10 @@ import { PersonDataContext } from '@/context';
 import ModalContainer from '@/components/ModalContainer';
 import { TextInput } from 'react-native-gesture-handler';
 import { useRef, useState } from 'react';
-import { MaterialIcons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { archieveData } from '@/constants/utangList';
 import { MODE } from '@/constants/mode';
-
-export const fetchData = async () => {
-    // Fetching the data
-    console.log('Fetching Data....')
-    try {
-        const getJsonValue = await AsyncStorage.getItem('Archieve')
-        const archieveStorage = getJsonValue != null ? JSON.parse(getJsonValue) : null;
-        return  archieveStorage ? archieveStorage : archieveData;
-    } catch (e) {
-        console.log(e)
-    }
-}
+import {fetchArchieveData} from '@/utils/fetchArchieveData'
 
 const PaymentInput = ({ setPaying }) => {
     const { personData, setPersonData, utang, setUtang, setMode } = useContext(PersonDataContext);
@@ -34,7 +20,7 @@ const PaymentInput = ({ setPaying }) => {
 
     const handlePaymentPress = async () => {
         setMode(MODE.IDLE)
-        const prevData = await fetchData()
+        const prevData = await fetchArchieveData()
         saveData(prevData)
         updatePersonData()
         setPaying(false)

@@ -1,11 +1,7 @@
-import {
-  View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, TextInput, FlatList, Modal,
-  ScrollView
-} from 'react-native'
-import React, { useEffect, useMemo, useState, useRef, useContext } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, } from 'react-native'
+import React, { useEffect, useMemo, useState, useContext } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
-import * as FileSystem from 'expo-file-system'
 import { utangData } from '../constants/utangList';
 import AddItems from '@/components/AddItems';
 import { MODE } from '../constants/mode';
@@ -14,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalContainer from '@/components/ModalContainer';
 import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
+import ExportArchieve from '@/components/ExportArchieve';
 
 const explore = () => {
   const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
@@ -97,8 +94,10 @@ const explore = () => {
     <View style={styles.container}>
 
       <View style={styles.headerContainer}>
-
-        <Text style={styles.titleTxt}>Lista</Text>
+        <View style={styles.topHeader}>
+          <Text style={styles.titleTxt}>Lista</Text>
+          <ExportArchieve />
+        </View>
 
         <View style={{ flexDirection: "row", margin: 10 }}>
           <TextInput
@@ -134,14 +133,14 @@ const explore = () => {
 
       {mode === MODE.ADD_ITEM && personData && < AddItems />}
 
-      <ModalContainer 
-      children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />} 
-      visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)} 
-      setMode={setMode} />
+      <ModalContainer
+        children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}
+        visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)}
+        setMode={setMode} />
 
-        <TouchableOpacity style={styles.iconStyle} onPress={() => { setMode(MODE.ADD_NAME) }} >
-          <MaterialIcons name='add' size={40} color="#E8E8E8" />
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.iconStyle} onPress={() => { setMode(MODE.ADD_NAME) }} >
+        <MaterialIcons name='add' size={40} color="#E8E8E8" />
+      </TouchableOpacity>
 
     </View>
   )
@@ -248,7 +247,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
-
+  topHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginRight: 20,
+  },
   clearSearch: {
     position: 'absolute',
     right: 10,
