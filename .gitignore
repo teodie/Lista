@@ -18,6 +18,9 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# added for eas build suggested bydave gray
+/ios
+
 # Metro
 .metro-health-check*
 

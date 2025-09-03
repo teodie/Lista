@@ -34,7 +34,6 @@ const UtangOverView = ({ person, setId, onChangeName, deleteName }) => {
     };
 
     const handleAddItems = () => {
-        console.log(person)
         setPersonData(person);
         setMode(MODE.ADD_ITEM)
     };
