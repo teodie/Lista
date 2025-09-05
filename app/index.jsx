@@ -12,6 +12,7 @@ import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
 import ExportArchieve from '@/components/ExportArchieve';
 import SwipeAble from '@/components/SwipeAble';
+import DepracatedSwipe from '@/components/DepracatedSwipe';
 
 const explore = () => {
   const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
@@ -105,6 +106,7 @@ const explore = () => {
             style={styles.searchInput}
             onChangeText={onChangeSearch}
             placeholder='Search Here...'
+            placeholderTextColor='gray'
             value={search}
             autoFocus={false}
           />
@@ -141,7 +143,7 @@ const explore = () => {
       {mode === MODE.ADD_ITEM && personData && < AddItems />}
 
       <ModalContainer
-        children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}
+        children={ <AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}
         visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)}
         setMode={setMode} />
 

@@ -59,7 +59,9 @@ const VoiceTyping = ({ setItems, items }) => {
         autoFocus={false}
         value={transcribeTxt}
         multiline={true}
+        cursorColor='gray'
         placeholder='Voice Typing here...'
+        placeholderTextColor='gray'
       />
 
       <Pressable

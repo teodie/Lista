@@ -53,6 +53,8 @@ const AddName = ({ id, setId, onChangeName, name }) => {
             <TextInput style={styles.addInput}
                 onChangeText={onChangeName}
                 placeholder='Type the name here....'
+                placeholderTextColor='gray'
+                cursorColor='gray'
                 value={name}
                 autoFocus={true}
             />
