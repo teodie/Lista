@@ -11,6 +11,7 @@ import ModalContainer from '@/components/ModalContainer';
 import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
 import ExportArchieve from '@/components/ExportArchieve';
+import SwipeAble from '@/components/SwipeAble';
 
 const explore = () => {
   const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
@@ -129,6 +130,12 @@ const explore = () => {
           showsVerticalScrollIndicator={false}
         />
       </View>
+
+      <FlatList
+      data={filterName}
+      renderItem={({item}) => <SwipeAble data={item} /> }
+      keyExtractor={item => item.id.toString()}
+      />
 
 
       {mode === MODE.ADD_ITEM && personData && < AddItems />}
