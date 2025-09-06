@@ -1,6 +1,6 @@
 
 import React, { useContext, useRef, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import { View, Alert, StyleSheet, TouchableOpacity, TextInput } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { MaterialIcons } from '@expo/vector-icons';
 import Card from "./Card";
@@ -15,12 +15,25 @@ const SwipeAble = ({ data }) => {
     const [name, setName] = useState('')
     const swipeRef = useRef(null)
 
-    
-
     const handleDelete = () => {
-        setUtang(utang.filter(item => item.id !== data.id))
-        console.log(`Person with id: ${data.id} has been deleted.`)
-    }
+        Alert.alert(
+          'Deleting Client Data',
+          'Client Data will be permanently deleted\nStill want to delete this client data?',
+          [{ text: 'Cancel', style: 'cancel' }, {
+            text: "Delete", onPress: () => {
+              Alert.alert('Sure na Sure?', '', [
+                { text: 'Hinde', style: 'cancel' },
+                {
+                  text: 'Oo',
+                  onPress: () => {
+                    setUtang(utang.filter(item => item.id !== data.id))
+                  }, style: 'destructive'
+                }])
+            }, style: 'default'
+          }],
+          { cancelable: true },
+        )
+      };
 
     const handleEdit = () => {
         setName(data.name)

@@ -9,7 +9,7 @@ const ExportArchieve = () => {
     const handlePress = async () => {
         // fetch all the archieve Data in the storage
         const allArcieveData = await fetchArchieveData()
-        exportToCSV(allArcieveData)
+        exportToCSV(allArcieveData, "Mga bayad na")
     }
 
     return (

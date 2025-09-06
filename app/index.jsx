@@ -1,18 +1,18 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, } from 'react-native'
-import React, { useEffect, useMemo, useState, useContext } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, Pressable, } from 'react-native'
+import React, { useEffect, useMemo, useState, useContext, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
 import { utangData } from '../constants/utangList';
 import AddItems from '@/components/AddItems';
 import { MODE } from '../constants/mode';
-import UtangOverView from '@/components/UtangOverView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalContainer from '@/components/ModalContainer';
 import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
 import ExportArchieve from '@/components/ExportArchieve';
 import SwipeAble from '@/components/SwipeAble';
-import DepracatedSwipe from '@/components/DepracatedSwipe';
+import Animated, { useAnimatedStyle, withSpring, withTiming, useSharedValue } from 'react-native-reanimated';
+import { exportToCSV } from '@/utils/jsonToCsv';
 
 const explore = () => {
   const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
@@ -20,6 +20,56 @@ const explore = () => {
 
   const [search, onChangeSearch] = useState('');
   const [name, onChangeName] = useState('');
+
+
+  const [longPressed, setLongPressed] = useState(false)
+  const addX = useSharedValue(0)
+  const addY = useSharedValue(0)
+  const deleteX = useSharedValue(0)
+  const micY = useSharedValue(0)
+  const elevate = useSharedValue(0)
+
+  const handleLongPress = () => {
+    if (!longPressed) {
+      addX.value = withSpring(addX.value - 70)
+      addY.value = withSpring(addY.value - 70)
+      deleteX.value = withSpring(deleteX.value - 90)
+      micY.value = withSpring(micY.value - 90)
+      elevate.value = withTiming(elevate.value + 5)
+    } else {
+      addX.value = withTiming(addX.value + 70, { duration: 300 })
+      addY.value = withTiming(addY.value + 70, { duration: 300 })
+      deleteX.value = withTiming(deleteX.value + 90, { duration: 300 })
+      micY.value = withTiming(micY.value + 90, { duration: 300 })
+      elevate.value = withTiming(elevate.value - 5)
+    }
+    setLongPressed(prev => !prev)
+  }
+
+
+  const addAnimation = useAnimatedStyle(() => ({
+    elevation : elevate.value,
+    transform: [
+      { translateX: addX.value },
+      { translateY: addY.value }
+    ]
+  }));
+
+  const deleteAnimation = useAnimatedStyle(() => ({
+    elevation : elevate.value,
+    transform: [
+      { translateX: deleteX.value },
+    ]
+  }));
+
+  const micAnimation = useAnimatedStyle(() => ({
+    elevation : elevate.value,
+    transform: [
+      { translateY: micY.value },
+    ]
+  }));
+
+
 
   const filterName = useMemo(() => utang.filter(items => search.toLowerCase() === '' ? items.name : items.name.toLowerCase().includes(search.toLowerCase())), [utang, search])
 
@@ -89,8 +139,9 @@ const explore = () => {
       }],
       { cancelable: true },
     )
-
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -121,35 +172,47 @@ const explore = () => {
       <View style={styles.cardContainer}>
         <FlatList
           data={filterName}
-          renderItem={({ item }) =>
-            <UtangOverView
-              person={item}
-              setId={setId}
-              onChangeName={onChangeName}
-              deleteName={deleteName}
-            />}
+          renderItem={({ item }) => <SwipeAble data={item} />}
           keyExtractor={item => item.id.toString()}
-          showsVerticalScrollIndicator={false}
         />
+
       </View>
 
-      <FlatList
-      data={filterName}
-      renderItem={({item}) => <SwipeAble data={item} /> }
-      keyExtractor={item => item.id.toString()}
-      />
 
 
       {mode === MODE.ADD_ITEM && personData && < AddItems />}
 
       <ModalContainer
-        children={ <AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}
+        children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}
         visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)}
         setMode={setMode} />
 
-      <TouchableOpacity style={styles.iconStyle} onPress={() => { setMode(MODE.ADD_NAME) }} >
-        <MaterialIcons name='add' size={40} color="#E8E8E8" />
-      </TouchableOpacity>
+      <View style={{ borderWidth: 1, position: 'relative' }}>
+        <Pressable style={[styles.iconStyle, styles.addIcon]} onPress={() => { setMode(MODE.ADD_NAME) }} onLongPress={handleLongPress} >
+          <MaterialIcons name='add' size={40} color="#E8E8E8" />
+        </Pressable>
+
+        <Animated.View style={[styles.iconStyle, styles.micIcon, micAnimation]}>
+          <TouchableOpacity onPress={() => { Alert.alert("AI Transcription feature currently not available") }} >
+            <MaterialIcons name='mic' size={40} color="#E8E8E8" />
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.View style={[styles.iconStyle, deleteAnimation]}>
+          <TouchableOpacity onPress={() => { Alert.alert("Delete feature currently not available")  }} >
+            <MaterialIcons name='delete' size={40} color="#E8E8E8" />
+          </TouchableOpacity>
+        </Animated.View>
+
+
+        <Animated.View style={[styles.iconStyle, addAnimation]} >
+          <TouchableOpacity onPress={() => { exportToCSV(utang, "Store Credits")}} >
+            <MaterialIcons name='save-alt' size={40} color="#E8E8E8" />
+          </TouchableOpacity>
+        </Animated.View>
+
+      </View>
+
 
     </View>
   )
@@ -175,44 +238,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 50,
     margin: 20,
-    elevation: 5,
-    alignSelf: 'flex-end'
-  },
-  processingOverlay: {
+    alignSelf: 'flex-end',
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
+    bottom: 10,
   },
-  processingText: {
-    marginTop: 10,
-    color: '#5959B2',
-    fontSize: 16,
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
-  resultContainer: {
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 10,
-    margin: 20,
-    maxHeight: '50%',
-  },
-  transcribedText: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: '#333',
-  },
-  parsedData: {
-    fontSize: 14,
-    color: '#666',
-    fontFamily: 'monospace',
+  addIcon: {
+    zIndex: 2,
+    elevation: 5
   },
   headerContainer: {
     height: 150,
@@ -233,23 +265,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     position: 'relative',
-  },
-  modalView: {
-    alignItems: 'stretch',
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    justifyContent: 'center',
   },
   modalWrapper: {
     flex: 1,

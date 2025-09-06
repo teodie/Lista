@@ -2,12 +2,12 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Parser } from '@json2csv/plainjs';
 
-export const exportToCSV = async (jsonObject) => {
+export const exportToCSV = async (jsonObject, filename) => {
     
     try {
         const csv = await convertToString(jsonObject)
         // 3. Define the file path
-        const fileUri = FileSystem.documentDirectory + 'tryData.csv';
+        const fileUri = FileSystem.documentDirectory + filename + '.csv';
 
         // 4. Write the CSV file
         await FileSystem.writeAsStringAsync(fileUri, csv, {
@@ -25,6 +25,24 @@ export const exportToCSV = async (jsonObject) => {
         console.error('Error exporting CSV:', error);
     }
 };
+
+const convertToString = async (data) => {
+    // This will format the data for readability in excel when exported
+    let all = ''
+
+    data.forEach((element) => {
+        const transactionParser = new Parser({ header: true });
+        const itemParser = new Parser({ header: true })
+
+        const {items, ...transac} = element
+
+        const transaction = transactionParser.parse(transac)
+        const item = itemParser.parse(items)
+        all = all + "\n" + transaction + "\n" + item
+    })
+    // Trim the \n in the beggining of the data
+    return all.trim()
+}
 
 export const share = async (jsonObject, filename) => {
     const parser = new Parser({header: true})
@@ -46,23 +64,4 @@ export const share = async (jsonObject, filename) => {
         console.log(e)
     }
 
-}
-
-
-const convertToString = async (data) => {
-    // This will format the data for readability in excel when exported
-    let all = ''
-
-    data.forEach((element) => {
-        const transactionParser = new Parser({ header: true });
-        const itemParser = new Parser({ header: true })
-
-        const {items, ...transac} = element
-
-        const transaction = transactionParser.parse(transac)
-        const item = itemParser.parse(items)
-        all = all + "\n" + transaction + "\n" + item
-    })
-    // Trim the \n in the beggining of the data
-    return all.trim()
 }

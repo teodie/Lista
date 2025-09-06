@@ -62,6 +62,7 @@ const PaymentInput = ({ setPaying }) => {
                 style={styles.paymentInput}
                 keyboardType='numeric'
                 placeholder='Amount'
+                placeholderTextColor='gray'
                 onChangeText={(text) => (payment.current = text)}
             />
 
@@ -108,7 +109,8 @@ const styles = StyleSheet.create({
     paymentInput: {
         borderWidth: 1,
         borderRadius: 10,
-        width: '50%'
+        width: '50%',
+        color: 'black'
     },
     paymentBtn: {
         margin: 10,
