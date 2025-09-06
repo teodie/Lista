@@ -2,34 +2,38 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React, {useContext} from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { PersonDataContext } from '@/context';
+import { MODE } from '@/constants/mode';
+import { router } from 'expo-router';
 
-
-
-const Card = ({name, total}) => {
+const Card = ({data}) => {
+    const {setMode, setPersonData} = useContext(PersonDataContext);
+    const ItemTotal = data.balance + data.items.reduce((acc, item) => acc + item.price, 0)
 
     const handleAddItems = () => {
-
+        setPersonData(data)
+        setMode(MODE.ADD_ITEM)
     }
 
     const handleNamePress = () => {
-
+        setPersonData(data)
+        router.navigate({ pathname: '/items', })
     }
 
 
     return (
         <View style={styles.card}>
             <View style={styles.headerTxtContainer} >
-                <TouchableOpacity >
-                    <Text style={styles.headerTxt}>{name}</Text>
+                <TouchableOpacity onPress={handleNamePress}>
+                    <Text style={styles.headerTxt}>{data.name}</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.balanceContainer} >
                 <Text style={styles.balanceTxt} > Balance: </Text>
-                <Text style={styles.totalBalanceTxt} >{total}</Text>
+                <Text style={styles.totalBalanceTxt} >{ItemTotal}</Text>
             </View>
 
-            <TouchableOpacity style={styles.addIcon} >
+            <TouchableOpacity style={styles.addIcon} onPress={handleAddItems}>
                 <MaterialIcons name='add' size={40} color="#E8E8E8" />
             </TouchableOpacity>
         </View>

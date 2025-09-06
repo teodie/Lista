@@ -26,9 +26,31 @@ export const exportToCSV = async (jsonObject) => {
     }
 };
 
+export const share = async (jsonObject, filename) => {
+    const parser = new Parser({header: true})
+
+    const jsonString = parser.parse(jsonObject)
+    const filepath = FileSystem.documentDirectory + 'utang ni ' + filename + '.csv'
+    const options = {encoding: FileSystem.EncodingType.UTF8}
+    
+    try {
+        await FileSystem.writeAsStringAsync(filepath, jsonString, options)
+
+        if( await Sharing.isAvailableAsync()){
+            await Sharing.shareAsync(filepath)
+        } else {
+            Alert.alert('Sharing is not available on this device!')
+        }
+
+    } catch(e) {
+        console.log(e)
+    }
+
+}
+
 
 const convertToString = async (data) => {
-    
+    // This will format the data for readability in excel when exported
     let all = ''
 
     data.forEach((element) => {

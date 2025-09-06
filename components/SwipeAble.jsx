@@ -7,14 +7,15 @@ import Card from "./Card";
 import Animated, { FadeIn, LinearTransition, FadeOut } from 'react-native-reanimated';
 import { PersonDataContext } from "@/context";
 import { CustomModal } from "./ModalContainer";
+import { share } from "@/utils/jsonToCsv";
 
 const SwipeAble = ({ data }) => {
-    const { utang, setUtang } = useContext(PersonDataContext)
+    const { utang, setUtang} = useContext(PersonDataContext)
     const [modalVisible, setModalVisible] = useState(false)
     const [name, setName] = useState('')
     const swipeRef = useRef(null)
 
-    const ItemTotal = data.balance + data.items.reduce((acc, item) => acc + item.price, 0)
+    
 
     const handleDelete = () => {
         setUtang(utang.filter(item => item.id !== data.id))
@@ -32,6 +33,11 @@ const SwipeAble = ({ data }) => {
         setModalVisible(!modalVisible)
         swipeRef.current?.reset()
     }
+
+    const handleSaveData = () => {
+        console.log(`Sharing ${data.name} data`)
+        share(data, data.name)
+    } 
 
     const renderLeftActions = () =>
     (<>
@@ -67,7 +73,7 @@ const SwipeAble = ({ data }) => {
     const renderRightActions = () =>
     (
         <View style={styles.renderRight}>
-            <TouchableOpacity >
+            <TouchableOpacity onPress={handleSaveData} >
                 <MaterialIcons name='save' size={50} color='#5959B2' />
             </TouchableOpacity>
         </View>
@@ -85,7 +91,7 @@ const SwipeAble = ({ data }) => {
                 renderLeftActions={renderLeftActions}
             >
 
-                <Card name={data.name} total={ItemTotal} />
+                <Card data={data} />
 
             </Swipeable>
         </Animated.View >

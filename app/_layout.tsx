@@ -14,7 +14,7 @@ export default function RootLayout() {
   const [personData, setPersonData] = useState({})
   const [utang, setUtang] = useState([])
   const [mode, setMode] = useState(MODE.IDLE)
-  const [archieveVisible, setArchieveVisible] = useState(true)
+  const [archieveVisible, setArchieveVisible] = useState(false)
   
 
   const colorScheme = useColorScheme();
