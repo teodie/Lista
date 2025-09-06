@@ -121,26 +121,6 @@ const explore = () => {
   }, [utang])
 
 
-  const deleteName = (id) => {
-    Alert.alert(
-      'Deleting Client Data',
-      'Client Data will be permanently deleted\nStill want to delete this client data?',
-      [{ text: 'Cancel', style: 'cancel' }, {
-        text: "Delete", onPress: () => {
-          Alert.alert('Sure na Sure?', '', [
-            { text: 'Hinde', style: 'cancel' },
-            {
-              text: 'Oo',
-              onPress: () => {
-                setUtang(utang.filter(item => item.id !== id))
-              }, style: 'destructive'
-            }])
-        }, style: 'default'
-      }],
-      { cancelable: true },
-    )
-  };
-
 
 
   return (
