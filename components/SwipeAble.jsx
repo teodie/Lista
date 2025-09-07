@@ -94,7 +94,7 @@ const SwipeAble = ({ data }) => {
 
 
     return (
-        <Animated.View layout={LinearTransition.springify()}>
+        <View >
             <Swipeable
                 ref={swipeRef}
                 friction={2}
@@ -107,7 +107,7 @@ const SwipeAble = ({ data }) => {
                 <Card data={data} />
 
             </Swipeable>
-        </Animated.View >
+        </View >
     )
 }
 

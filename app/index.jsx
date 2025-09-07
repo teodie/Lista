@@ -11,7 +11,7 @@ import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
 import ExportArchieve from '@/components/ExportArchieve';
 import SwipeAble from '@/components/SwipeAble';
-import Animated, { useAnimatedStyle, withSpring, withTiming, useSharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withSpring, withTiming, useSharedValue, LinearTransition } from 'react-native-reanimated';
 import { exportToCSV } from '@/utils/jsonToCsv';
 
 const explore = () => {
@@ -150,7 +150,8 @@ const explore = () => {
       </View>
 
       <View style={styles.cardContainer}>
-        <FlatList
+        <Animated.FlatList
+         itemLayoutAnimation={LinearTransition.springify()}
           data={filterName}
           renderItem={({ item }) => <SwipeAble data={item} />}
           keyExtractor={item => item.id.toString()}
