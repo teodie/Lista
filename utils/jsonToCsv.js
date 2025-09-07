@@ -1,11 +1,13 @@
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Parser } from '@json2csv/plainjs';
+import { Alert } from 'react-native';
 
 export const exportToCSV = async (jsonObject, filename) => {
-    
     try {
         const csv = await convertToString(jsonObject)
+
+
         // 3. Define the file path
         const fileUri = FileSystem.documentDirectory + filename + '.csv';
 
@@ -34,33 +36,41 @@ const convertToString = async (data) => {
         const transactionParser = new Parser({ header: true });
         const itemParser = new Parser({ header: true })
 
-        const {items, ...transac} = element
+        const { items, ...transac } = element
 
         const transaction = transactionParser.parse(transac)
-        const item = itemParser.parse(items)
-        all = all + "\n" + transaction + "\n" + item
+
+        if (!items || items.length == 0) {
+            all += transaction + '\n\n'
+        } else {
+            const item = itemParser.parse(items)
+            all += transaction + "\n" + item + "\n\n"
+        }
+
     })
+
     // Trim the \n in the beggining of the data
     return all.trim()
 }
 
+
 export const share = async (jsonObject, filename) => {
-    const parser = new Parser({header: true})
+    const parser = new Parser({ header: true })
 
     const jsonString = parser.parse(jsonObject)
     const filepath = FileSystem.documentDirectory + 'utang ni ' + filename + '.csv'
-    const options = {encoding: FileSystem.EncodingType.UTF8}
-    
+    const options = { encoding: FileSystem.EncodingType.UTF8 }
+
     try {
         await FileSystem.writeAsStringAsync(filepath, jsonString, options)
 
-        if( await Sharing.isAvailableAsync()){
+        if (await Sharing.isAvailableAsync()) {
             await Sharing.shareAsync(filepath)
         } else {
             Alert.alert('Sharing is not available on this device!')
         }
 
-    } catch(e) {
+    } catch (e) {
         console.log(e)
     }
 

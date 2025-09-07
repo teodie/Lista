@@ -24,14 +24,13 @@ const Total = ({ title, amount }) => {
   );
 }
 
-const ArchieveView = ({ sectionData, id }) => {
+const ArchieveView = ({ sectionData, id, name }) => {
 
   const handleDownloadPress = async () => {
     console.log("Fetching Individual data")
     const personData = await IndividualArchieveData(id)
-    console.log(personData)
     // save the individual data
-    exportToCSV(personData)
+    exportToCSV(personData, `${name}_Bayad_na` )
   }
 
   return (
@@ -110,7 +109,7 @@ const items = () => {
 
       <View >
         {archieveVisible
-          ? <ArchieveView sectionData={sectionData} id={personData.id} />
+          ? <ArchieveView sectionData={sectionData} id={personData.id} name={personData.name} />
           : <PaymentView personData={personData} grandTotal={grandTotal} itemTotal={itemTotal} />
         }
       </View>

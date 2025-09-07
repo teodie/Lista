@@ -11,7 +11,8 @@ import { useRef, useState } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MODE } from '@/constants/mode';
-import {fetchArchieveData} from '@/utils/fetchArchieveData'
+import { fetchArchieveData } from '@/utils/fetchArchieveData'
+import { MaterialIcons } from '@expo/vector-icons';
 
 const PaymentInput = ({ setPaying }) => {
     const { personData, setPersonData, utang, setUtang, setMode } = useContext(PersonDataContext);
@@ -19,6 +20,13 @@ const PaymentInput = ({ setPaying }) => {
     const payment = useRef('0')
 
     const handlePaymentPress = async () => {
+        const change = total - payment.current
+        change > 0
+            ? Alert.alert(`Balance of ${change}`)
+            : change < 0
+                ? Alert.alert(`Change of: ${-change}`)
+                : null
+
         setMode(MODE.IDLE)
         const prevData = await fetchArchieveData()
         saveData(prevData)
@@ -27,16 +35,15 @@ const PaymentInput = ({ setPaying }) => {
         payment.current = ''
     }
 
-
     const saveData = async (prevData) => {
         console.log('Saving Data....')
         const remainingBalance = total - Number(payment.current)
-        
+
         const date = new Date();
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const dateString = date.toLocaleDateString('en-US', options);
         //Saving the data
-        const dataToSave = [...(prevData || []), { ...personData, paidDate: dateString, paidAmount: payment.current, remainingBalance: remainingBalance, total: total}]
+        const dataToSave = [...(prevData || []), { ...personData, paidDate: dateString, paidAmount: payment.current, remainingBalance: remainingBalance, total: total }]
         console.log(dataToSave)
         try {
             const saveJsonValue = JSON.stringify(dataToSave)
@@ -50,7 +57,7 @@ const PaymentInput = ({ setPaying }) => {
 
     const updatePersonData = () => {
         const remainingBalance = total - Number(payment.current)
-        const newData = { ...personData, balance: remainingBalance, items: [] }
+        const newData = { ...personData, balance: remainingBalance < 0 ? 0 : remainingBalance , items: [] }
         setUtang(utang.map(element => element.id === personData.id ? newData : element))
         // To remove the data when the items are payed
         setPersonData(newData)
@@ -58,6 +65,8 @@ const PaymentInput = ({ setPaying }) => {
 
     return (
         <>
+            <Text style={{ fontWeight: 'bold', fontSize: 30, marginBottom: 10, color: "#5959B2" }}>Total: {total}</Text>
+
             <TextInput
                 style={styles.paymentInput}
                 keyboardType='numeric'
@@ -76,7 +85,7 @@ const PaymentInput = ({ setPaying }) => {
 
 const Payment = () => {
     const { setArchieveVisible, mode, setMode } = useContext(PersonDataContext);
-    
+
     const handlePaymentPress = () => {
         // Hide the modal for payment
         setMode(MODE.PAYING)
@@ -115,7 +124,7 @@ const styles = StyleSheet.create({
     paymentBtn: {
         margin: 10,
         backgroundColor: '#5959B2',
-        padding: 20,
+        paddingVertical: 10,
         width: '30%',
         borderRadius: 10,
         alignItems: 'center'
