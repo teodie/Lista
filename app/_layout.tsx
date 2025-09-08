@@ -33,6 +33,8 @@ export default function RootLayout() {
         <PersonDataContext.Provider value={ {personData , setPersonData, mode, setMode, utang, setUtang, archieveVisible, setArchieveVisible }} >
           <Stack>
             {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
+            <Stack.Screen name='login' options={{ headerShown: false }} />
+            <Stack.Screen name='signup' options={{ headerShown: false }} /> 
             <Stack.Screen name='index' options={{ headerShown: false }} />
             <Stack.Screen name='items' options={{ headerShown: true, title: 'Details', headerRight: () => <Payment />, headerStyle: { backgroundColor: '#5959B2' } }} />
           </Stack>
