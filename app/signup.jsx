@@ -1,10 +1,11 @@
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions, Image, KeyboardAvoidingView } from 'react-native'
-import React from 'react'
-import { TextInput } from 'react-native-gesture-handler'
+import React, { useState } from 'react'
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { router } from 'expo-router'
+import { TextInput, Button } from 'react-native-paper'
 
 const signup = () => {
+    const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
 
@@ -14,35 +15,62 @@ const signup = () => {
                 <Animated.Image entering={FadeInUp.duration(100).springify()} style={styles.logo} source={require('@/assets/images/splash-icon-light.png')} />
             </View>
             <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={-90} >
-            <View style={styles.lower}>
+                <View style={styles.lower}>
 
-                <Animated.View entering={FadeInUp.duration(1000).springify()} >
-                    <TextInput style={styles.textInput} placeholder='Username' placeholderTextColor="gray" />
-                </Animated.View>
+                    <Animated.View entering={FadeInUp.duration(1000).springify()} >
+                        <TextInput
+                            label='Username'
+                            autoCapitalize='none'
+                            keyboardType='text'
+                            placeholder='your name'
+                            outlineColor='white'
+                            mode="outlined"
+                            left={<TextInput.Icon icon="account-outline" />}
+                        />
+                    </Animated.View>
 
-                <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} >
-                    <TextInput style={styles.textInput} placeholder='Email' placeholderTextColor="gray" />
-                </Animated.View>
 
-                <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()} >
-                    <TextInput style={styles.textInput} placeholder='Password' placeholderTextColor="gray" secureTextEntry />
-                </Animated.View>
 
-                <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} >
-                    <TouchableOpacity >
-                        <View style={styles.loginBtn}>
-                            <Text style={styles.loginText} >Sign Up</Text>
-                        </View>
-                    </TouchableOpacity>
-                </Animated.View>
-                <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()}  style={styles.signupWrapper}>
-                    <Text>Already have an account? </Text>
-                    <TouchableOpacity onPress={() => router.navigate({pathname: 'login'})}>
-                        <Text style={styles.signupTxt} >Log in</Text>
-                    </TouchableOpacity>
-                </Animated.View>
-            </View>
-        </KeyboardAvoidingView>
+                    <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} >
+                        <TextInput
+                            label='email'
+                            autoCapitalize='none'
+                            keyboardType='email-address'
+                            placeholder='youremail@gmail.com'
+                            outlineColor='white'
+                            mode="outlined"
+                            left={<TextInput.Icon icon="email-outline" />}
+                        />
+                    </Animated.View>
+
+                    <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()} >
+                        <TextInput
+                            label='password'
+                            autoCapitalize='none'
+                            secureTextEntry={eyeIsOpen}
+                            mode="outlined"
+                            placeholder='Type your password'
+                            outlineColor='white'
+                            left={<TextInput.Icon icon="lock-outline" />}
+                            right={<TextInput.Icon icon={eyeIsOpen ? 'eye' : 'eye-off'} onPress={() => setEyes(prev => !prev)} />}
+                        />
+                    </Animated.View>
+
+                    <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} >
+                        <TouchableOpacity >
+                            <View style={styles.loginBtn}>
+                                <Text style={styles.loginText} >Sign Up</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </Animated.View>
+                    <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()} style={styles.signupWrapper}>
+                        <Text>Already have an account? </Text>
+                        <TouchableOpacity onPress={() => router.navigate({ pathname: 'login' })}>
+                            <Text style={styles.signupTxt} >Log in</Text>
+                        </TouchableOpacity>
+                    </Animated.View>
+                </View>
+            </KeyboardAvoidingView>
         </View>
     )
 }
@@ -62,7 +90,7 @@ function createStyles(height, width,) {
                 alignItems: 'center'
             }, lower: {
                 paddingHorizontal: width * .05,
-                height: height * .50,
+                height: height * .50 + 100,
                 backgroundColor: '#EBEFEE',
                 borderTopLeftRadius: width / 15,
                 borderTopRightRadius: width / 15,

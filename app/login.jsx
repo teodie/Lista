@@ -1,10 +1,11 @@
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions, Image, KeyboardAvoidingView } from 'react-native'
-import React from 'react'
-import { TextInput } from 'react-native-gesture-handler'
+import React, { useState } from 'react'
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { router } from 'expo-router'
+import { TextInput, Button } from 'react-native-paper'
 
 const login = () => {
+    const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
 
@@ -18,11 +19,28 @@ const login = () => {
 
                 <View style={styles.lower}>
                     <Animated.View entering={FadeInUp.duration(1000).springify()} >
-                        <TextInput style={styles.textInput} placeholder='Email' placeholderTextColor="gray" />
+                        <TextInput
+                            label='email'
+                            autoCapitalize='none'
+                            keyboardType='email-address'
+                            placeholder='youremail@gmail.com'
+                            outlineColor='white'
+                            mode="outlined"
+                            left={<TextInput.Icon icon="email-outline" />}
+                            />
                     </Animated.View>
 
                     <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} >
-                        <TextInput style={styles.textInput} placeholder='Password' placeholderTextColor="gray" secureTextEntry />
+                        <TextInput
+                            label='password'
+                            autoCapitalize='none'
+                            secureTextEntry = {eyeIsOpen}
+                            mode="outlined"
+                            placeholder='Type your password'
+                            outlineColor='white'
+                            left={<TextInput.Icon icon="lock-outline" />}
+                            right={<TextInput.Icon icon={eyeIsOpen ? 'eye' : 'eye-off'} onPress={() => setEyes(prev => !prev)} />}
+                            />
                     </Animated.View>
 
                     <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()}  >

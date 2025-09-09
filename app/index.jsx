@@ -17,7 +17,7 @@ import { Redirect } from "expo-router";
 
 
 const explore = () => {
-  return <Redirect href="/login" />;
+  return <Redirect href="/signup" />;
 
 
   const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
