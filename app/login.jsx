@@ -1,13 +1,31 @@
-import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions, Image, KeyboardAvoidingView } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, TouchableOpacity, View, useWindowDimensions, Image, KeyboardAvoidingView } from 'react-native'
+import React, { useState, useReducer } from 'react'
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { router } from 'expo-router'
-import { TextInput, Button } from 'react-native-paper'
+import { TextInput, Button, Text, useTheme } from 'react-native-paper'
+import { useAuth } from '@/utils/auth-context'
 
 const login = () => {
+    const {logIn} = useAuth()
     const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [error, setError] = useState(null)
+
+    const theme = useTheme()
+
+    const handleLogin = async () => {
+        if (!email) setError("Email can't be empty.")
+        if (!password) setError("Password can't be empty.")
+        setError(null)
+
+        const error = await logIn(email, password)
+        if(error) return setError(error)
+        
+        router.replace('/')
+    }
 
     return (
         <View style={styles.container}>
@@ -26,22 +44,30 @@ const login = () => {
                             placeholder='youremail@gmail.com'
                             outlineColor='white'
                             mode="outlined"
+                            onChangeText={setEmail}
                             left={<TextInput.Icon icon="email-outline" />}
-                            />
+                        />
                     </Animated.View>
 
                     <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} >
                         <TextInput
                             label='password'
                             autoCapitalize='none'
-                            secureTextEntry = {eyeIsOpen}
+                            secureTextEntry={eyeIsOpen}
                             mode="outlined"
                             placeholder='Type your password'
                             outlineColor='white'
+                            onChangeText={setPassword}
                             left={<TextInput.Icon icon="lock-outline" />}
                             right={<TextInput.Icon icon={eyeIsOpen ? 'eye' : 'eye-off'} onPress={() => setEyes(prev => !prev)} />}
-                            />
+                        />
                     </Animated.View>
+
+                    {error
+                        ? <Text style={{ color: theme.colors.error }}>{error}</Text>
+                        : null
+                    }
+
 
                     <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()}  >
                         <TouchableOpacity>
@@ -50,7 +76,7 @@ const login = () => {
                     </Animated.View>
 
                     <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} >
-                        <TouchableOpacity >
+                        <TouchableOpacity onPress={handleLogin} >
                             <View style={styles.loginBtn}>
                                 <Text style={styles.loginText} >Log in</Text>
                             </View>
@@ -59,7 +85,7 @@ const login = () => {
                     <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()} style={styles.signupWrapper}>
                         <Text>Dont have an account? </Text>
                         <TouchableOpacity onPress={() => router.navigate({ pathname: 'signup' })}>
-                            <Text style={styles.signupTxt} > Sign Up</Text>
+                            <Text style={styles.signupTxt} >Sign Up</Text>
                         </TouchableOpacity>
                     </Animated.View>
                 </View>

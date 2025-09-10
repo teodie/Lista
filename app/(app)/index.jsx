@@ -2,9 +2,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, P
 import React, { useEffect, useMemo, useState, useContext, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
-import { utangData } from '../constants/utangList';
+import { utangData } from '@/constants/utangList';
 import AddItems from '@/components/AddItems';
-import { MODE } from '../constants/mode';
+import { MODE } from '@/constants/mode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalContainer from '@/components/ModalContainer';
 import { PersonDataContext } from '@/context';
@@ -17,9 +17,6 @@ import { Redirect } from "expo-router";
 
 
 const explore = () => {
-  return <Redirect href="/signup" />;
-
-
   const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
   const [id, setId] = useState(null);
 
