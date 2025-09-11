@@ -16,6 +16,7 @@ import { exportToCSV } from '@/utils/jsonToCsv';
 import { Redirect } from "expo-router";
 
 
+
 const explore = () => {
   const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
   const [id, setId] = useState(null);

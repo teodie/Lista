@@ -5,25 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PersonDataContext } from '@/context';
 import { useState, useEffect } from 'react';
 import { MODE } from '@/constants/mode'
-import { router } from 'expo-router';
 import AuthProvider from '@/utils/auth-context'
-
-
-function RouteGaurd({ children }: { children: React.ReactNode }) {
-  const isAuth = false
-
-  useEffect(() => {
-    if (!isAuth) {
-      // router.replace('/login')
-      const timer = setTimeout(() => {
-        router.navigate('/signup')
-      }, 100)
-      return () => clearTimeout(timer)
-    }
-  }, [isAuth])
-
-  return <>{children}</>
-}
 
 
 export default function RootLayout() {
@@ -37,13 +19,10 @@ export default function RootLayout() {
       <PersonDataContext.Provider value={{ personData, setPersonData, mode, setMode, utang, setUtang, archieveVisible, setArchieveVisible }} >
         <AuthProvider>
           <StatusBar style='light' />
-          <RouteGaurd>
             <Stack>
               <Stack.Screen name='(app)' options={{ headerShown: false }} />
-              <Stack.Screen name='login' options={{ headerShown: false }} />
-              <Stack.Screen name='signup' options={{ headerShown: false }} />
+              <Stack.Screen name='(auth)' options={{ headerShown: false }} />
             </Stack>
-          </RouteGaurd>
         </AuthProvider>
       </PersonDataContext.Provider>
     </GestureHandlerRootView >

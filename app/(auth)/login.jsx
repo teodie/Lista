@@ -6,7 +6,7 @@ import { TextInput, Button, Text, useTheme } from 'react-native-paper'
 import { useAuth } from '@/utils/auth-context'
 
 const login = () => {
-    const {logIn} = useAuth()
+    const { logIn } = useAuth()
     const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
@@ -17,13 +17,14 @@ const login = () => {
     const theme = useTheme()
 
     const handleLogin = async () => {
-        if (!email) setError("Email can't be empty.")
-        if (!password) setError("Password can't be empty.")
+        if (!email.trim()) return setError("Email can't be empty.")
+        if (!password.trim()) return setError("Password can't be empty.")
         setError(null)
 
         const error = await logIn(email, password)
-        if(error) return setError(error)
-        
+        console.log(JSON.stringify(error))
+        if (error) return setError(error)
+
         router.replace('/')
     }
 
@@ -69,8 +70,8 @@ const login = () => {
                     }
 
 
-                    <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()}  >
-                        <TouchableOpacity>
+                    <Animated.View style={styles.forgotWrapper} entering={FadeInUp.delay(400).duration(1000).springify()}  >
+                        <TouchableOpacity onPress={() => router.navigate('fpass')}>
                             <Text style={styles.forgotTxt}>Forgot Password?</Text>
                         </TouchableOpacity>
                     </Animated.View>
@@ -84,7 +85,7 @@ const login = () => {
                     </Animated.View>
                     <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()} style={styles.signupWrapper}>
                         <Text>Dont have an account? </Text>
-                        <TouchableOpacity onPress={() => router.navigate({ pathname: 'signup' })}>
+                        <TouchableOpacity onPress={() => router.replace('signup')}>
                             <Text style={styles.signupTxt} >Sign Up</Text>
                         </TouchableOpacity>
                     </Animated.View>
@@ -129,10 +130,12 @@ function createStyles(height, width,) {
                 color: 'white'
             },
             forgotTxt: {
-                alignSelf: 'flex-end',
                 fontSize: width / 30,
                 color: '#5959B2',
                 fontWeight: 'bold',
+            },
+            forgotWrapper: {
+                alignSelf: 'flex-end'
             },
             loginBtn: {
                 height: width * .13,
