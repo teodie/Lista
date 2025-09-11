@@ -4,19 +4,24 @@ import { account } from "@/utils/appWrite"
 
 const AuthContext = createContext(undefined)
 
+
 export default AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
 
-    const signUp = async (email, password) => {
+    const signUp = async (email, password, username) => {
         try {
-            await account.create(ID.unique(), email, password);
-            return null;
+            const result = await account.create( ID.unique(), email, password, username );
+            console.log(result)
+            return null
         } catch (error) {
-            if (error instanceof Error) {
-                return error.message;
-            }
+            console.error("Full error object:", error);
+            console.error("Error message:", error.message);
+            console.error("Error type:", error.type);
+            console.error("Error code:", error.code);
+            
+            if(error instanceof Error) return error.message
 
-            return "An error occured during signup";
+            return "Error occured while creating account."
         }
     };
 
@@ -25,7 +30,7 @@ export default AuthProvider = ({ children }) => {
             await account.createEmailPasswordSession(email, password)
             const session = await account.get()
 
-            setUser(sanitizedUser)
+            setUser(session)
             return null
         } catch (error) {
             if (error instanceof Error) {

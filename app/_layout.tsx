@@ -16,7 +16,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
     if (!isAuth) {
       // router.replace('/login')
       const timer = setTimeout(() => {
-        router.navigate('/login')
+        router.navigate('/signup')
       }, 100)
       return () => clearTimeout(timer)
     }

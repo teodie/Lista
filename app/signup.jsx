@@ -8,7 +8,7 @@ import { account } from '@/utils/appWrite'
 import { ID, Models } from "react-native-appwrite";
 
 const signup = () => {
-    const { signUp, logIn } = useAuth()
+    const { signUp } = useAuth()
     const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
@@ -20,34 +20,16 @@ const signup = () => {
 
     const theme = useTheme()
 
-    const testSignUp = async () => {
-        console.log("trying to create account")
-        try {
-            const result = await account.create( ID.unique(), 'email@example.com', 'this_is_password', 'teodi' );
-            console.log(result)
-        } catch (error) {
-            console.error("Full error object:", error);
-            console.error("Error message:", error.message);
-            console.error("Error type:", error.type);
-            console.error("Error code:", error.code);
-            
-            if(error instanceof Error) return error.message
-
-            return "Error occured while creating account."
-        }
-
-
-
-    }
 
     const handleSignUp = async () => {
-        // if(!username) return setError("User name is empty")
+        console.log(`Creating account for name: ${username} email: ${email} pass: ${password}`)
+        if(!username) return setError("User name is empty")
         if (!email) return setError("Email can't be empty.")
         if (!password) return setError("Password can't be empty.")
         
         setError(null)
 
-        const error = await signUp(email, password)
+        const error = await signUp(email, password, username)
         if(error) return setError(error)
 
         router.replace('/login')
@@ -65,8 +47,8 @@ const signup = () => {
                         <TextInput
                             label='Username'
                             autoCapitalize='none'
+                            value={username}
                             keyboardType='text'
-                            placeholder='your name'
                             outlineColor='white'
                             mode="outlined"
                             left={<TextInput.Icon icon="account-outline" />}
@@ -80,8 +62,8 @@ const signup = () => {
                         <TextInput
                             label='email'
                             autoCapitalize='none'
+                            value={email}
                             keyboardType='email-address'
-                            placeholder='youremail@gmail.com'
                             outlineColor='white'
                             mode="outlined"
                             left={<TextInput.Icon icon="email-outline" />}
@@ -95,9 +77,9 @@ const signup = () => {
                             autoCapitalize='none'
                             secureTextEntry={eyeIsOpen}
                             mode="outlined"
-                            placeholder='Type your password'
+                            value={password}
                             outlineColor='white'
-                            onChange={setPassword}
+                            onChangeText={setPassword}
                             left={<TextInput.Icon icon="lock-outline" />}
                             right={<TextInput.Icon icon={eyeIsOpen ? 'eye' : 'eye-off'} onPress={() => setEyes(prev => !prev)} />}
                         />
@@ -109,7 +91,7 @@ const signup = () => {
                     }
 
                     <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} >
-                        <TouchableOpacity onPress={() => testSignUp()}>
+                        <TouchableOpacity onPress={handleSignUp}>
                             <View style={styles.loginBtn}>
                                 <Text style={styles.loginText} >Sign Up</Text>
                             </View>
