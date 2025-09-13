@@ -91,7 +91,11 @@ const login = () => {
                     </Animated.View>
 
                     <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()}>
-                        <Button mode='outlined' icon={googleIcon} labelStyle={{ color: '' }} onPress={() => setError(googleSignUp())} >
+                        <Button mode='outlined' icon={googleIcon} labelStyle={{ color: '' }} onPress={async () => {
+                            setError(null);
+                            const error = await googleSignUp();
+                            if (error) setError(error);
+                        }} >
                             Sign in with Google
                         </Button>
                     </Animated.View>
