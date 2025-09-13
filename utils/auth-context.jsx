@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { ID } from "react-native-appwrite";
 import { account, OauthProvider } from "@/utils/appWrite"
 import toast from '@/utils/toast'
+import { makeRedirectUri } from 'expo-auth-session'
+import * as WebBrowser from 'expo-web-browser';
 
 const AuthContext = createContext(undefined)
 
@@ -66,38 +68,74 @@ export default AuthProvider = ({ children }) => {
 
     try {
       // Check if we're in a web environment
-      if (typeof window === 'undefined') {
-        console.log("Not in web environment");
-        return "Google sign-in is not available in this environment";
-      }
-      
-      console.log("In web environment, proceeding with OAuth");
-      
-      // For web browsers, we need to handle the OAuth flow differently
-      const currentUrl = window.location.origin;
-      console.log("Current URL:", currentUrl);
-      const successUrl = `${currentUrl}/`;
-      const failureUrl = `${currentUrl}/login`;
-      
-      console.log("Success URL:", successUrl);
-      console.log("Failure URL:", failureUrl);
-      
-      console.log("Creating OAuth session...");
-      const result = await account.createOAuth2Session({
-        provider: OauthProvider.Google,
-        success: successUrl,
-        failure: failureUrl,
-      });
-      
-      console.log("OAuth session created successfully:", result);
-      
-      // Redirect to the OAuth URL
-      if (result && result.href) {
-        console.log("Redirecting to:", result.href);
-        window.location.href = result.href;
+      if (typeof window !== 'undefined') {
+        console.log("In web environment, using web OAuth");
+        
+        // For web browsers
+        const currentUrl = window.location.origin;
+        const successUrl = `${currentUrl}/`;
+        const failureUrl = `${currentUrl}/login`;
+        
+        const result = await account.createOAuth2Session({
+          provider: OauthProvider.Google,
+          success: successUrl,
+          failure: failureUrl,
+        });
+        
+        if (result && result.href) {
+          window.location.href = result.href;
+        } else {
+          return "Failed to get OAuth redirect URL";
+        }
       } else {
-        console.error("No redirect URL received from OAuth session");
-        return "Failed to get OAuth redirect URL";
+        console.log("In mobile environment, using mobile OAuth");
+        
+        // For mobile apps (Android/iOS)
+        const redirectUri = makeRedirectUri({ preferLocalhost: true });
+        console.log("Redirect URI:", redirectUri);
+        
+        const scheme = `${redirectUri.split('://')[0]}://`;
+        console.log("Scheme:", scheme);
+        
+        // Create OAuth URL
+        const loginUrl = account.createOAuth2Token(
+          OauthProvider.Google,
+          redirectUri,
+          redirectUri
+        );
+        
+        console.log("OAuth URL:", loginUrl);
+        
+        // Open OAuth in browser
+        const result = await WebBrowser.openAuthSessionAsync(loginUrl, scheme);
+        
+        console.log("WebBrowser result:", result);
+        
+        if (result.type === 'success' && result.url) {
+          // Extract credentials from OAuth redirect URL
+          const url = new URL(result.url);
+          const secret = url.searchParams.get('secret');
+          const userId = url.searchParams.get('userId');
+          
+          console.log("OAuth credentials:", { secret, userId });
+          
+          if (secret && userId) {
+            // Create session with OAuth credentials
+            await account.createSession({
+              userId,
+              secret
+            });
+            
+            // Get user data after successful OAuth
+            await getUser();
+            
+            toast("Successfully signed in with Google!");
+          } else {
+            return "Failed to get OAuth credentials";
+          }
+        } else {
+          return "OAuth was cancelled or failed";
+        }
       }
     } catch (error) {
       console.error("Google OAuth error:", error);
