@@ -23,16 +23,14 @@ const signup = () => {
 
     const handleSignUp = async () => {
         console.log(`Creating account for name: ${username} email: ${email} pass: ${password}`)
-        if(!username) return setError("User name is empty")
+        if (!username) return setError("User name is empty")
         if (!email) return setError("Email can't be empty.")
         if (!password) return setError("Password can't be empty.")
-        
+
         setError(null)
 
         const error = await signUp(email, password, username)
-        if(error) return setError(error)
-
-        router.replace('/login')
+        if (error) return setError(error)
     }
 
     return (
@@ -90,13 +88,12 @@ const signup = () => {
                         : null
                     }
 
-                    <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} >
-                        <TouchableOpacity onPress={handleSignUp}>
-                            <View style={styles.loginBtn}>
-                                <Text style={styles.loginText} >Sign Up</Text>
-                            </View>
-                        </TouchableOpacity>
+                    <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()}>
+                        <Button mode='contained' buttonColor='#5959B2' onPress={handleSignUp} >
+                            Sign up
+                        </Button>
                     </Animated.View>
+
                     <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()} style={styles.signupWrapper}>
                         <Text>Already have an account? </Text>
                         <TouchableOpacity onPress={() => router.navigate({ pathname: '/login' })}>

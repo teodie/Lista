@@ -83,6 +83,7 @@ const login = () => {
                             <Text style={styles.forgotTxt}>Forgot Password?</Text>
                         </TouchableOpacity>
                     </Animated.View>
+                    
                     <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()}>
                         <Button mode='contained' buttonColor='#5959B2' onPress={handleLogin} >
                             Log in
