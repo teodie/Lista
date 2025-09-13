@@ -20,8 +20,8 @@ export default function RootLayout() {
         <AuthProvider>
           <StatusBar style='light' />
             <Stack>
-              <Stack.Screen name='(app)' options={{ headerShown: false }} />
               <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+              <Stack.Screen name='(app)' options={{ headerShown: false }} />
             </Stack>
         </AuthProvider>
       </PersonDataContext.Provider>

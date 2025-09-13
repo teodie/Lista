@@ -5,8 +5,12 @@ import { router } from 'expo-router'
 import { TextInput, Button, Text, useTheme } from 'react-native-paper'
 import { useAuth } from '@/utils/auth-context'
 
+
+const googleIcon = require('@/assets/images/google-icon.png')
+
+
 const login = () => {
-    const { logIn } = useAuth()
+    const { logIn, googleSignUp } = useAuth()
     const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
@@ -17,16 +21,20 @@ const login = () => {
     const theme = useTheme()
 
     const handleLogin = async () => {
+        if (!email.includes('@gmail.com')) return setError("Invalid email address.")
         if (!email.trim()) return setError("Email can't be empty.")
         if (!password.trim()) return setError("Password can't be empty.")
+        if (password.trim().length <= 8) return setError("Password must be atleast 8 characters long.")
+
         setError(null)
 
         const error = await logIn(email, password)
-        console.log(JSON.stringify(error))
+        console.log(typeof (error))
         if (error) return setError(error)
 
         router.replace('/')
     }
+
 
     return (
         <View style={styles.container}>
@@ -34,7 +42,6 @@ const login = () => {
                 <Animated.Image entering={FadeInUp.duration(100).springify()} style={styles.logo} source={require('@/assets/images/splash-icon-light.png')} />
             </View>
             <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={-90} >
-
 
                 <View style={styles.lower}>
                     <Animated.View entering={FadeInUp.duration(1000).springify()} >
@@ -45,6 +52,7 @@ const login = () => {
                             placeholder='youremail@gmail.com'
                             outlineColor='white'
                             mode="outlined"
+                            value={email}
                             onChangeText={setEmail}
                             left={<TextInput.Icon icon="email-outline" />}
                         />
@@ -56,6 +64,7 @@ const login = () => {
                             autoCapitalize='none'
                             secureTextEntry={eyeIsOpen}
                             mode="outlined"
+                            value={password}
                             placeholder='Type your password'
                             outlineColor='white'
                             onChangeText={setPassword}
@@ -69,21 +78,24 @@ const login = () => {
                         : null
                     }
 
-
                     <Animated.View style={styles.forgotWrapper} entering={FadeInUp.delay(400).duration(1000).springify()}  >
                         <TouchableOpacity onPress={() => router.navigate('fpass')}>
                             <Text style={styles.forgotTxt}>Forgot Password?</Text>
                         </TouchableOpacity>
                     </Animated.View>
-
-                    <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} >
-                        <TouchableOpacity onPress={handleLogin} >
-                            <View style={styles.loginBtn}>
-                                <Text style={styles.loginText} >Log in</Text>
-                            </View>
-                        </TouchableOpacity>
+                    <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()}>
+                        <Button mode='contained' buttonColor='#5959B2' onPress={handleLogin} >
+                            Log in
+                        </Button>
                     </Animated.View>
-                    <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()} style={styles.signupWrapper}>
+
+                    <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()}>
+                        <Button mode='outlined' icon={googleIcon} labelStyle={{ color: '' }} onPress={() => setError(googleSignUp())} >
+                            Sign in with Google
+                        </Button>
+                    </Animated.View>
+
+                    <Animated.View entering={FadeInUp.delay(1000).duration(1000).springify()} style={styles.signupWrapper}>
                         <Text>Dont have an account? </Text>
                         <TouchableOpacity onPress={() => router.replace('signup')}>
                             <Text style={styles.signupTxt} >Sign Up</Text>

@@ -6,4 +6,3 @@ export const client = new Client()
     .setPlatform(process.env.EXPO_PUBLIC_APPWRITE_PLATFORM)
 
 export const account = new Account(client)
-
