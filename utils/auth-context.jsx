@@ -2,8 +2,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { ID } from "react-native-appwrite";
 import { account, OauthProvider } from "@/utils/appWrite"
 import toast from '@/utils/toast'
-import { makeRedirectUri } from 'expo-auth-session'
+import { makeRedirectUri, Prompt, ResponseType, useAuthRequest } from 'expo-auth-session'
 import * as WebBrowser from 'expo-web-browser';
+import { Platform } from "react-native";
 
 const AuthContext = createContext(undefined)
 
@@ -12,6 +13,34 @@ export default AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [isLoadingUser, setIsLoadingUser] = useState(true)
 
+
+  const redirectUri = makeRedirectUri({ scheme: 'lista' });
+
+
+  // Step 3: Create auth request configuration
+  const authRequestConfig = {
+    responseType: ResponseType.Code,
+    clientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID, // Optional: your Google client ID
+    scopes: ['openid', 'profile', 'email'],
+    redirectUri: redirectUri,
+    additionalParameters: {},
+    prompt: Prompt.SelectAccount,
+  };
+
+  // Step 2: Get Appwrite OAuth URL
+  const oauthUrl = account.createOAuth2Session(
+    OauthProvider.Google,
+    redirectUri,
+    redirectUri // Same for success/failure in this case
+  );
+
+  const [request, response, promptAsync] = useAuthRequest(
+    authRequestConfig,
+    {
+      authorizationEndpoint: oauthUrl, // Use Appwrite's OAuth URL
+    }
+  );
+
   useEffect(() => {
     // Check if we're returning from OAuth
     handleOAuthRedirect();
@@ -19,29 +48,30 @@ export default AuthProvider = ({ children }) => {
   }, []);
 
   const handleOAuthRedirect = async () => {
+
     try {
       // Check if we're in a web environment
       if (typeof window === 'undefined') return;
-      
+
       // Check if we have OAuth parameters in the URL
       const urlParams = new URLSearchParams(window.location.search);
       const secret = urlParams.get('secret');
       const userId = urlParams.get('userId');
       console.log("OAuth params:", { secret, userId });
-      
+
       if (secret && userId) {
         console.log("OAuth redirect detected, creating session...");
         await account.createSession({
           userId,
           secret
         });
-        
+
         // Get user data after successful OAuth
         await getUser();
-        
+
         // Clean up URL parameters
         window.history.replaceState({}, document.title, window.location.pathname);
-        
+
         // Show success message
         toast("Successfully signed in with Google!");
       }
@@ -65,77 +95,104 @@ export default AuthProvider = ({ children }) => {
 
   const googleSignUp = async () => {
     console.log("Google signUp function called")
+    console.log("Platform: ", Platform.OS)
 
     try {
       // Check if we're in a web environment
-      if (typeof window !== 'undefined') {
+      if (Platform.OS === 'web') {
         console.log("In web environment, using web OAuth");
-        
+
         // For web browsers
         const currentUrl = window.location.origin;
         const successUrl = `${currentUrl}/`;
         const failureUrl = `${currentUrl}/login`;
-        
+
         const result = await account.createOAuth2Session({
           provider: OauthProvider.Google,
           success: successUrl,
           failure: failureUrl,
         });
-        
+
         if (result && result.href) {
           window.location.href = result.href;
         } else {
           return "Failed to get OAuth redirect URL";
         }
-      } else {
+
+      } else if (Platform.OS === 'android') {
         console.log("In mobile environment, using mobile OAuth");
-        
+
         // For mobile apps (Android/iOS)
-        const redirectUri = makeRedirectUri({ preferLocalhost: true });
+        // const redirectUri = makeRedirectUri({ scheme: 'lista' });
         console.log("Redirect URI:", redirectUri);
-        
-        const scheme = `${redirectUri.split('://')[0]}://`;
-        console.log("Scheme:", scheme);
-        
-        // Create OAuth URL
-        const loginUrl = account.createOAuth2Token(
-          OauthProvider.Google,
-          redirectUri,
-          redirectUri
-        );
-        
-        console.log("OAuth URL:", loginUrl);
-        
-        // Open OAuth in browser
-        const result = await WebBrowser.openAuthSessionAsync(loginUrl, scheme);
-        
-        console.log("WebBrowser result:", result);
-        
-        if (result.type === 'success' && result.url) {
-          // Extract credentials from OAuth redirect URL
-          const url = new URL(result.url);
-          const secret = url.searchParams.get('secret');
-          const userId = url.searchParams.get('userId');
-          
-          console.log("OAuth credentials:", { secret, userId });
-          
-          if (secret && userId) {
-            // Create session with OAuth credentials
-            await account.createSession({
-              userId,
-              secret
-            });
-            
-            // Get user data after successful OAuth
-            await getUser();
-            
-            toast("Successfully signed in with Google!");
-          } else {
-            return "Failed to get OAuth credentials";
-          }
-        } else {
-          return "OAuth was cancelled or failed";
-        }
+
+
+        // // Step 2: Get Appwrite OAuth URL
+        // const oauthUrl = await account.createOAuth2Token(
+        //   OauthProvider.Google,
+        //   redirectUri,
+        //   redirectUri // Same for success/failure in this case
+        // );
+
+        console.log("App write oauth link: ", oauthUrl)
+
+        // const authRequestConfig = {
+        //   responseType: ResponseType.Code,
+        //   clientId: process.env.EXPO_PUBLIC_CLIENT_ID, // Optional: your Google client ID
+        //   scopes: ['openid', 'profile', 'email'],
+        //   redirectUri: redirectUri,
+        //   additionalParameters: {},
+        //   prompt: Prompt.SelectAccount,
+        // };
+
+        console.log("request config: ", authRequestConfig)
+
+        // // Step 4: Create auth request
+        // const [request, response, promptAsync] = useAuthRequest(
+        //   authRequestConfig,
+        //   {
+        //     authorizationEndpoint: oauthUrl, // Use Appwrite's OAuth URL
+        //   }
+        // );
+
+        console.log("Auth request created:", request);
+
+        // Step 5: Start OAuth flow
+        console.log("Starting OAuth flow...");
+        const result = await promptAsync({
+          dismissButtonStyle: 'close',
+          showInRecents: true,
+        });
+
+        console.log("Auth session result:", result);
+
+        // if (result.type === 'success' && result.url) {
+        //   // Extract credentials from OAuth redirect URL
+        //   const url = new URL(result.url);
+        //   const secret = url.searchParams.get('secret');
+        //   const userId = url.searchParams.get('userId');
+
+        //   console.log("OAuth credentials:", { secret, userId });
+
+        //   if (secret && userId) {
+        //     // Create session with OAuth credentials
+        //     await account.createSession({
+        //       userId,
+        //       secret
+        //     });
+
+        //     // Get user data after successful OAuth
+        //     await getUser();
+
+        //     toast("Successfully signed in with Google!");
+        //   } else {
+        //     return "Failed to get OAuth credentials";
+        //   }
+        // } else {
+        //   return "OAuth was cancelled or failed";
+        // }
+
+
       }
     } catch (error) {
       console.error("Google OAuth error:", error);
