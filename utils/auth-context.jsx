@@ -16,7 +16,7 @@ export default AuthProvider = ({ children }) => {
 
   const android_OAuth = async () => {
 
-    const deepLink = new URL(makeRedirectUri({ preferLocalhost: true }));
+    const deepLink = new URL(makeRedirectUri({ preferLocalhost: true, path: 'waiting'}));
     console.log("deepLink: ", deepLink)
     const scheme = `${deepLink.protocol}//`;
     console.log("scheme: ", scheme)
@@ -26,11 +26,31 @@ export default AuthProvider = ({ children }) => {
       `${deepLink}`,
       `${deepLink}`,
     );
-    console.log(loginUrl)
 
-    // Open loginUrl and listen for the scheme redirect
     const result = await WebBrowser.openAuthSessionAsync(`${loginUrl}`, scheme);
-    console.log(result)
+    console.log("result: ", result)
+    // Extract credentials from OAuth redirect URL
+    const url = new URL(result.url);
+    const secret = url.searchParams.get('secret');
+    const userId = url.searchParams.get('userId');
+
+    console.log("secret: ", secret)
+    console.log("userID: ", userId)
+
+    if (secret && userId) {
+      console.log("OAuth redirect detected, creating session...");
+      await account.createSession({
+        userId,
+        secret
+      });
+    }
+    
+    await getUser()
+    
+    if (Platform.OS === 'android') {
+      toast("Successfully signed in with Google!");
+    }
+
 
   }
 
@@ -106,6 +126,7 @@ export default AuthProvider = ({ children }) => {
       const session = await account.get();
       console.log("Session: ", session)
       setUser(session);
+      console.log("user has been set: ")
     } catch (error) {
       setUser(null);
     } finally {

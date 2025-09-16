@@ -5,12 +5,12 @@ import { router } from 'expo-router'
 import { TextInput, Button, Text, useTheme } from 'react-native-paper'
 import { useAuth } from '@/utils/auth-context'
 
-
 const googleIcon = require('@/assets/images/google-icon.png')
 
 
 const login = () => {
-    const { logIn, googleSignUp } = useAuth()
+
+    const { logIn, googleSignUp, setIsLoadingUser } = useAuth()
     const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
@@ -95,6 +95,8 @@ const login = () => {
                             setError(null);
                             const error = await googleSignUp();
                             if (error) setError(error);
+                            router.replace('/')
+            
                         }} >
                             Sign in with Google
                         </Button>
