@@ -4,8 +4,6 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { router } from 'expo-router'
 import { TextInput, Button, Text, useTheme } from 'react-native-paper'
 import { useAuth } from '@/utils/auth-context'
-import { account } from '@/utils/appWrite'
-import { ID, Models } from "react-native-appwrite";
 
 const signup = () => {
     const { signUp } = useAuth()
@@ -31,6 +29,8 @@ const signup = () => {
 
         const error = await signUp(email, password, username)
         if (error) return setError(error)
+
+        router.replace('/login')
     }
 
     return (

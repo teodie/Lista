@@ -10,7 +10,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
   const { user, isLoadingUser } = useAuth()
 
   useEffect(() => {
-
+    console.log("user or the is loading change checking redirects")
     if (!user && !isLoadingUser) {
       router.replace('/login')
     }

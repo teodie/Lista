@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PersonDataContext } from '@/context';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { MODE } from '@/constants/mode'
 import AuthProvider from '@/utils/auth-context'
 

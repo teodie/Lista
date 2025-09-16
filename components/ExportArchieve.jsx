@@ -5,7 +5,6 @@ import { exportToCSV } from '@/utils/jsonToCsv'
 import { fetchArchieveData } from '@/utils/fetchArchieveData'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useAuth } from '@/utils/auth-context'
-import { router } from 'expo-router'
 
 const ExportArchieve = () => {
     const {signOut} = useAuth()
@@ -15,18 +14,12 @@ const ExportArchieve = () => {
         exportToCSV(allArcieveData, "Mga bayad na")
     }
 
-    const handleLogOut = async () => {
-        console.log("Signing Out!")
-        signOut()
-        router.replace('/login')
-    }
-
     return (
         <View style={{flexDirection: 'row', gap: 20, alignSelf: 'center'}}>
             <Pressable onPress={handlePress}>
                 <MaterialIcons name='save' size={30} color='#ffffff' />
             </Pressable>
-            <Pressable onPress={handleLogOut}>
+            <Pressable onPress={() => signOut()}>
                 <MaterialCommunityIcons name="logout" size={30} color="#ffffff" />
             </Pressable>
         </View>
