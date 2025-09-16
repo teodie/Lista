@@ -26,7 +26,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="lista"/>
+        <data android:scheme="appwrite-callback-68bfe83f0000c8279419"/>
         <data android:scheme="exp+lista"/>
       </intent-filter>
     </activity>
