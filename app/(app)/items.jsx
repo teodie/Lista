@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, FlatList, SectionList, Button } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useContext, useEffect, useState } from 'react';
-import { PersonDataContext } from '@/context';
+import {  useEffect, useState } from 'react';
 import { fetchArchieveData, IndividualArchieveData } from '@/utils/fetchArchieveData';
 import { exportToCSV } from '@/utils/jsonToCsv';
+import { useData } from '@/utils/userdata-context';
 
 const ProductOverview = ({ item }) => {
   return (
@@ -75,7 +75,7 @@ const PaymentView = ({ personData, grandTotal, itemTotal }) => {
 
 
 const items = () => {
-  const { personData, archieveVisible } = useContext(PersonDataContext)
+  const { personData, archieveVisible } = useData()
   const itemTotal = personData.items.reduce((acc, element) => acc + element.price, 0)
   const grandTotal = personData.balance + itemTotal
   const [sectionData, setSectionData] = useState([])

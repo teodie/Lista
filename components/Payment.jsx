@@ -2,9 +2,8 @@ import {
     StyleSheet, Text, TouchableOpacity, View, Alert, Button
     ,
 } from 'react-native'
-import React, { useContext } from 'react'
+import React from 'react'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { PersonDataContext } from '@/context';
 import ModalContainer from '@/components/ModalContainer';
 import { TextInput } from 'react-native-gesture-handler';
 import { useRef, useState } from 'react';
@@ -12,10 +11,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MODE } from '@/constants/mode';
 import { fetchArchieveData } from '@/utils/fetchArchieveData'
-import { MaterialIcons } from '@expo/vector-icons';
+import { useData } from '@/utils/userdata-context';
 
 const PaymentInput = ({ setPaying }) => {
-    const { personData, setPersonData, utang, setUtang, setMode } = useContext(PersonDataContext);
+    const { personData, setPersonData, utang, setUtang, setMode } = useData()
     const total = personData.balance + personData.items.reduce((sum, item) => sum + item.price, 0);
     const payment = useRef('0')
 
@@ -84,7 +83,7 @@ const PaymentInput = ({ setPaying }) => {
 
 
 const Payment = () => {
-    const { setArchieveVisible, mode, setMode } = useContext(PersonDataContext);
+    const { setArchieveVisible, mode, setMode } = useData()
 
     const handlePaymentPress = () => {
         // Hide the modal for payment

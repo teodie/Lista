@@ -7,18 +7,18 @@ import AddItems from '@/components/AddItems';
 import { MODE } from '@/constants/mode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalContainer from '@/components/ModalContainer';
-import { PersonDataContext } from '@/context';
 import AddName from '@/components/AddName';
 import ExportArchieve from '@/components/ExportArchieve';
 import SwipeAble from '@/components/SwipeAble';
 import Animated, { useAnimatedStyle, withSpring, withTiming, useSharedValue, LinearTransition } from 'react-native-reanimated';
 import { exportToCSV } from '@/utils/jsonToCsv';
 import { Redirect } from "expo-router";
+import { useData } from '@/utils/userdata-context';
 
 
 
 const explore = () => {
-  const { mode, setMode, utang, setUtang, personData } = useContext(PersonDataContext)
+  const { mode, setMode, utang, setUtang, personData } = useData()
   const [id, setId] = useState(null);
 
   const [search, onChangeSearch] = useState('');

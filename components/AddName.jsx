@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native'
-import React, { useContext, useState } from 'react'
-import { PersonDataContext } from '@/context'
+import React from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { MODE } from '@/constants/mode'
+import { useData } from '@/utils/userdata-context'
 
 const AddName = ({ id, setId, onChangeName, name }) => {
-    const { mode, setMode, utang, setUtang } = useContext(PersonDataContext)
+    const { mode, setMode, utang, setUtang } = useData()
 
     const nameAlreadyExist = () => {
         const nameAlreadyExist = utang.find((item) => item.name.toUpperCase() === name.toUpperCase())

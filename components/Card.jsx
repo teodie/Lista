@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, {useContext} from 'react'
+import React from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
-import { PersonDataContext } from '@/context';
 import { MODE } from '@/constants/mode';
 import { router } from 'expo-router';
+import { useData } from '@/utils/userdata-context';
 
 const Card = ({data}) => {
-    const {setMode, setPersonData} = useContext(PersonDataContext);
+    const {setMode, setPersonData} = useData
     const ItemTotal = data.balance + data.items.reduce((acc, item) => acc + item.price, 0)
 
     const handleAddItems = () => {

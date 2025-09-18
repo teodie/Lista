@@ -1,6 +1,6 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView, Pressable } from 'react-native'
 import NewItemsView from './NewItemsView';
 import NoItems from './NoItems';
@@ -8,10 +8,10 @@ import { MODE } from '../constants/mode';
 import VoiceTyping from './VoiceTyping';
 import ManualInput from './ManualInput';
 import Toggle, { SwitchVoiceTyping } from './Toggle';
-import { PersonDataContext } from '@/context';
+import { useData } from '@/utils/userdata-context';
 
 const AddItems = () => {
-  const { personData, setUtang, utang, setMode } = useContext(PersonDataContext)
+  const { personData, setUtang, utang, setMode } = useData()
   const [items, setItems] = useState([]);
   const [enableVoiceType, setEnableVoiceType] = useState(true);
   // text input Variables

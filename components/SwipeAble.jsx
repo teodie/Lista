@@ -1,16 +1,15 @@
 
-import React, { useContext, useRef, useState } from "react";
+import React, {  useRef, useState } from "react";
 import { View, Alert, StyleSheet, TouchableOpacity, TextInput } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { MaterialIcons } from '@expo/vector-icons';
 import Card from "./Card";
-import Animated, { FadeIn, LinearTransition, FadeOut } from 'react-native-reanimated';
-import { PersonDataContext } from "@/context";
 import { CustomModal } from "./ModalContainer";
 import { share } from "@/utils/jsonToCsv";
+import { useData } from "@/utils/userdata-context";
 
 const SwipeAble = ({ data }) => {
-    const { utang, setUtang} = useContext(PersonDataContext)
+    const { utang, setUtang} = useData()
     const [modalVisible, setModalVisible] = useState(false)
     const [name, setName] = useState('')
     const swipeRef = useRef(null)

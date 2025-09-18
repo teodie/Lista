@@ -160,11 +160,7 @@ export default AuthProvider = ({ children }) => {
       await account.create(ID.unique(), email, password, username);
       return null
     } catch (error) {
-      console.error("Full error object:", error);
-      console.error("Error message:", error.message);
-      console.error("Error type:", error.type);
-      console.error("Error code:", error.code);
-
+      if(error.code === 400) return "Email account already exist. Please proceed to login"
       if (error instanceof Error) return error.message
 
       return "Error occured while creating account."

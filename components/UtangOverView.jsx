@@ -1,13 +1,13 @@
 import { StyleSheet, Text, View, TouchableOpacity, Pressable } from 'react-native'
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { MODE } from '@/constants/mode';
 import Animated, { FadeIn, LinearTransition, FadeOut } from 'react-native-reanimated';
-import { PersonDataContext } from '@/context';
+import { useData } from '@/utils/userdata-context';
 
 const UtangOverView = ({ person, setId, onChangeName, deleteName }) => {
-    const { setPersonData, setMode, setArchieveVisible } = useContext(PersonDataContext);
+    const { setPersonData, setMode, setArchieveVisible } = useData()
 
     const [longPressed, setLongPressed] = useState(false)
     const totalBalance = person.balance + person.items.reduce((sum, item) => sum + item.price, 0);

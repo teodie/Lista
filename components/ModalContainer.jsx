@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useContext, useState } from 'react'
+import React from 'react'
 import { MODE } from '@/constants/mode'
-import { PersonDataContext } from '@/context'
+import { useData } from '@/utils/userdata-context'
 
 const ModalContainer = ({ children, visible }) => {
-    const {setMode} = useContext(PersonDataContext)
+    const {setMode} = useData()
     
     const handleClose = () => setMode(MODE.IDLE);
 
