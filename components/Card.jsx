@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { useData } from '@/utils/userdata-context';
 
 const Card = ({data}) => {
-    const {setMode, setPersonData} = useData
+    const {setMode, setPersonData} = useData()
     const ItemTotal = data.balance + data.items.reduce((acc, item) => acc + item.price, 0)
 
     const handleAddItems = () => {
