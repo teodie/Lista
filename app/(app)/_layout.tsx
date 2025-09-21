@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/utils/auth-context'
 
+
 function RouteGaurd({ children }: { children: React.ReactNode }) {
   const { user, isLoadingUser } = useAuth()
 

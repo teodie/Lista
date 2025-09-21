@@ -12,7 +12,6 @@ import ExportArchieve from '@/components/ExportArchieve';
 import SwipeAble from '@/components/SwipeAble';
 import Animated, { useAnimatedStyle, withSpring, withTiming, useSharedValue, LinearTransition } from 'react-native-reanimated';
 import { exportToCSV } from '@/utils/jsonToCsv';
-import { Redirect } from "expo-router";
 import { useData } from '@/utils/userdata-context';
 
 

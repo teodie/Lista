@@ -4,11 +4,13 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { router } from 'expo-router'
 import { TextInput, Button, Text, useTheme } from 'react-native-paper'
 import { useAuth } from '@/utils/auth-context'
+import {Redirect} from 'expo-router'
 
 const googleIcon = require('@/assets/images/google-icon.png')
 
 
 const login = () => {
+    // return <Redirect href="/notif" />
 
     const { logIn, googleSignUp, setIsLoadingUser } = useAuth()
     const [eyeIsOpen, setEyes] = useState(true);
