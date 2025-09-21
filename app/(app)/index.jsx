@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, Pressable, } from 'react-native'
+import { TouchableWithoutFeedback, View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, Pressable, } from 'react-native'
 import React, { useEffect, useMemo, useState, useContext, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
@@ -13,10 +13,12 @@ import SwipeAble from '@/components/SwipeAble';
 import Animated, { useAnimatedStyle, withSpring, withTiming, useSharedValue, LinearTransition } from 'react-native-reanimated';
 import { exportToCSV } from '@/utils/jsonToCsv';
 import { useData } from '@/utils/userdata-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 
 
 const explore = () => {
+  const { bottom } = useSafeAreaInsets()
   const { mode, setMode, utang, setUtang, personData } = useData()
   const [id, setId] = useState(null);
 
@@ -50,7 +52,7 @@ const explore = () => {
 
 
   const addAnimation = useAnimatedStyle(() => ({
-    elevation : elevate.value,
+    elevation: elevate.value,
     transform: [
       { translateX: addX.value },
       { translateY: addY.value }
@@ -58,14 +60,14 @@ const explore = () => {
   }));
 
   const deleteAnimation = useAnimatedStyle(() => ({
-    elevation : elevate.value,
+    elevation: elevate.value,
     transform: [
       { translateX: deleteX.value },
     ]
   }));
 
   const micAnimation = useAnimatedStyle(() => ({
-    elevation : elevate.value,
+    elevation: elevate.value,
     transform: [
       { translateY: micY.value },
     ]
@@ -126,78 +128,80 @@ const explore = () => {
 
 
   return (
-    <View style={styles.container}>
+    <TouchableWithoutFeedback onPress={() => longPressed === true && handleLongPress() }>
+      <View style={[styles.container, { paddingBottom: bottom }]}>
 
-      <View style={styles.headerContainer}>
-        <View style={styles.topHeader}>
-          <Text style={styles.titleTxt}>Lista</Text>
-          <ExportArchieve />
+        <View style={styles.headerContainer}>
+          <View style={styles.topHeader}>
+            <Text style={styles.titleTxt}>Lista</Text>
+            <ExportArchieve />
+          </View>
+
+          <View style={{ flexDirection: "row", margin: 10 }}>
+            <TextInput
+              style={styles.searchInput}
+              onChangeText={onChangeSearch}
+              placeholder='Search Here...'
+              placeholderTextColor='gray'
+              value={search}
+              autoFocus={false}
+            />
+          </View>
+
+          <TouchableOpacity style={styles.clearSearch} onPress={() => onChangeSearch('')}>
+            <MaterialIcons name='clear' size={30} color='gray' />
+          </TouchableOpacity>
+
         </View>
 
-        <View style={{ flexDirection: "row", margin: 10 }}>
-          <TextInput
-            style={styles.searchInput}
-            onChangeText={onChangeSearch}
-            placeholder='Search Here...'
-            placeholderTextColor='gray'
-            value={search}
-            autoFocus={false}
+        <View style={styles.cardContainer}>
+          <Animated.FlatList
+            itemLayoutAnimation={LinearTransition.springify()}
+            data={filterName}
+            renderItem={({ item }) => <SwipeAble data={item} />}
+            keyExtractor={item => item.id.toString()}
           />
+
         </View>
 
-        <TouchableOpacity style={styles.clearSearch} onPress={() => onChangeSearch('')}>
-          <MaterialIcons name='clear' size={30} color='gray' />
-        </TouchableOpacity>
+
+
+        {mode === MODE.ADD_ITEM && personData && < AddItems />}
+
+        <ModalContainer
+          children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}
+          visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)}
+          setMode={setMode} />
+
+        <View style={{ position: 'relative' }}>
+          <Pressable style={[styles.iconStyle, styles.addIcon]} onPress={() => { setMode(MODE.ADD_NAME) }} onLongPress={handleLongPress} >
+            <MaterialIcons name='add' size={40} color="#E8E8E8" />
+          </Pressable>
+
+          <Animated.View style={[styles.iconStyle, styles.micIcon, micAnimation]}>
+            <TouchableOpacity onPress={() => { Alert.alert("AI Transcription feature currently not available") }} >
+              <MaterialIcons name='mic' size={40} color="#E8E8E8" />
+            </TouchableOpacity>
+          </Animated.View>
+
+          <Animated.View style={[styles.iconStyle, deleteAnimation]}>
+            <TouchableOpacity onPress={() => { Alert.alert("Delete feature currently not available") }} >
+              <MaterialIcons name='delete' size={40} color="#E8E8E8" />
+            </TouchableOpacity>
+          </Animated.View>
+
+
+          <Animated.View style={[styles.iconStyle, addAnimation]} >
+            <TouchableOpacity onPress={() => { exportToCSV(utang, "Store Credits") }} >
+              <MaterialIcons name='save-alt' size={40} color="#E8E8E8" />
+            </TouchableOpacity>
+          </Animated.View>
+
+        </View>
+
 
       </View>
-
-      <View style={styles.cardContainer}>
-        <Animated.FlatList
-         itemLayoutAnimation={LinearTransition.springify()}
-          data={filterName}
-          renderItem={({ item }) => <SwipeAble data={item} />}
-          keyExtractor={item => item.id.toString()}
-        />
-
-      </View>
-
-
-
-      {mode === MODE.ADD_ITEM && personData && < AddItems />}
-
-      <ModalContainer
-        children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}
-        visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)}
-        setMode={setMode} />
-
-      <View style={{ borderWidth: 1, position: 'relative' }}>
-        <Pressable style={[styles.iconStyle, styles.addIcon]} onPress={() => { setMode(MODE.ADD_NAME) }} onLongPress={handleLongPress} >
-          <MaterialIcons name='add' size={40} color="#E8E8E8" />
-        </Pressable>
-
-        <Animated.View style={[styles.iconStyle, styles.micIcon, micAnimation]}>
-          <TouchableOpacity onPress={() => { Alert.alert("AI Transcription feature currently not available") }} >
-            <MaterialIcons name='mic' size={40} color="#E8E8E8" />
-          </TouchableOpacity>
-        </Animated.View>
-
-        <Animated.View style={[styles.iconStyle, deleteAnimation]}>
-          <TouchableOpacity onPress={() => { Alert.alert("Delete feature currently not available")  }} >
-            <MaterialIcons name='delete' size={40} color="#E8E8E8" />
-          </TouchableOpacity>
-        </Animated.View>
-
-
-        <Animated.View style={[styles.iconStyle, addAnimation]} >
-          <TouchableOpacity onPress={() => { exportToCSV(utang, "Store Credits")}} >
-            <MaterialIcons name='save-alt' size={40} color="#E8E8E8" />
-          </TouchableOpacity>
-        </Animated.View>
-
-      </View>
-
-
-    </View>
+    </TouchableWithoutFeedback>
   )
 }
 

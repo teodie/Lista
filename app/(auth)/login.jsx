@@ -4,6 +4,7 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { router } from 'expo-router'
 import { TextInput, Button, Text, useTheme } from 'react-native-paper'
 import { useAuth } from '@/utils/auth-context'
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {Redirect} from 'expo-router'
 
 const googleIcon = require('@/assets/images/google-icon.png')
@@ -11,7 +12,7 @@ const googleIcon = require('@/assets/images/google-icon.png')
 
 const login = () => {
     // return <Redirect href="/notif" />
-
+    const inset = useSafeAreaInsets()
     const { logIn, googleSignUp, setIsLoadingUser } = useAuth()
     const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
@@ -37,9 +38,8 @@ const login = () => {
         router.replace('/')
     }
 
-
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {paddingBottom: inset.bottom}]}>
             <View style={styles.upper}>
                 <Animated.Image entering={FadeInUp.duration(100).springify()} style={styles.logo} source={require('@/assets/images/splash-icon-light.png')} />
             </View>
@@ -132,7 +132,7 @@ function createStyles(height, width,) {
                 alignItems: 'center'
             }, lower: {
                 paddingHorizontal: width * .05,
-                height: height * .5,
+                height: height * .6,
                 backgroundColor: '#EBEFEE',
                 borderTopLeftRadius: width / 15,
                 borderTopRightRadius: width / 15,

@@ -29,6 +29,9 @@ export default AuthProvider = ({ children }) => {
 
     const result = await WebBrowser.openAuthSessionAsync(`${loginUrl}`, scheme);
     console.log("result: ", result)
+
+    if(result.type === 'dismiss') return console.log("Authentecation has been desmissed")
+    if(result.type === 'error') return console.error("OAuth error:", result.error);
     // Extract credentials from OAuth redirect URL
     const url = new URL(result.url);
     const secret = url.searchParams.get('secret');
@@ -124,7 +127,7 @@ export default AuthProvider = ({ children }) => {
   const getUser = async () => {
     try {
       const session = await account.get();
-      console.log("Session: ", session)
+      console.log(JSON.stringify(session, null, 2))
       setUser(session);
       console.log("user has been set: ")
     } catch (error) {

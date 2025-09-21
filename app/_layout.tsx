@@ -9,15 +9,16 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView>
-      <DataProvider> 
-        <AuthProvider>
-          <StatusBar style='light' />
-          <Stack>
-            <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-            <Stack.Screen name='(app)' options={{ headerShown: false }} />
-          </Stack>
-        </AuthProvider>
-      </DataProvider>
+          <DataProvider>
+            <AuthProvider>
+              <StatusBar style='light' />
+              <Stack>
+                <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+                <Stack.Screen name='(app)' options={{ headerShown: false }} />
+                <Stack.Screen name='(test)' options={{ headerShown: false }} />
+              </Stack>
+            </AuthProvider>
+          </DataProvider>
     </GestureHandlerRootView >
   );
 }

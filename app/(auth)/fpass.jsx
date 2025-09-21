@@ -1,11 +1,9 @@
 import { StyleSheet, View } from 'react-native'
 import React from 'react'
 import { Text, Button, TextInput } from 'react-native-paper'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 const fpass = () => {
   return (
-    <SafeAreaProvider>
       <View style={styles.container}>
         <View style={styles.headerTxt}>
           <Text variant='headlineSmall' style={{ fontWeight: '500' }}>Retrieve your account</Text>
@@ -18,7 +16,6 @@ const fpass = () => {
         />
         <Button mode='contained' buttonColor="#5959B2" style={styles.continueBtn}>Continue</Button>
       </View>
-    </SafeAreaProvider>
   )
 }
 

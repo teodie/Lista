@@ -41,7 +41,7 @@ export default function ScreenLayout() {
     <RouteGaurd>
       <Stack>
         <Stack.Screen name='index' options={{ headerShown: false }} />
-        <Stack.Screen name='items' options={{ headerShown: true, title: 'Details', headerRight: () => <Payment />, headerStyle: { backgroundColor: '#5959B2' } }} />
+        <Stack.Screen name='items' options={{ headerShown: true, title: 'Details', headerRight: () => <Payment />, headerStyle: { backgroundColor: '#5959B2' }, headerTintColor: 'white' }} />
       </Stack>
     </RouteGaurd>
   );
