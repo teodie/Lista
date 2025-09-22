@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/utils/auth-context'
-
+import { ClientProvider } from '@/utils/client-context';
 
 function RouteGaurd({ children }: { children: React.ReactNode }) {
   const { user, isLoadingUser } = useAuth()
@@ -21,7 +21,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
   if (isLoadingUser) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large"  color="#5959B2"/>
+        <ActivityIndicator size="large" color="#5959B2" />
       </View>
     )
   }
@@ -39,10 +39,12 @@ export default function ScreenLayout() {
 
   return (
     <RouteGaurd>
-      <Stack>
-        <Stack.Screen name='index' options={{ headerShown: false }} />
-        <Stack.Screen name='items' options={{ headerShown: true, title: 'Details', headerRight: () => <Payment />, headerStyle: { backgroundColor: '#5959B2' }, headerTintColor: 'white' }} />
-      </Stack>
+      <ClientProvider>
+        <Stack>
+          <Stack.Screen name='index' options={{ headerShown: false }} />
+          <Stack.Screen name='items' options={{ headerShown: true, title: 'Details', headerRight: () => <Payment />, headerStyle: { backgroundColor: '#5959B2' }, headerTintColor: 'white' }} />
+        </Stack>
+      </ClientProvider>
     </RouteGaurd>
   );
 }

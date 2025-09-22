@@ -3,9 +3,13 @@ import React from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { MODE } from '@/constants/mode'
 import { useData } from '@/utils/userdata-context'
+import { useClient } from '@/utils/client-context'
+import { useAuth } from '@/utils/auth-context'
 
 const AddName = ({ id, setId, onChangeName, name }) => {
     const { mode, setMode, utang, setUtang } = useData()
+    const { createClient } = useClient()
+    const { user } = useAuth()
 
     const nameAlreadyExist = () => {
         const nameAlreadyExist = utang.find((item) => item.name.toUpperCase() === name.toUpperCase())
@@ -15,6 +19,9 @@ const AddName = ({ id, setId, onChangeName, name }) => {
     const createName = () => {
         if (!name.trim()) return Alert.alert('Name is blank!')
         if (nameAlreadyExist()) return Alert.alert('Name Already Exist')
+        console.log(user)
+        //create row in appwrite database
+        createClient(name)
 
         const newId = utang.length > 0 ? utang[0].id + 1 : 1;
         setUtang([{ id: newId, name: name.toUpperCase(), balance: 0, items: [] }, ...utang])

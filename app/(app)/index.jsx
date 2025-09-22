@@ -14,10 +14,10 @@ import Animated, { useAnimatedStyle, withSpring, withTiming, useSharedValue, Lin
 import { exportToCSV } from '@/utils/jsonToCsv';
 import { useData } from '@/utils/userdata-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
-
+import { useClient } from '@/utils/client-context';
 
 const explore = () => {
+  const {clients, fetchClients} = useClient()
   const { bottom } = useSafeAreaInsets()
   const { mode, setMode, utang, setUtang, personData } = useData()
   const [id, setId] = useState(null);
@@ -78,6 +78,7 @@ const explore = () => {
   const filterName = useMemo(() => utang.filter(items => search.toLowerCase() === '' ? items.name : items.name.toLowerCase().includes(search.toLowerCase())), [utang, search])
 
   useEffect(() => {
+    
     const getData = async () => {
       try {
         const jsonValue = await AsyncStorage.getItem('Listahan');
@@ -94,7 +95,8 @@ const explore = () => {
       }
     };
 
-
+    // fetchClients()
+    
     const getPermission = async () => {
       try {
         const status = await AudioModule.requestRecordingPermissionsAsync();
