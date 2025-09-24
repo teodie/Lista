@@ -17,11 +17,10 @@ const converToObj = (txt) => {
     if (Number.isNaN(Number(currentItem))) {
       words.push(currentItem)
     } else {
-      item.push({ id: uuid.v4(), product: words.toString().replaceAll(",", " "), price: Number(currentItem) })
+      // item.push({ id: uuid.v4(), product: words.toString().replaceAll(",", " "), price: Number(currentItem) })
+      item.push({ productName: words.toString().replaceAll(",", " "), price: Number(currentItem) })
       words = []
     }
-
-
 
   }
 

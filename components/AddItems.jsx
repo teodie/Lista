@@ -9,8 +9,11 @@ import VoiceTyping from './VoiceTyping';
 import ManualInput from './ManualInput';
 import Toggle, { SwitchVoiceTyping } from './Toggle';
 import { useData } from '@/utils/userdata-context';
+import { useItems } from '@/utils/items-context';
+import { ID } from 'react-native-appwrite';
 
 const AddItems = () => {
+  const { createItem } = useItems()
   const { personData, setUtang, utang, setMode } = useData()
   const [items, setItems] = useState([]);
   const [enableVoiceType, setEnableVoiceType] = useState(true);
@@ -37,21 +40,15 @@ const AddItems = () => {
     return dateString
   }
 
-  const saveItems = (personId) => {
-    const date = genDate()
+  const saveItems = () => {
+    // Create item in appwrite data base
     
-    const newItems = items.map((item) => { return { ...item, date: date } })
-    setUtang(utang.map((item) =>
-      item.id == personId
-        ? { ...item, items: [...(item.items || []), ...newItems] }
-        : item))
-
-    items.length === 0
-      ? Alert.alert("Emty Items!")
-      : setMode(MODE.IDLE)
+    items.forEach(element => {
+      createItem(element, ID.unique())
+    });
 
     setItems([])
-
+    setMode(MODE.IDLE)
   }
 
   const handleExitPress = () => {
@@ -98,7 +95,7 @@ const AddItems = () => {
 
 
         <View style={styles.saveBtn} >
-          <TouchableOpacity onPress={() => saveItems(personData.id)} >
+          <TouchableOpacity onPress={() => saveItems()} >
             <Text style={styles.saveTxt} > Save </Text>
           </TouchableOpacity>
         </View>

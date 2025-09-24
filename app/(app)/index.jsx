@@ -15,12 +15,13 @@ import { exportToCSV } from '@/utils/jsonToCsv';
 import { useData } from '@/utils/userdata-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useClient } from '@/utils/client-context';
+import { client } from '@/utils/appWrite';
 
 const explore = () => {
-  const {clients, fetchClients} = useClient()
   const { bottom } = useSafeAreaInsets()
   const { mode, setMode, utang, setUtang, personData } = useData()
   const [id, setId] = useState(null);
+  const { fetchClients, clients } = useClient()
 
   const [search, onChangeSearch] = useState('');
   const [name, onChangeName] = useState('');
@@ -75,28 +76,9 @@ const explore = () => {
 
 
 
-  const filterName = useMemo(() => utang.filter(items => search.toLowerCase() === '' ? items.name : items.name.toLowerCase().includes(search.toLowerCase())), [utang, search])
 
   useEffect(() => {
-    
-    const getData = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem('Listahan');
-        const storageUtang = jsonValue != null ? JSON.parse(jsonValue) : null;
 
-        if (storageUtang && storageUtang.length) {
-          setUtang(storageUtang.sort((a, b) => b.id - a.id))
-        } else {
-          setUtang(utangData.sort((a, b) => b.id - a.id))
-        }
-
-      } catch (e) {
-        console.error('Error retrieving the data erro: ', e)
-      }
-    };
-
-    // fetchClients()
-    
     const getPermission = async () => {
       try {
         const status = await AudioModule.requestRecordingPermissionsAsync();
@@ -108,29 +90,12 @@ const explore = () => {
       }
     };
 
-    getData()
     getPermission();
   }, []);
 
 
-  useEffect(() => {
-    const storeData = async (value) => {
-      try {
-        const jsonValue = JSON.stringify(value);
-        await AsyncStorage.setItem('Listahan', jsonValue);
-      } catch (e) {
-        console.log('Error saving the data with error: ', e)
-      }
-    };
-
-    storeData(utang)
-  }, [utang])
-
-
-
-
   return (
-    <TouchableWithoutFeedback onPress={() => longPressed === true && handleLongPress() }>
+    <TouchableWithoutFeedback onPress={() => longPressed === true && handleLongPress()}>
       <View style={[styles.container, { paddingBottom: bottom }]}>
 
         <View style={styles.headerContainer}>
@@ -159,11 +124,13 @@ const explore = () => {
         <View style={styles.cardContainer}>
           <Animated.FlatList
             itemLayoutAnimation={LinearTransition.springify()}
-            data={filterName}
-            renderItem={({ item }) => <SwipeAble data={item} />}
-            keyExtractor={item => item.id.toString()}
+            data={clients}
+            renderItem={({ item }) =>
+              <SwipeAble data={item} />
+            }
+            keyExtractor={item => item.$id.toString()}
           />
-
+          {/* {clients && <Text>{JSON.stringify(clients.rows, null, 2)}</Text>} */}
         </View>
 
 
@@ -192,7 +159,6 @@ const explore = () => {
             </TouchableOpacity>
           </Animated.View>
 
-
           <Animated.View style={[styles.iconStyle, addAnimation]} >
             <TouchableOpacity onPress={() => { exportToCSV(utang, "Store Credits") }} >
               <MaterialIcons name='save-alt' size={40} color="#E8E8E8" />
@@ -213,6 +179,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f6fa',
+    position: 'relative'
   },
   text: {
     color: 'black',

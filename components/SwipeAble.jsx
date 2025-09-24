@@ -7,9 +7,11 @@ import Card from "./Card";
 import { CustomModal } from "./ModalContainer";
 import { share } from "@/utils/jsonToCsv";
 import { useData } from "@/utils/userdata-context";
+import { useClient } from "@/utils/client-context";
 
 const SwipeAble = ({ data }) => {
     const { utang, setUtang} = useData()
+    const { deleteClient, updateClient } = useClient()
     const [modalVisible, setModalVisible] = useState(false)
     const [name, setName] = useState('')
     const swipeRef = useRef(null)
@@ -25,7 +27,9 @@ const SwipeAble = ({ data }) => {
                 {
                   text: 'Oo',
                   onPress: () => {
-                    setUtang(utang.filter(item => item.id !== data.id))
+                    // setUtang(utang.filter(item => item.id !== data.id))
+                    deleteClient(data.$id)
+
                   }, style: 'destructive'
                 }])
             }, style: 'default'
@@ -40,7 +44,8 @@ const SwipeAble = ({ data }) => {
     }
 
     const handleSaveEdit = () => {
-        setUtang(utang.map(item => item.id === data.id ? {...item, name: name} : item))
+        // setUtang(utang.map(item => item.id === data.id ? {...item, name: name} : item))
+        updateClient(name, data.$id)
         setName('')
         setModalVisible(!modalVisible)
         swipeRef.current?.reset()

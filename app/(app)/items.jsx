@@ -4,13 +4,24 @@ import {  useEffect, useState } from 'react';
 import { fetchArchieveData, IndividualArchieveData } from '@/utils/fetchArchieveData';
 import { exportToCSV } from '@/utils/jsonToCsv';
 import { useData } from '@/utils/userdata-context';
+import { useClient } from '@/utils/client-context'
 
 const ProductOverview = ({ item }) => {
+
+  function formatAppwriteDate(createdAt) {
+    const date = new Date(createdAt);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric"
+    });
+  }
+
   return (
     <View style={styles.overView}>
-      <Text style={styles.itemsTxt} >{item.product}</Text>
+      <Text style={styles.itemsTxt} >{item.productName}</Text>
       <Text style={styles.itemsTxt} >{item.price}</Text>
-      <Text style={styles.itemsTxt} >{item.date}</Text>
+      <Text style={styles.itemsTxt} >{formatAppwriteDate(item.$createdAt)}</Text>
     </View>
   );
 }
@@ -55,7 +66,7 @@ const ArchieveView = ({ sectionData, id, name }) => {
 }
 
 
-const PaymentView = ({ personData, grandTotal, itemTotal }) => {
+const PaymentView = ({ personData, itemTotal, grandTotal }) => {
   return (
     <>
       <View style={styles.header}>
@@ -64,7 +75,7 @@ const PaymentView = ({ personData, grandTotal, itemTotal }) => {
         <Total title="Total" amount={grandTotal} />
       </View>
       <FlatList
-        data={personData.items}
+        data={personData}
         renderItem={({ item }) => <ProductOverview item={item} />}
       />
       <Text style={[styles.headerTxt, { alignSelf: 'center', marginTop: 10 }]} >{itemTotal}</Text>
@@ -76,8 +87,24 @@ const PaymentView = ({ personData, grandTotal, itemTotal }) => {
 
 const items = () => {
   const { personData, archieveVisible } = useData()
-  const itemTotal = personData.items.reduce((acc, element) => acc + element.price, 0)
-  const grandTotal = personData.balance + itemTotal
+  const { fetchClientById, setClientId } = useClient()
+  const [balance, setBalance] = useState(null)
+
+  const fetchBalance = async () => {
+    try {
+      const response = await fetchClientById()
+      console.log("Response: ", response)
+
+      return setBalance(response.balance)
+    } catch (error) {
+      console.log(error)
+      return setBalance(null)
+    }
+    
+  }
+
+  const itemTotal = personData.reduce((acc, element) => acc + element.price, 0)
+  const grandTotal = balance + itemTotal
   const [sectionData, setSectionData] = useState([])
 
   useEffect(() => {
@@ -91,8 +118,9 @@ const items = () => {
       setSectionData(secData)
     }
 
-    getArchieveData();
+    // getArchieveData();
   }, [archieveVisible])
+
 
   const handleWipe = async () => {
     try {
@@ -102,7 +130,6 @@ const items = () => {
       console.log(e)
     }
   }
-
 
   return (
     <View style={styles.container}>

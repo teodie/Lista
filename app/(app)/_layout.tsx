@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Redirect, Slot, Stack } from 'expo-router';
 import 'react-native-reanimated';
 import Payment from '@/components/Payment';
 import { router } from 'expo-router';
@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/utils/auth-context'
 import { ClientProvider } from '@/utils/client-context';
+import { ItemsProvider } from '@/utils/items-context';
 
 function RouteGaurd({ children }: { children: React.ReactNode }) {
   const { user, isLoadingUser } = useAuth()
@@ -40,10 +41,12 @@ export default function ScreenLayout() {
   return (
     <RouteGaurd>
       <ClientProvider>
-        <Stack>
-          <Stack.Screen name='index' options={{ headerShown: false }} />
-          <Stack.Screen name='items' options={{ headerShown: true, title: 'Details', headerRight: () => <Payment />, headerStyle: { backgroundColor: '#5959B2' }, headerTintColor: 'white' }} />
-        </Stack>
+        <ItemsProvider>
+          <Stack>
+            <Stack.Screen name='index' options={{ headerShown: false }} />
+            <Stack.Screen name='items' options={{ headerShown: true, title: 'Details', headerRight: () => <Payment />, headerStyle: { backgroundColor: '#5959B2' }, headerTintColor: 'white' }} />
+          </Stack>
+        </ItemsProvider>
       </ClientProvider>
     </RouteGaurd>
   );

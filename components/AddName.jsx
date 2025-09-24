@@ -5,6 +5,8 @@ import { MODE } from '@/constants/mode'
 import { useData } from '@/utils/userdata-context'
 import { useClient } from '@/utils/client-context'
 import { useAuth } from '@/utils/auth-context'
+import { ID } from 'react-native-appwrite'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const AddName = ({ id, setId, onChangeName, name }) => {
     const { mode, setMode, utang, setUtang } = useData()
@@ -16,15 +18,14 @@ const AddName = ({ id, setId, onChangeName, name }) => {
         return nameAlreadyExist ? true : false;
     }
 
-    const createName = () => {
+    const createName = async () => {
         if (!name.trim()) return Alert.alert('Name is blank!')
         if (nameAlreadyExist()) return Alert.alert('Name Already Exist')
-        console.log(user)
+        
         //create row in appwrite database
-        createClient(name)
+        const newId = ID.unique()
+        createClient(name, newId)
 
-        const newId = utang.length > 0 ? utang[0].id + 1 : 1;
-        setUtang([{ id: newId, name: name.toUpperCase(), balance: 0, items: [] }, ...utang])
         onChangeName('')
         setMode(MODE.IDLE)
     };

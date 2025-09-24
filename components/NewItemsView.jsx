@@ -8,7 +8,7 @@ const NewItemsView = ({ item, deleteItem, editItem }) => {
         <View style={styles.container} >
 
             <View style={styles.textContainer} >
-                <Text style={styles.txt} >{item.product}</Text>
+                <Text style={styles.txt} >{item.productName}</Text>
                 <Text style={styles.txt} >{item.price}.00</Text>
             </View>
 

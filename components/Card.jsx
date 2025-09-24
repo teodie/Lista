@@ -4,21 +4,29 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { MODE } from '@/constants/mode';
 import { router } from 'expo-router';
 import { useData } from '@/utils/userdata-context';
+import { useClient } from '@/utils/client-context';
+import { useItems } from '@/utils/items-context';
 
 const Card = ({data}) => {
     const {setMode, setPersonData} = useData()
-    const ItemTotal = data.balance + data.items.reduce((acc, item) => acc + item.price, 0)
+    const { setClientId } = useClient()
+    const { fetchClientItems } = useItems()
 
     const handleAddItems = () => {
-        setPersonData(data)
+        // setPersonData(data)
+        setClientId(data.$id)
         setMode(MODE.ADD_ITEM)
     }
 
-    const handleNamePress = () => {
-        setPersonData(data)
+    const handleNamePress = async () => {
+        // setPersonData(data)
+
+        // fetch data from the database
+        const response = await fetchClientItems(data.userId, data.$id)
+        setClientId(data.$id)
+        setPersonData(response)
         router.navigate({ pathname: '/items', })
     }
-
 
     return (
         <View style={styles.card}>
@@ -29,8 +37,8 @@ const Card = ({data}) => {
             </View>
 
             <View style={styles.balanceContainer} >
-                <Text style={styles.balanceTxt} > Balance: </Text>
-                <Text style={styles.totalBalanceTxt} >{ItemTotal}</Text>
+                <Text style={styles.balanceTxt} > Payable: </Text>
+                <Text style={styles.totalBalanceTxt} >{data.itemsTotal}</Text>
             </View>
 
             <TouchableOpacity style={styles.addIcon} onPress={handleAddItems}>
