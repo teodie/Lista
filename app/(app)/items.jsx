@@ -1,10 +1,9 @@
-import { View, Text, StyleSheet, FlatList, SectionList, Button } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {  useEffect, useState } from 'react';
-import { fetchArchieveData, IndividualArchieveData } from '@/utils/fetchArchieveData';
-import { exportToCSV } from '@/utils/jsonToCsv';
+import { View, Text, StyleSheet, FlatList, SectionList } from 'react-native'
+import { useEffect, useState } from 'react';
 import { useData } from '@/utils/userdata-context';
-import { useClient } from '@/utils/client-context'
+import NoItems from '@/components/NoItems'
+import { useClient } from '@/utils/client-context';
+
 
 const ProductOverview = ({ item }) => {
 
@@ -35,117 +34,54 @@ const Total = ({ title, amount }) => {
   );
 }
 
-const ArchieveView = ({ sectionData, id, name }) => {
+const PaymentView = ({ personData, clientData }) => {
 
-  const handleDownloadPress = async () => {
-    console.log("Fetching Individual data")
-    const personData = await IndividualArchieveData(id)
-    // save the individual data
-    exportToCSV(personData, `${name}_Bayad_na` )
-  }
-
-  return (
-    <>
-      <Text style={[styles.headerTxt, { alignSelf: 'center' }]}>Paid Items</Text>
-      <SectionList
-        sections={sectionData}
-        renderItem={({ item }) => (<ProductOverview item={item} />)}
-        renderSectionHeader={({ section }) => (
-          <View style={styles.sectionHeader}>
-            <Text>{section.header.date}</Text>
-            <Total title="P_Balance" amount={section.header.balance} />
-            <Total title="I_Total" amount={section.header.total} />
-            <Total title="Paid" amount={section.header.paidAmount} />
-            <Total title="Balance" amount={section.header.remainingBalance} />
-          </View>
-        )} />
-
-      <Button title='Download' onPress={handleDownloadPress} />
-    </>
-  );
-}
-
-
-const PaymentView = ({ personData, itemTotal, grandTotal }) => {
   return (
     <>
       <View style={styles.header}>
         <Text style={styles.headerTxt}>{personData.name}</Text>
-        <Total title="Balance" amount={personData.balance} />
-        <Total title="Total" amount={grandTotal} />
+        <Total title="Balance" amount={clientData.balance} />
+        <Total title="Payable" amount={clientData.balance + clientData.itemsTotal} />
       </View>
       <FlatList
         data={personData}
         renderItem={({ item }) => <ProductOverview item={item} />}
       />
-      <Text style={[styles.headerTxt, { alignSelf: 'center', marginTop: 10 }]} >{itemTotal}</Text>
+      <Text style={[styles.headerTxt, { alignSelf: 'center', marginTop: 10 }]} >{clientData.itemsTotal}</Text>
     </>
   );
 }
 
-
-
 const items = () => {
-  const { personData, archieveVisible } = useData()
-  const { fetchClientById, setClientId } = useClient()
-  const [balance, setBalance] = useState(null)
+  const { personData } = useData()
+  const [clientData, setClientData] = useState(null)
+  const { fetchClientById } = useClient()
 
-  const fetchBalance = async () => {
-    try {
-      const response = await fetchClientById()
-      console.log("Response: ", response)
-
-      return setBalance(response.balance)
-    } catch (error) {
-      console.log(error)
-      return setBalance(null)
-    }
-    
-  }
-
-  const itemTotal = personData.reduce((acc, element) => acc + element.price, 0)
-  const grandTotal = balance + itemTotal
-  const [sectionData, setSectionData] = useState([])
 
   useEffect(() => {
-    const getArchieveData = async () => {
-      // Retrieve the data from the memory
-      const archieveData = await fetchArchieveData()
-      // filter the data for the specifict user
-      const filterData = archieveData.filter((element) => element.id === personData.id)
-      // create a new array with just the needed data for section list
-      const secData = filterData.map((element) => { return { data: [...element.items], header: { date: element.paidDate, paidAmount: element.paidAmount, remainingBalance: element.remainingBalance, total: element.total, balance: element.balance } } })
-      setSectionData(secData)
+    const fetchClientData = async () => {
+      const clientRow = await fetchClientById()
+      console.log(JSON.stringify(clientRow, null, 2))
+      setClientData(clientRow)
     }
 
-    // getArchieveData();
-  }, [archieveVisible])
+    // fetch the client data for the balance and items total
+    console.log("Items component has been mounted")
+    fetchClientData()
 
-
-  const handleWipe = async () => {
-    try {
-      console.log("Wipping the data")
-      await AsyncStorage.removeItem('Archieve')
-    } catch (e) {
-      console.log(e)
-    }
-  }
+  }, [])
 
   return (
     <View style={styles.container}>
 
       <View >
-        {archieveVisible
-          ? <ArchieveView sectionData={sectionData} id={personData.id} name={personData.name} />
-          : <PaymentView personData={personData} grandTotal={grandTotal} itemTotal={itemTotal} />
-        }
-      </View>
 
-      {/* <Button
-        disabled={true}
-        title='Wipe Data'
-        onPress={() => handleWipe()}
-      /> */}
+        {personData !== null && clientData !== null
+          ? <PaymentView personData={personData} clientData={clientData} />
+          : <NoItems />
+        }
+
+      </View>
 
     </View>
   )

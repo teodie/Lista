@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { client, tablesDB } from "./appWrite";
 import { useAuth } from "./auth-context";
 import { ID, Permission, Query, Role, TablesDB } from "react-native-appwrite";
+import { RectButton } from "react-native-gesture-handler";
 
 
 const ClientContext = createContext(undefined)
@@ -16,17 +17,19 @@ export const ClientProvider = ({ children }) => {
     const CLIENTS_TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_CLIENTS_TABLE_ID
 
     const fetchClientById = async () => {
+        console.log("fetching client data row")
         try {
             const response = await tablesDB.getRow(
                 DATABASE_ID,
                 CLIENTS_TABLE_ID,
                 clientId,
             )
-            console.log(response)
+            return response
         } catch (error) {
             console.log(error)
+            return null
         }
-    } 
+    }
 
     const fetchClients = async () => {
         console.log("Fetching client of the user: ")
@@ -44,13 +47,13 @@ export const ClientProvider = ({ children }) => {
         }
     }
 
-    const updateClient = async (newName, id) => {
+    const updateClient = async (id, data) => {
         try {
             const result = await tablesDB.updateRow(
                 DATABASE_ID,
                 CLIENTS_TABLE_ID,
                 id,
-                { name: newName }
+                data
             )
 
             console.log(result)
@@ -93,37 +96,35 @@ export const ClientProvider = ({ children }) => {
 
     useEffect(() => {
         let unsubscribe
-        if (user) {
-            fetchClients()
-            const clientTableChannel = `databases.${process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID}.tables.${process.env.EXPO_PUBLIC_APPWRITE_CLIENTS_TABLE_ID}.rows`
-            unsubscribe = client.subscribe(clientTableChannel,
-                (response) => {
-                    const { payload, events } = response
-                    // console.log(JSON.stringify(events, null, 2))
-                    if (events[0].includes('create')) {
-                        setClients((prevClients) => [...prevClients, payload])
-                    }
+        if (!user) return setClients([])
 
-                    if (events[0].includes('delete')) {
-                        console.log(JSON.stringify(payload, null, 2))
-                        setClients((prevClients) => prevClients.filter((client) => client.$id !== payload.$id))
-                    }
+        fetchClients()
 
-                    if (events[0].includes('update')) {
-                        console.log(JSON.stringify(payload, null, 2))
-                        setClients((prevClients) => prevClients.map((client) =>
-                            client.$id === payload.$id
-                                ? { ...client, name: payload.name }
-                                : client)
-                        )
-                    }
+        const clientTableChannel = `databases.${DATABASE_ID}.tables.${CLIENTS_TABLE_ID}.rows`
+        unsubscribe = client.subscribe(clientTableChannel,
+            (response) => {
+                const { payload, events } = response
+                if (events[0].includes('create')) {
+                    setClients((prevClients) => [...prevClients, payload])
                 }
 
-            )
+                if (events[0].includes('delete')) {
+                    console.log(JSON.stringify(payload, null, 2))
+                    setClients((prevClients) => prevClients.filter((client) => client.$id !== payload.$id))
+                }
 
-        } else {
-            setClients([])
-        }
+                if (events[0].includes('update')) {
+                    console.log(JSON.stringify(payload, null, 2))
+                    setClients((prevClients) => prevClients.map((client) =>
+                        client.$id === payload.$id
+                            ? { ...client, name: payload.name, balance: payload.balance, itemsTotal: payload.itemsTotal }
+                            : client)
+                    )
+                }
+            }
+
+        )
+
 
         return () => {
             if (unsubscribe) {
@@ -133,9 +134,8 @@ export const ClientProvider = ({ children }) => {
     }, [user])
 
 
-
     return (
-        <ClientContext.Provider value={{ clients, clientId, setClientId, createClient, fetchClients, deleteClient, updateClient, fetchClientById }}>
+        <ClientContext.Provider value={{ clients, clientId , setClientId, createClient, fetchClients, deleteClient, updateClient, fetchClientById }}>
             {children}
         </ClientContext.Provider>)
 }

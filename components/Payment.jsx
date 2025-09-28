@@ -2,65 +2,70 @@ import {
     StyleSheet, Text, TouchableOpacity, View, Alert, Button
     ,
 } from 'react-native'
-import React from 'react'
+import React, { use, useEffect } from 'react'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import ModalContainer from '@/components/ModalContainer';
 import { TextInput } from 'react-native-gesture-handler';
 import { useRef, useState } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MODE } from '@/constants/mode';
-import { fetchArchieveData } from '@/utils/fetchArchieveData'
 import { useData } from '@/utils/userdata-context';
+import { useClient } from '@/utils/client-context';
+import { useItems } from '@/utils/items-context';
+import { Redirect, router } from 'expo-router';
 
-const PaymentInput = ({ setPaying }) => {
-    const { personData, setPersonData, utang, setUtang, setMode } = useData()
-    const total = personData.balance + personData.items.reduce((sum, item) => sum + item.price, 0);
+const PaymentInput = () => {
+    const { setMode } = useData()
+    const { fetchClientItems, updateItem } = useItems()
+    const { fetchClientById, updateClient, clientId } = useClient()
+    const [total, setTotal] = useState(0)
+
     const payment = useRef('0')
 
-    const handlePaymentPress = async () => {
-        const change = total - payment.current
-        change > 0
-            ? Alert.alert(`Balance of ${change}`)
-            : change < 0
-                ? Alert.alert(`Change of: ${-change}`)
-                : null
+    useEffect(() => {
+        fetchClientRow()
+    }, [])
 
-        setMode(MODE.IDLE)
-        const prevData = await fetchArchieveData()
-        saveData(prevData)
-        updatePersonData()
-        setPaying(false)
-        payment.current = ''
+    const fetchClientRow = async () => {
+        // fetcht the client data
+        const clientData = await fetchClientById()
+        // assign the items total to be use in the calculation
+        setTotal(clientData.itemsTotal)
     }
 
-    const saveData = async (prevData) => {
-        console.log('Saving Data....')
-        const remainingBalance = total - Number(payment.current)
+    const setItemsToPaid = async () => {
+        const response = await fetchClientItems(clientId, false)
 
-        const date = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const dateString = date.toLocaleDateString('en-US', options);
-        //Saving the data
-        const dataToSave = [...(prevData || []), { ...personData, paidDate: dateString, paidAmount: payment.current, remainingBalance: remainingBalance, total: total }]
-        console.log(dataToSave)
-        try {
-            const saveJsonValue = JSON.stringify(dataToSave)
-            await AsyncStorage.setItem('Archieve', saveJsonValue)
-            console.log('Data has been saved')
-        } catch (e) {
-            console.log('Error in saving to Archieve: ', e)
+        if (response.length !== 0) {
+            response.forEach(async (element) => {
+                await updateItem(element.$id, { paid: true })
+            });
         }
 
     }
 
-    const updatePersonData = () => {
-        const remainingBalance = total - Number(payment.current)
-        const newData = { ...personData, balance: remainingBalance < 0 ? 0 : remainingBalance , items: [] }
-        setUtang(utang.map(element => element.id === personData.id ? newData : element))
-        // To remove the data when the items are payed
-        setPersonData(newData)
+    const handlePaymentPress = () => {
+        // Calculate change
+        const change = total - payment.current
+
+        if (change > 0) {
+            updateClient(clientId, { balance: change, itemsTotal: 0 })
+            Alert.alert(`Balance of ${change}`)
+        }
+        if (change < 0) {
+            updateClient(clientId, { balance: 0, itemsTotal: 0 })
+            Alert.alert(`Change of: ${-change}`)
+        } 
+        
+        // set the current unpaid items to paid = true
+        setItemsToPaid()
+
+        setMode(MODE.IDLE)
+        payment.current = '0'
+        router.replace('/')
     }
+
+
 
     return (
         <>
@@ -80,7 +85,6 @@ const PaymentInput = ({ setPaying }) => {
         </>
     );
 }
-
 
 const Payment = () => {
     const { setArchieveVisible, mode, setMode } = useData()

@@ -1,31 +1,32 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useState } from 'react'
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView, Pressable } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View, FlatList, KeyboardAvoidingView } from 'react-native'
 import NewItemsView from './NewItemsView';
 import NoItems from './NoItems';
 import { MODE } from '../constants/mode';
 import VoiceTyping from './VoiceTyping';
 import ManualInput from './ManualInput';
-import Toggle, { SwitchVoiceTyping } from './Toggle';
+import Toggle from './Toggle';
 import { useData } from '@/utils/userdata-context';
 import { useItems } from '@/utils/items-context';
-import { ID } from 'react-native-appwrite';
+import { useClient } from '@/utils/client-context';
 
 const AddItems = () => {
-  const { createItem } = useItems()
-  const { personData, setUtang, utang, setMode } = useData()
+  const { createItem, fetchClientItems } = useItems()
+  const { updateClient, clientId, fetchClientById } = useClient()
+  const { setMode } = useData()
   const [items, setItems] = useState([]);
   const [enableVoiceType, setEnableVoiceType] = useState(true);
   // text input Variables
   const [productName, setProductName] = useState('');
   const [price, setPrice] = useState('');
-
+  const [clientName, setClientName] = useState()
 
   const editItem = (id) => {
     setEnableVoiceType(false)
     const item = items.find((item) => item.id === id)
-    setProductName(item.product)
+    setProductName(item.productName)
     setPrice(String(item.price))
     deleteItem(id)
   }
@@ -34,19 +35,22 @@ const AddItems = () => {
     setItems(items.filter(item => item.id !== id))
   }
 
-  const genDate = () => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const dateString = new Date().toLocaleDateString('en-US', options);
-    return dateString
-  }
-
-  const saveItems = () => {
+  const saveItems = async (id) => {
     // Create item in appwrite data base
-    
-    items.forEach(element => {
-      createItem(element, ID.unique())
+    const clientItemsOnDatabase = await fetchClientItems(clientId, false)
+    // Calculate the total for the items to be added and the current items on the database
+    const totalOfCurrentItems = items.reduce((acc, item) => item.price + acc, 0)
+    const totalOfItemsOnDatabase = clientItemsOnDatabase.length ? clientItemsOnDatabase.reduce((acc, item) => item.price + acc, 0) : 0
+
+    console.log("total of items on database: ", totalOfItemsOnDatabase)
+    // udpate the itemtotal of the person on the database
+    items.forEach(async (element) => {
+      await createItem({productName: element.productName, price: element.price }, element.id)
     });
 
+    const grandTotal = totalOfCurrentItems + totalOfItemsOnDatabase
+    // Update the itemsTotal column of the client with the same id
+    updateClient(id, {itemsTotal: grandTotal})
     setItems([])
     setMode(MODE.IDLE)
   }
@@ -55,6 +59,15 @@ const AddItems = () => {
     setItems([]);
     setMode(MODE.IDLE)
   }
+
+  useEffect(() => {
+    const client = async () => {
+      const response = await fetchClientById(clientId)
+      setClientName(response.name)
+    }
+
+    client()
+  }, [])
 
   return (
     <View style={styles.processingOverlay}>
@@ -68,7 +81,7 @@ const AddItems = () => {
               < MaterialIcons name="exit-to-app" size={30} color="white" />
             </TouchableOpacity>
 
-            <Text style={styles.headerTxt}>{personData.name}</Text>
+            <Text style={styles.headerTxt}>{clientName}</Text>
 
             <Toggle enableVoiceType={enableVoiceType} setEnableVoiceType={setEnableVoiceType} />
 
@@ -95,7 +108,7 @@ const AddItems = () => {
 
 
         <View style={styles.saveBtn} >
-          <TouchableOpacity onPress={() => saveItems()} >
+          <TouchableOpacity onPress={() => saveItems(clientId)} >
             <Text style={styles.saveTxt} > Save </Text>
           </TouchableOpacity>
         </View>

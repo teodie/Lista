@@ -1,7 +1,7 @@
 import { Redirect, Slot, Stack } from 'expo-router';
 import 'react-native-reanimated';
 import Payment from '@/components/Payment';
-import { router } from 'expo-router';
+import { router, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/utils/auth-context'
@@ -10,13 +10,18 @@ import { ItemsProvider } from '@/utils/items-context';
 
 function RouteGaurd({ children }: { children: React.ReactNode }) {
   const { user, isLoadingUser } = useAuth()
+  const segments = useSegments()
+  console.log(segments)
 
   useEffect(() => {
-    console.log("user or the is loading change checking redirects")
-    if (!user && !isLoadingUser) {
-      router.replace('/login')
+    const inAuthGroup = segments[0] === "login";
+
+    if (!user && !inAuthGroup && !isLoadingUser) {
+      router.replace("/login");
+    } else if (user && inAuthGroup && !isLoadingUser) {
+      router.replace("/");
     }
-  }, [user, isLoadingUser])
+  }, [user, segments]);
 
   // Avoid rendering app screens until auth state is resolved to prevent flash
   if (isLoadingUser) {
@@ -26,6 +31,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
       </View>
     )
   }
+
 
   if (!user) {
     // Redirect will run via useEffect; render nothing to avoid index flash

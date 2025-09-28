@@ -1,8 +1,8 @@
 import { StyleSheet, View, TextInput, TouchableOpacity, Pressable } from 'react-native'
 import React, { useState, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
-import uuid from 'react-native-uuid';
 import Animated, { FadeIn, FadeOut, runOnJS } from 'react-native-reanimated';
+import { ID } from 'react-native-appwrite';
 
 const converToObj = (txt) => {
   const txtArr = txt.split(' ')
@@ -17,8 +17,7 @@ const converToObj = (txt) => {
     if (Number.isNaN(Number(currentItem))) {
       words.push(currentItem)
     } else {
-      // item.push({ id: uuid.v4(), product: words.toString().replaceAll(",", " "), price: Number(currentItem) })
-      item.push({ productName: words.toString().replaceAll(",", " "), price: Number(currentItem) })
+      item.push({id: ID.unique(), productName: words.toString().replaceAll(",", " "), price: Number(currentItem) })
       words = []
     }
 

@@ -13,16 +13,15 @@ const Card = ({data}) => {
     const { fetchClientItems } = useItems()
 
     const handleAddItems = () => {
-        // setPersonData(data)
         setClientId(data.$id)
         setMode(MODE.ADD_ITEM)
     }
 
     const handleNamePress = async () => {
-        // setPersonData(data)
-
         // fetch data from the database
-        const response = await fetchClientItems(data.userId, data.$id)
+        console.log("Fetching items of the clients")
+        const response = await fetchClientItems(data.$id, false)
+        console.log(JSON.stringify(response, null, 2))
         setClientId(data.$id)
         setPersonData(response)
         router.navigate({ pathname: '/items', })
@@ -38,7 +37,7 @@ const Card = ({data}) => {
 
             <View style={styles.balanceContainer} >
                 <Text style={styles.balanceTxt} > Payable: </Text>
-                <Text style={styles.totalBalanceTxt} >{data.itemsTotal}</Text>
+                <Text style={styles.totalBalanceTxt} >{data.itemsTotal + data.balance}</Text>
             </View>
 
             <TouchableOpacity style={styles.addIcon} onPress={handleAddItems}>

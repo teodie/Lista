@@ -15,13 +15,12 @@ import { exportToCSV } from '@/utils/jsonToCsv';
 import { useData } from '@/utils/userdata-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useClient } from '@/utils/client-context';
-import { client } from '@/utils/appWrite';
 
 const explore = () => {
   const { bottom } = useSafeAreaInsets()
   const { mode, setMode, utang, setUtang, personData } = useData()
   const [id, setId] = useState(null);
-  const { fetchClients, clients } = useClient()
+  const { clients } = useClient()
 
   const [search, onChangeSearch] = useState('');
   const [name, onChangeName] = useState('');
@@ -120,22 +119,17 @@ const explore = () => {
           </TouchableOpacity>
 
         </View>
-
+        
         <View style={styles.cardContainer}>
           <Animated.FlatList
             itemLayoutAnimation={LinearTransition.springify()}
             data={clients}
-            renderItem={({ item }) =>
-              <SwipeAble data={item} />
-            }
+            renderItem={({ item }) => <SwipeAble data={item} /> }
             keyExtractor={item => item.$id.toString()}
           />
-          {/* {clients && <Text>{JSON.stringify(clients.rows, null, 2)}</Text>} */}
         </View>
 
-
-
-        {mode === MODE.ADD_ITEM && personData && < AddItems />}
+        {mode === MODE.ADD_ITEM && personData  && < AddItems />}
 
         <ModalContainer
           children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}

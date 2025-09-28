@@ -3,7 +3,7 @@ import { useAuth } from "./auth-context";
 import { client, tablesDB } from "./appWrite";
 import { useData } from "./userdata-context";
 import { useClient } from "./client-context";
-import { Permission, Role, Query } from "react-native-appwrite";
+import { Permission, Role, Query, TablesDB } from "react-native-appwrite";
 
 // initialize the context
 const ItemsContext = createContext(undefined)
@@ -17,29 +17,42 @@ export const ItemsProvider = ({ children }) => {
     const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID
     const ITEMS_TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_ITEMS_TABLE_ID
 
-    const fetchAllItems = () => {
 
-    }
-
-    const fetchClientItems = async (userId, clientId) => {
-        console.log(userId, clientId)
-
+    const fetchClientItems = async (clientId, isPaid) => {
         try {
             const response = await tablesDB.listRows(
                 DATABASE_ID,
                 ITEMS_TABLE_ID,
                 [
-                    Query.equal('userId', userId),
-                    Query.equal('clientId', clientId)
+                    Query.equal('userId', user.$id),
+                    Query.equal('clientId', clientId),
+                    Query.equal('paid', isPaid),
                 ]
             )
-            
-            if(response.total === 0) return null
+                
+            if(response.total === 0) return {}
 
             return response.rows
         } catch (error) {
             console.log(error)
-            return null
+            return {}
+        }
+    }
+
+    
+    const updateItem = async (id, data) => {
+        console.log("updating items now")
+        try {
+            const response = await tablesDB.updateRow(
+                DATABASE_ID,
+                ITEMS_TABLE_ID,
+                id,
+                data
+            )
+
+            console.log("response back: ", response)
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -63,16 +76,30 @@ export const ItemsProvider = ({ children }) => {
         }
     }
 
-    const updatedItem = (id) => {
-
+    const deleteItem = async (id) => {
+        try {
+            await tablesDB.deleteRow(
+                DATABASE_ID,
+                ITEMS_TABLE_ID,
+                id
+            )
+        } catch (error) {
+            console.log(error)
+        }
     }
 
-    const deleteItem = (id) => {
+    const batchDelete = async (clientId) => {
+        // fetch the rows with matching client id
+        const clientItems = await fetchClientItems(clientId)
+        console.log(JSON.stringify(clientItems, null, 2))
 
+        if(clientItems.length === undefined) return console.log("No items to delete")
+
+        clientItems.map((item) => deleteItem(item.$id) )
     }
 
     return (
-        <ItemsContext.Provider value={{items, createItem, fetchClientItems}}>
+        <ItemsContext.Provider value={{items, createItem, fetchClientItems, batchDelete, updateItem }}>
             {children}
         </ItemsContext.Provider>
     )
