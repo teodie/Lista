@@ -45,12 +45,12 @@ const AddItems = () => {
     console.log("total of items on database: ", totalOfItemsOnDatabase)
     // udpate the itemtotal of the person on the database
     items.forEach(async (element) => {
-      await createItem({productName: element.productName, price: element.price }, element.id)
+      await createItem({ productName: element.productName, price: element.price }, element.id)
     });
 
     const grandTotal = totalOfCurrentItems + totalOfItemsOnDatabase
     // Update the itemsTotal column of the client with the same id
-    updateClient(id, {itemsTotal: grandTotal})
+    updateClient(id, { itemsTotal: grandTotal })
     setItems([])
     setMode(MODE.IDLE)
   }

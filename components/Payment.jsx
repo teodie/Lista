@@ -1,8 +1,5 @@
-import {
-    StyleSheet, Text, TouchableOpacity, View, Alert, Button
-    ,
-} from 'react-native'
-import React, { use, useEffect } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View, Alert} from 'react-native'
+import React, { useEffect } from 'react'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import ModalContainer from '@/components/ModalContainer';
 import { TextInput } from 'react-native-gesture-handler';
@@ -12,7 +9,8 @@ import { MODE } from '@/constants/mode';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import { useItems } from '@/utils/items-context';
-import { Redirect, router } from 'expo-router';
+import { router } from 'expo-router';
+
 
 const PaymentInput = () => {
     const { setMode } = useData()
@@ -30,7 +28,7 @@ const PaymentInput = () => {
         // fetcht the client data
         const clientData = await fetchClientById()
         // assign the items total to be use in the calculation
-        setTotal(clientData.itemsTotal)
+        setTotal(clientData.itemsTotal + clientData.balance)
     }
 
     const setItemsToPaid = async () => {
@@ -52,11 +50,12 @@ const PaymentInput = () => {
             updateClient(clientId, { balance: change, itemsTotal: 0 })
             Alert.alert(`Balance of ${change}`)
         }
-        if (change < 0) {
+        if (change <= 0) {
             updateClient(clientId, { balance: 0, itemsTotal: 0 })
-            Alert.alert(`Change of: ${-change}`)
-        } 
-        
+            change < 0 && Alert.alert(`Change of: ${-change}`)
+        }
+
+
         // set the current unpaid items to paid = true
         setItemsToPaid()
 
@@ -64,8 +63,6 @@ const PaymentInput = () => {
         payment.current = '0'
         router.replace('/')
     }
-
-
 
     return (
         <>
@@ -142,12 +139,3 @@ const styles = StyleSheet.create({
         gap: 20,
     }
 })
-
-/* Payment algorithm
-[X] load the person data in the componet
-[X] ask how much is the payment
-[X] subtract the payment to the total
-[X] save the data for archieving
-[X] if there is a balance save that
-[X] update the client data with blank items along with the balance
-*/
