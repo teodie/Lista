@@ -22,11 +22,15 @@ const Card = ({data}) => {
         console.log("Fetching items of the clients")
         const response = await fetchClientItems(data.$id, false)
 
-        if(!response) return console.log("No unpaid items found")
-
         setClientId(data.$id)
+        if(!response) {
+            console.log("No unpaid items found")
+            setPersonData([])
+        } else {
         setPersonData( response.sort( (a, b) =>  b.$createdAt - a.$createdAt) )
-        router.navigate({ pathname: '/items', })
+    }
+    
+    router.navigate({ pathname: '/items', })
     }
 
     return (

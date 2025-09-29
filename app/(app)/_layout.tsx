@@ -11,7 +11,6 @@ import { ItemsProvider } from '@/utils/items-context';
 function RouteGaurd({ children }: { children: React.ReactNode }) {
   const { user, isLoadingUser } = useAuth()
   const segments = useSegments()
-  console.log(segments)
 
   useEffect(() => {
     const inAuthGroup = segments[0] === "login";
@@ -40,7 +39,6 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>
 }
-
 
 export default function ScreenLayout() {
 

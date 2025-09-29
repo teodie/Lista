@@ -127,7 +127,6 @@ export default AuthProvider = ({ children }) => {
   const getUser = async () => {
     try {
       const session = await account.get();
-      console.log(JSON.stringify(session, null, 2))
       setUser(session);
       console.log("user has been set: ")
     } catch (error) {

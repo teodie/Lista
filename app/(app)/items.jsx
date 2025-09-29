@@ -43,11 +43,20 @@ const PaymentView = ({ personData, clientData }) => {
         <Total title="Balance" amount={clientData.balance} />
         <Total title="Payable" amount={clientData.balance + clientData.itemsTotal} />
       </View>
-      <FlatList
-        data={personData}
-        renderItem={({ item }) => <ProductOverview item={item} />}
-      />
-      <Text style={[styles.headerTxt, { alignSelf: 'center', marginTop: 10 }]} >{clientData.itemsTotal}</Text>
+
+      {
+        personData.length === 0
+          ? <NoItems />
+          : <>
+            <FlatList
+              data={personData}
+              renderItem={({ item }) => <ProductOverview item={item} />}
+            />
+            <Text style={[styles.headerTxt, { alignSelf: 'center', marginTop: 10 }]} >{clientData.itemsTotal}</Text>
+          </>
+      }
+
+
     </>
   );
 }
@@ -76,8 +85,7 @@ const items = () => {
       <View >
 
         {personData !== null && clientData !== null
-          ? <PaymentView personData={personData} clientData={clientData} />
-          : <NoItems />
+          && <PaymentView personData={personData} clientData={clientData} />
         }
 
       </View>
