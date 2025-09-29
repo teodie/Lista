@@ -24,6 +24,7 @@ const explore = () => {
 
   const [search, onChangeSearch] = useState('');
   const [name, onChangeName] = useState('');
+  const [filteredClients, setFilteredClients] = useState([])
 
 
   const [longPressed, setLongPressed] = useState(false)
@@ -50,7 +51,6 @@ const explore = () => {
     setLongPressed(prev => !prev)
   }
 
-
   const addAnimation = useAnimatedStyle(() => ({
     elevation: elevate.value,
     transform: [
@@ -73,9 +73,6 @@ const explore = () => {
     ]
   }));
 
-
-
-
   useEffect(() => {
 
     const getPermission = async () => {
@@ -88,10 +85,18 @@ const explore = () => {
         console.error('Failed to get permission:', err);
       }
     };
-
     getPermission();
   }, []);
 
+  useEffect(() => {
+    filterClient()
+  }, [search, clients])
+
+  const filterClient = () => {
+    search.trim() === '' 
+    ? setFilteredClients(clients)
+    : setFilteredClients(clients.filter((client) => client.name?.toLowerCase().includes(search.toLowerCase())))
+  }
 
   return (
     <TouchableWithoutFeedback onPress={() => longPressed === true && handleLongPress()}>
@@ -119,17 +124,17 @@ const explore = () => {
           </TouchableOpacity>
 
         </View>
-        
+
         <View style={styles.cardContainer}>
           <Animated.FlatList
             itemLayoutAnimation={LinearTransition.springify()}
-            data={clients}
-            renderItem={({ item }) => <SwipeAble data={item} /> }
+            data={filteredClients}
+            renderItem={({ item }) => <SwipeAble data={item} />}
             keyExtractor={item => item.$id.toString()}
           />
         </View>
 
-        {mode === MODE.ADD_ITEM && personData  && < AddItems />}
+        {mode === MODE.ADD_ITEM && personData && < AddItems />}
 
         <ModalContainer
           children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}

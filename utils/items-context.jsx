@@ -24,18 +24,36 @@ export const ItemsProvider = ({ children }) => {
                 DATABASE_ID,
                 ITEMS_TABLE_ID,
                 [
-                    Query.equal('userId', user.$id),
                     Query.equal('clientId', clientId),
                     Query.equal('paid', isPaid),
                 ]
             )
                 
-            if(response.total === 0) return {}
+            if(response.total === 0) return null
 
             return response.rows
         } catch (error) {
             console.log(error)
-            return {}
+            return null
+        }
+    }
+
+    const fetchAllItems = async (clientId) => {
+        try {
+            const response = await tablesDB.listRows(
+                DATABASE_ID,
+                ITEMS_TABLE_ID,
+                [
+                    Query.equal('clientId', clientId),
+                ]
+            )
+                
+            if(response.total === 0) return null
+
+            return response.rows
+        } catch (error) {
+            console.log(error)
+            return null
         }
     }
 
@@ -89,17 +107,25 @@ export const ItemsProvider = ({ children }) => {
     }
 
     const batchDelete = async (clientId) => {
-        // fetch the rows with matching client id
-        const clientItems = await fetchClientItems(clientId)
-        console.log(JSON.stringify(clientItems, null, 2))
+        try {
+            // fetch all the items with the same client Id
+            const items = await fetchAllItems(clientId)
 
-        if(clientItems.length === undefined) return console.log("No items to delete")
+            // check it there are items returned
+            if(items){
+                // loop to the items and delete them one by one
+                items.forEach((item) => {
+                    deleteItem(item.$id)
+                })
+            }
 
-        clientItems.map((item) => deleteItem(item.$id) )
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
-        <ItemsContext.Provider value={{items, createItem, fetchClientItems, batchDelete, updateItem }}>
+        <ItemsContext.Provider value={{items, createItem, fetchClientItems, batchDelete, updateItem  }}>
             {children}
         </ItemsContext.Provider>
     )

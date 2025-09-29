@@ -21,19 +21,19 @@ const Card = ({data}) => {
         // fetch data from the database
         console.log("Fetching items of the clients")
         const response = await fetchClientItems(data.$id, false)
-        console.log(JSON.stringify(response, null, 2))
+
+        if(!response) return console.log("No unpaid items found")
+
         setClientId(data.$id)
-        setPersonData(response)
+        setPersonData( response.sort( (a, b) =>  b.$createdAt - a.$createdAt) )
         router.navigate({ pathname: '/items', })
     }
 
     return (
         <View style={styles.card}>
-            <View style={styles.headerTxtContainer} >
-                <TouchableOpacity onPress={handleNamePress}>
+                <TouchableOpacity style={styles.headerTxtContainer} onPress={handleNamePress}>
                     <Text style={styles.headerTxt}>{data.name}</Text>
                 </TouchableOpacity>
-            </View>
 
             <View style={styles.balanceContainer} >
                 <Text style={styles.balanceTxt} > Payable: </Text>
@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
         height: 70
     },
     headerTxtContainer: {
-
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',

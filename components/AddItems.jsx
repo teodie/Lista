@@ -36,23 +36,28 @@ const AddItems = () => {
   }
 
   const saveItems = async (id) => {
-    // Create item in appwrite data base
-    const clientItemsOnDatabase = await fetchClientItems(clientId, false)
-    // Calculate the total for the items to be added and the current items on the database
-    const totalOfCurrentItems = items.reduce((acc, item) => item.price + acc, 0)
-    const totalOfItemsOnDatabase = clientItemsOnDatabase.length ? clientItemsOnDatabase.reduce((acc, item) => item.price + acc, 0) : 0
+    try {
+      // Create item in appwrite data base
+      const clientItemsOnDatabase = await fetchClientItems(clientId, false)
+      // Calculate the total for the items to be added and the current items on the database
+      const totalOfCurrentItems = items.reduce((acc, item) => item.price + acc, 0)
+      const totalOfItemsOnDatabase = clientItemsOnDatabase ? clientItemsOnDatabase.reduce((acc, item) => item.price + acc, 0) : 0
 
-    console.log("total of items on database: ", totalOfItemsOnDatabase)
-    // udpate the itemtotal of the person on the database
-    items.forEach(async (element) => {
-      await createItem({ productName: element.productName, price: element.price }, element.id)
-    });
+      console.log("total of items on database: ", totalOfItemsOnDatabase)
+      // udpate the itemtotal of the person on the database
+      items.forEach(async (element) => {
+        await createItem({ productName: element.productName, price: element.price }, element.id)
+      });
 
-    const grandTotal = totalOfCurrentItems + totalOfItemsOnDatabase
-    // Update the itemsTotal column of the client with the same id
-    updateClient(id, { itemsTotal: grandTotal })
-    setItems([])
-    setMode(MODE.IDLE)
+      const grandTotal = totalOfCurrentItems + totalOfItemsOnDatabase
+      // Update the itemsTotal column of the client with the same id
+      updateClient(id, { itemsTotal: grandTotal })
+      setItems([])
+      setMode(MODE.IDLE)
+    } catch (error) {
+      console.log(error)
+    }
+
   }
 
   const handleExitPress = () => {

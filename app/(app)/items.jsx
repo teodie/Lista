@@ -61,7 +61,6 @@ const items = () => {
   useEffect(() => {
     const fetchClientData = async () => {
       const clientRow = await fetchClientById()
-      console.log(JSON.stringify(clientRow, null, 2))
       setClientData(clientRow)
     }
 
