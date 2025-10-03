@@ -11,7 +11,6 @@ import { useItems } from "@/utils/items-context";
 
 const SwipeAble = ({ data }) => {
     const { deleteClient, updateClient } = useClient()
-    const {batchDelete} = useItems()
     const [modalVisible, setModalVisible] = useState(false)
     const [name, setName] = useState('')
     const swipeRef = useRef(null)
@@ -28,7 +27,6 @@ const SwipeAble = ({ data }) => {
                   text: 'Oo',
                   onPress: () => {
                     deleteClient(data.$id)
-                    batchDelete(data.$id)
                   }, style: 'destructive'
                 }])
             }, style: 'default'

@@ -4,6 +4,7 @@ import { client, tablesDB } from "./appWrite";
 import { useData } from "./userdata-context";
 import { useClient } from "./client-context";
 import { Permission, Role, Query, TablesDB } from "react-native-appwrite";
+import { resolveDiscoveryAsync } from "expo-auth-session";
 
 // initialize the context
 const ItemsContext = createContext(undefined)
@@ -30,6 +31,7 @@ export const ItemsProvider = ({ children }) => {
             )
                 
             if(response.total === 0) return null
+            console.log(JSON.stringify(response, null, 2))
 
             return response.rows
         } catch (error) {
@@ -80,7 +82,7 @@ export const ItemsProvider = ({ children }) => {
                 DATABASE_ID,
                 ITEMS_TABLE_ID,
                 id,
-                {...data, userId: user.$id, paid: false, clientId: clientId , isSynced: false },
+                {...data, userId: user.$id, paid: false, clientId: clientId, isSynced: false, client:  clientId},
                 [
                     Permission.read(Role.user(user.$id)),
                     Permission.update(Role.user(user.$id)),
@@ -106,26 +108,9 @@ export const ItemsProvider = ({ children }) => {
         }
     }
 
-    const batchDelete = async (clientId) => {
-        try {
-            // fetch all the items with the same client Id
-            const items = await fetchAllItems(clientId)
-
-            // check it there are items returned
-            if(items){
-                // loop to the items and delete them one by one
-                items.forEach((item) => {
-                    deleteItem(item.$id)
-                })
-            }
-
-        } catch (error) {
-            console.log(error)
-        }
-    }
 
     return (
-        <ItemsContext.Provider value={{items, createItem, fetchClientItems, batchDelete, updateItem  }}>
+        <ItemsContext.Provider value={{items, createItem, fetchClientItems, updateItem  }}>
             {children}
         </ItemsContext.Provider>
     )

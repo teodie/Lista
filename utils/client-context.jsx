@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { client, tablesDB } from "./appWrite";
 import { useAuth } from "./auth-context";
 import { ID, Permission, Query, Role, TablesDB } from "react-native-appwrite";
-import { RectButton } from "react-native-gesture-handler";
 
 
 const ClientContext = createContext(undefined)
@@ -100,8 +99,8 @@ export const ClientProvider = ({ children }) => {
 
         fetchClients()
 
-        const clientTableChannel = `databases.${DATABASE_ID}.tables.${CLIENTS_TABLE_ID}.rows`
-        unsubscribe = client.subscribe(clientTableChannel,
+        const channel = `databases.${DATABASE_ID}.tables.${CLIENTS_TABLE_ID}.rows`
+        unsubscribe = client.subscribe(channel,
             (response) => {
                 const { payload, events } = response
                 if (events[0].includes('create')) {
