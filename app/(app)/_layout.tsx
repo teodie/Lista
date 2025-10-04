@@ -41,7 +41,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
 }
 
 export default function ScreenLayout() {
-
+  
   return (
     <RouteGaurd>
       <ClientProvider>
