@@ -4,17 +4,14 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { MODE } from '@/constants/mode'
 import { useData } from '@/utils/userdata-context'
 import { useClient } from '@/utils/client-context'
-import { useAuth } from '@/utils/auth-context'
 import { ID } from 'react-native-appwrite'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const AddName = ({ id, setId, onChangeName, name }) => {
     const { mode, setMode, utang, setUtang } = useData()
-    const { createClient } = useClient()
-    const { user } = useAuth()
+    const { createClient, clients } = useClient()
 
     const nameAlreadyExist = () => {
-        const nameAlreadyExist = utang.find((item) => item.name.toUpperCase() === name.toUpperCase())
+        const nameAlreadyExist = clients.find((item) => item.name.toLowerCase() === name.trim().toLowerCase())
         return nameAlreadyExist ? true : false;
     }
 
@@ -30,8 +27,6 @@ const AddName = ({ id, setId, onChangeName, name }) => {
         setMode(MODE.IDLE)
     };
 
-
-
     const editName = (id) => {
         setUtang(utang.map(item => item.id === id ? { ...item, name: name.toUpperCase() } : item))
         console.log(id.toString() + " Has been Updated.")
@@ -41,7 +36,6 @@ const AddName = ({ id, setId, onChangeName, name }) => {
 
         switch (mode) {
             case MODE.ADD_NAME:
-                setMode(MODE.IDLE)
                 createName()
                 break;
             case MODE.EDIT_NAME:
@@ -71,7 +65,10 @@ const AddName = ({ id, setId, onChangeName, name }) => {
                     <MaterialIcons name='add' size={40} color="white" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.iconStyle} onPress={() => setMode(MODE.IDLE)} >
+                <TouchableOpacity style={styles.iconStyle} onPress={() => {
+                    setMode(MODE.IDLE)
+                    onChangeName('')
+                    } } >
                     <MaterialIcons name='chevron-left' size={40} color="white" />
                 </TouchableOpacity>
             </View>

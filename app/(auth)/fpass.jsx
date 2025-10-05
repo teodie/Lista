@@ -15,7 +15,7 @@ const fpass = () => {
   const [buttonDisable, setButtonDisable] = useState(false)
 
   useEffect(() => {
-    
+
     const handleUrl = (event) => {
       const url = event.url;
       console.log("Incoming link:", url);
