@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Text, Button, TextInput } from 'react-native-paper'
 import { account } from '@/utils/appWrite'
@@ -15,6 +15,7 @@ const fpass = () => {
   const [buttonDisable, setButtonDisable] = useState(false)
 
   useEffect(() => {
+    
     const handleUrl = (event) => {
       const url = event.url;
       console.log("Incoming link:", url);
