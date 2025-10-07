@@ -35,7 +35,7 @@ const Total = ({ title, amount }) => {
 }
 
 const PaymentView = ({ personData, clientData }) => {
-
+  console.log(clientData)
   return (
     <>
       <View style={styles.header}>

@@ -13,10 +13,11 @@ const AuthContext = createContext(undefined)
 export default AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [isLoadingUser, setIsLoadingUser] = useState(true)
+  const [userProfile, setUserProfile] = useState(null)
 
   const android_OAuth = async () => {
 
-    const deepLink = new URL(makeRedirectUri({ preferLocalhost: true, path: 'waiting'}));
+    const deepLink = new URL(makeRedirectUri({ preferLocalhost: true, path: 'waiting' }));
     console.log("deepLink: ", deepLink)
     const scheme = `${deepLink.protocol}//`;
     console.log("scheme: ", scheme)
@@ -30,8 +31,8 @@ export default AuthProvider = ({ children }) => {
     const result = await WebBrowser.openAuthSessionAsync(`${loginUrl}`, scheme);
     console.log("result: ", result)
 
-    if(result.type === 'dismiss') return console.log("Authentecation has been desmissed")
-    if(result.type === 'error') return console.error("OAuth error:", result.error);
+    if (result.type === 'dismiss') return console.log("Authentecation has been desmissed")
+    if (result.type === 'error') return console.error("OAuth error:", result.error);
     // Extract credentials from OAuth redirect URL
     const url = new URL(result.url);
     const secret = url.searchParams.get('secret');
@@ -47,9 +48,10 @@ export default AuthProvider = ({ children }) => {
         secret
       });
     }
-    
+
     await getUser()
-    
+
+
     if (Platform.OS === 'android') {
       toast("Successfully signed in with Google!");
     }
@@ -84,6 +86,7 @@ export default AuthProvider = ({ children }) => {
     // Check if we're returning from OAuth
     handleOAuthRedirect();
     getUser();
+    getAccessToken()
   }, []);
 
   const handleOAuthRedirect = async () => {
@@ -108,6 +111,7 @@ export default AuthProvider = ({ children }) => {
 
         // Get user data after successful OAuth
         await getUser();
+        await getAccessToken()
 
         // Clean up URL parameters
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -128,7 +132,7 @@ export default AuthProvider = ({ children }) => {
     try {
       const session = await account.get();
       setUser(session);
-      console.log("user has been set: ")
+      console.log("user has been set: ", session)
     } catch (error) {
       setUser(null);
     } finally {
@@ -162,7 +166,7 @@ export default AuthProvider = ({ children }) => {
       await account.create(ID.unique(), email, password, username);
       return null
     } catch (error) {
-      if(error.code === 400) return "Email account already exist. Please proceed to login"
+      if (error.code === 400) return "Email account already exist. Please proceed to login"
       if (error instanceof Error) return error.message
 
       return "Error occured while creating account."
@@ -185,7 +189,6 @@ export default AuthProvider = ({ children }) => {
 
   }
 
-
   const signOut = async () => {
     try {
       await account.deleteSession("current");
@@ -195,10 +198,41 @@ export default AuthProvider = ({ children }) => {
     }
   };
 
+  const getAccessToken = async () => {
+    try {
+      const response = await account.listIdentities()
+      if (response) {
+        const token = response.identities[0].providerAccessToken
+        console.log("token: ", token)
 
+        getUserAvatar(token)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const getUserAvatar = async (token) => {
+    try {
+      const response = await fetch(
+        'https://www.googleapis.com/oauth2/v2/userinfo',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const profile = await response.json();
+      console.log("Profile: ", profile)
+      setUserProfile(profile)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
-    <AuthContext.Provider value={{ user, isLoadingUser, logIn, signUp, signOut, googleSignUp }}>
+    <AuthContext.Provider value={{ user, isLoadingUser, logIn, signUp, signOut, googleSignUp, userProfile }}>
       {children}
     </AuthContext.Provider>
   );

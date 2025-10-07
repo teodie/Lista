@@ -9,7 +9,7 @@ import { share } from "@/utils/jsonToCsv";
 import { useClient } from "@/utils/client-context";
 import { useItems } from "@/utils/items-context";
 
-const SwipeAble = ({ data }) => {
+const SwipeAble = ({ data, scrollRef }) => {
     const { deleteClient, updateClient } = useClient()
     const [modalVisible, setModalVisible] = useState(false)
     const [name, setName] = useState('')
@@ -96,14 +96,13 @@ const SwipeAble = ({ data }) => {
     return (
         <View >
             <Swipeable
-                ref={swipeRef}
-                friction={2}
+                ref={scrollRef}
+                friction={4}
                 leftThreshold={20}
                 containerStyle={{ overflow: "visible" }}
                 renderRightActions={renderRightActions}
                 renderLeftActions={renderLeftActions}
             >
-
                 <Card data={data} />
 
             </Swipeable>

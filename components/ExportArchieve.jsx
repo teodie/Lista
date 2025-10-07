@@ -3,12 +3,9 @@ import { MaterialIcons } from '@expo/vector-icons'
 import React from 'react'
 import { exportToCSV } from '@/utils/jsonToCsv'
 import { fetchArchieveData } from '@/utils/fetchArchieveData'
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useAuth } from '@/utils/auth-context'
 import NetInfo from "@react-native-community/netinfo";
 
 const ExportArchieve = () => {
-    const { signOut } = useAuth()
     const { isConnected } = NetInfo.useNetInfo();
     const handlePress = async () => {
         // fetch all the archieve Data in the storage
@@ -20,9 +17,6 @@ const ExportArchieve = () => {
         <View style={{ flexDirection: 'row', gap: 20, alignSelf: 'center', position: 'relative' }}>
             <Pressable onPress={handlePress}>
                 <MaterialIcons name='save' size={30} color='#ffffff' />
-            </Pressable>
-            <Pressable onPress={() => signOut()}>
-                <MaterialCommunityIcons name="logout" size={30} color="#ffffff" />
             </Pressable>
             <MaterialIcons name="cloud" size={30} color="white" />
             <View style={{height: 10, width: 10, backgroundColor: isConnected ? '#00FF01' : 'gray', borderRadius: 5, position: 'absolute', right: 0, top: 5,}}/>

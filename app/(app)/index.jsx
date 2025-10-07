@@ -17,14 +17,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useClient } from '@/utils/client-context';
 
 const explore = () => {
-  const { bottom } = useSafeAreaInsets()
-  const { mode, setMode, utang, setUtang, personData } = useData()
+  const { mode, setMode, utang, personData } = useData()
   const [id, setId] = useState(null);
   const { clients } = useClient()
 
   const [search, onChangeSearch] = useState('');
   const [name, onChangeName] = useState('');
   const [filteredClients, setFilteredClients] = useState([])
+
+  const scrollRef = useRef(null);
 
 
   const [longPressed, setLongPressed] = useState(false)
@@ -93,14 +94,14 @@ const explore = () => {
   }, [search, clients])
 
   const filterClient = () => {
-    search.trim() === '' 
-    ? setFilteredClients(clients)
-    : setFilteredClients(clients.filter((client) => client.name?.toLowerCase().includes(search.toLowerCase())))
+    search.trim() === ''
+      ? setFilteredClients(clients)
+      : setFilteredClients(clients.filter((client) => client.name?.toLowerCase().includes(search.toLowerCase())))
   }
 
   return (
     <TouchableWithoutFeedback onPress={() => longPressed === true && handleLongPress()}>
-      <View style={[styles.container, { paddingBottom: bottom }]}>
+      <View style={styles.container}>
 
         <View style={styles.headerContainer}>
           <View style={styles.topHeader}>
@@ -127,9 +128,12 @@ const explore = () => {
 
         <View style={styles.cardContainer}>
           <Animated.FlatList
+            ref={scrollRef}
+            showsVerticalScrollIndicator={false}
             itemLayoutAnimation={LinearTransition.springify()}
             data={filteredClients}
-            renderItem={({ item }) => <SwipeAble data={item} />}
+            renderItem={({ item }) => 
+            <SwipeAble data={item} scrollRef={scrollRef} />}
             keyExtractor={item => item.$id.toString()}
           />
         </View>
@@ -178,7 +182,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f6fa',
-    position: 'relative'
   },
   text: {
     color: 'black',
@@ -209,7 +212,6 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 40,
     flexGrow: 1,
-    // borderWidth: 1,
     padding: 10,
     backgroundColor: "white",
     borderRadius: 5,
@@ -239,8 +241,7 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 1,
-    backgroundColor: '#f5f6fa',
-    paddingVertical: 10,
+    paddingTop: 10,
   }
 
 })
