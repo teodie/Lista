@@ -1,19 +1,16 @@
-import { TouchableWithoutFeedback, View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, Pressable, } from 'react-native'
-import React, { useEffect, useMemo, useState, useContext, useRef } from 'react'
+import { TouchableWithoutFeedback, View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, Pressable, StatusBar, Keyboard, } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
-import { utangData } from '@/constants/utangList';
 import AddItems from '@/components/AddItems';
 import { MODE } from '@/constants/mode';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalContainer from '@/components/ModalContainer';
 import AddName from '@/components/AddName';
 import ExportArchieve from '@/components/ExportArchieve';
 import SwipeAble from '@/components/SwipeAble';
-import Animated, { useAnimatedStyle, withSpring, withTiming, useSharedValue, LinearTransition } from 'react-native-reanimated';
+import Animated, {  LinearTransition } from 'react-native-reanimated';
 import { exportToCSV } from '@/utils/jsonToCsv';
 import { useData } from '@/utils/userdata-context';
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useClient } from '@/utils/client-context';
 
 const explore = () => {
@@ -27,52 +24,6 @@ const explore = () => {
 
   const scrollRef = useRef(null);
 
-
-  const [longPressed, setLongPressed] = useState(false)
-  const addX = useSharedValue(0)
-  const addY = useSharedValue(0)
-  const deleteX = useSharedValue(0)
-  const micY = useSharedValue(0)
-  const elevate = useSharedValue(0)
-
-  const handleLongPress = () => {
-    if (!longPressed) {
-      addX.value = withSpring(addX.value - 70)
-      addY.value = withSpring(addY.value - 70)
-      deleteX.value = withSpring(deleteX.value - 90)
-      micY.value = withSpring(micY.value - 90)
-      elevate.value = withTiming(elevate.value + 5)
-    } else {
-      addX.value = withTiming(addX.value + 70, { duration: 300 })
-      addY.value = withTiming(addY.value + 70, { duration: 300 })
-      deleteX.value = withTiming(deleteX.value + 90, { duration: 300 })
-      micY.value = withTiming(micY.value + 90, { duration: 300 })
-      elevate.value = withTiming(elevate.value - 5)
-    }
-    setLongPressed(prev => !prev)
-  }
-
-  const addAnimation = useAnimatedStyle(() => ({
-    elevation: elevate.value,
-    transform: [
-      { translateX: addX.value },
-      { translateY: addY.value }
-    ]
-  }));
-
-  const deleteAnimation = useAnimatedStyle(() => ({
-    elevation: elevate.value,
-    transform: [
-      { translateX: deleteX.value },
-    ]
-  }));
-
-  const micAnimation = useAnimatedStyle(() => ({
-    elevation: elevate.value,
-    transform: [
-      { translateY: micY.value },
-    ]
-  }));
 
   useEffect(() => {
 
@@ -100,9 +51,9 @@ const explore = () => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={() => longPressed === true && handleLongPress()}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss}>
       <View style={styles.container}>
-
+        <StatusBar barStyle={'light-content'} />
         <View style={styles.headerContainer}>
           <View style={styles.topHeader}>
             <Text style={styles.titleTxt}>Lista</Text>
@@ -132,8 +83,8 @@ const explore = () => {
             showsVerticalScrollIndicator={false}
             itemLayoutAnimation={LinearTransition.springify()}
             data={filteredClients}
-            renderItem={({ item }) => 
-            <SwipeAble data={item} scrollRef={scrollRef} />}
+            renderItem={({ item }) =>
+              <SwipeAble data={item} scrollRef={scrollRef} />}
             keyExtractor={item => item.$id.toString()}
           />
         </View>
@@ -144,32 +95,6 @@ const explore = () => {
           children={<AddName id={id} setId={setId} name={name} onChangeName={onChangeName} />}
           visible={[MODE.ADD_NAME, MODE.EDIT_NAME].includes(mode)}
           setMode={setMode} />
-
-        <View style={{ position: 'relative' }}>
-          <Pressable style={[styles.iconStyle, styles.addIcon]} onPress={() => { setMode(MODE.ADD_NAME) }} onLongPress={handleLongPress} >
-            <MaterialIcons name='add' size={40} color="#E8E8E8" />
-          </Pressable>
-
-          <Animated.View style={[styles.iconStyle, styles.micIcon, micAnimation]}>
-            <TouchableOpacity onPress={() => { Alert.alert("AI Transcription feature currently not available") }} >
-              <MaterialIcons name='mic' size={40} color="#E8E8E8" />
-            </TouchableOpacity>
-          </Animated.View>
-
-          <Animated.View style={[styles.iconStyle, deleteAnimation]}>
-            <TouchableOpacity onPress={() => { Alert.alert("Delete feature currently not available") }} >
-              <MaterialIcons name='delete' size={40} color="#E8E8E8" />
-            </TouchableOpacity>
-          </Animated.View>
-
-          <Animated.View style={[styles.iconStyle, addAnimation]} >
-            <TouchableOpacity onPress={() => { exportToCSV(utang, "Store Credits") }} >
-              <MaterialIcons name='save-alt' size={40} color="#E8E8E8" />
-            </TouchableOpacity>
-          </Animated.View>
-
-        </View>
-
 
       </View>
     </TouchableWithoutFeedback>
@@ -222,11 +147,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     position: 'relative',
-  },
-  modalWrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   topHeader: {
     flexDirection: 'row',

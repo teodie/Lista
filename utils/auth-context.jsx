@@ -49,8 +49,11 @@ export default AuthProvider = ({ children }) => {
       });
     }
 
+    const profile = await fetchData()
+    console.log("Updating Profile: ", profile)
+    await account.updatePrefs({...profile})
+    
     await getUser()
-
 
     if (Platform.OS === 'android') {
       toast("Successfully signed in with Google!");
@@ -126,12 +129,36 @@ export default AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchData = async () => {
+    try {
+      const response = await account.listIdentities()
+      if (!response) return Alert.alert("no Identities found")
+      const accessToken = response.identities[0].providerAccessToken
+      console.log("access Token: ", accessToken)
+
+      const profileResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${accessToken}` } });
+
+      console.log("response: ", JSON.stringify(profileResponse, null, 2))
+
+      if (profileResponse.ok) {
+        const data = await profileResponse.json()
+        console.log("Profile: ", data)
+        return data
+      } else {
+        Alert.alert("accessToken expired")
+        return null
+      }
+
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const getUser = async () => {
     try {
       const session = await account.get();
-      getAccessToken();
       setUser(session);
-      console.log("user has been set: ", session)
     } catch (error) {
       setUser(null);
     } finally {
@@ -197,15 +224,14 @@ export default AuthProvider = ({ children }) => {
     }
   };
 
-  const getAccessToken = async () => {
+  const getUserProfile = async () => {
     try {
       console.log("Starting to fetch accessToken")
-      const response = await account.listIdentities()
-      console.log("Response: ", JSON.stringify(response.identities[0].providerAccessToken, null, 2))
-      const token = response.identities[0].providerAccessToken
+      const responseIdentities = await account.listIdentities()
+      const token = responseIdentities.identities[0].providerAccessToken
+      console.log("token: ", token)
 
       if (token) {
-        console.log("token: ", token)
 
         const response = await fetch(
           'https://www.googleapis.com/oauth2/v2/userinfo',
@@ -215,18 +241,25 @@ export default AuthProvider = ({ children }) => {
             },
           }
         );
+        console.log(response)
+        const profile = await response.json()
 
-        const profile = await response.json();
-        console.log("Profile: ", profile)
-        setUserProfile(profile)
+        if (profile) {
+          console.log("result after fetch: ", response)
+          const profile = await response.json();
+          console.log("Profile: ", profile)
+        }
+
+        return null
       }
     } catch (error) {
       console.log(error)
+      return null
     }
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoadingUser, logIn, signUp, signOut, googleSignUp, userProfile }}>
+    <AuthContext.Provider value={{ user, isLoadingUser, logIn, signUp, signOut, googleSignUp, getUserProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -16,7 +16,7 @@ const html = `
       src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.hK5q86yFD58YrDXZUOyW-AHaE8%3Fpid%3DApi&f=1&ipt=2eabb9a610b9de387a34e792742651c607ed5712e5f8f7aabdd2cebef88f6bbb&ipo=images"
       style="width: 90vw;" />
   </body>
-</html>w
+</html>
 `;
 
 export default function App() {

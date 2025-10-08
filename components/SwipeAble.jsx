@@ -7,7 +7,6 @@ import Card from "./Card";
 import { CustomModal } from "./ModalContainer";
 import { share } from "@/utils/jsonToCsv";
 import { useClient } from "@/utils/client-context";
-import { useItems } from "@/utils/items-context";
 
 const SwipeAble = ({ data, scrollRef }) => {
     const { deleteClient, updateClient } = useClient()
@@ -104,7 +103,6 @@ const SwipeAble = ({ data, scrollRef }) => {
                 renderLeftActions={renderLeftActions}
             >
                 <Card data={data} />
-
             </Swipeable>
         </View >
     )

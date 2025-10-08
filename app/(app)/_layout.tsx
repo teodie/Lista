@@ -3,7 +3,7 @@ import 'react-native-reanimated';
 import Payment from '@/components/Payment';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
-import { View, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, TouchableOpacity, StatusBar } from 'react-native';
 import { useAuth } from '@/utils/auth-context'
 import { ClientProvider } from '@/utils/client-context';
 import { ItemsProvider } from '@/utils/items-context';
@@ -47,13 +47,14 @@ export default function ScreenLayout() {
     <RouteGaurd>
       <ClientProvider>
         <ItemsProvider>
-              <Tabs screenOptions={{ tabBarActiveTintColor: '#5959B2' }}>
+              <Tabs screenOptions={{ tabBarActiveTintColor: '#5959B2'}}>
                 <Tabs.Screen
                   name='index'
                   options={{
                     title: "Home",
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
-                    headerShown: false
+                    headerShown: false,
+                    
                   }}
                 />
 
@@ -97,7 +98,9 @@ export default function ScreenLayout() {
                   options={{
                     title: 'Add',
                     tabBarIcon: ({ color }) => <Ionicons name="person-add" size={24} color={color} />,
-                    headerShown: false
+                    headerShown: true,
+                    headerTintColor: 'white',
+                    headerStyle: {backgroundColor: '#5959B2'}
                   }} />
 
                 <Tabs.Screen
@@ -105,7 +108,7 @@ export default function ScreenLayout() {
                   options={{
                     title: 'Settings',
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
-                    headerShown: false
+                    headerShown: false,
                   }} />
               </Tabs>
         </ItemsProvider>
