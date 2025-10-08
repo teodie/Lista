@@ -86,7 +86,6 @@ export default AuthProvider = ({ children }) => {
     // Check if we're returning from OAuth
     handleOAuthRedirect();
     getUser();
-    getAccessToken()
   }, []);
 
   const handleOAuthRedirect = async () => {
@@ -111,7 +110,6 @@ export default AuthProvider = ({ children }) => {
 
         // Get user data after successful OAuth
         await getUser();
-        await getAccessToken()
 
         // Clean up URL parameters
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -131,6 +129,7 @@ export default AuthProvider = ({ children }) => {
   const getUser = async () => {
     try {
       const session = await account.get();
+      getAccessToken();
       setUser(session);
       console.log("user has been set: ", session)
     } catch (error) {
@@ -200,32 +199,27 @@ export default AuthProvider = ({ children }) => {
 
   const getAccessToken = async () => {
     try {
+      console.log("Starting to fetch accessToken")
       const response = await account.listIdentities()
-      if (response) {
-        const token = response.identities[0].providerAccessToken
+      console.log("Response: ", JSON.stringify(response.identities[0].providerAccessToken, null, 2))
+      const token = response.identities[0].providerAccessToken
+
+      if (token) {
         console.log("token: ", token)
 
-        getUserAvatar(token)
+        const response = await fetch(
+          'https://www.googleapis.com/oauth2/v2/userinfo',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const profile = await response.json();
+        console.log("Profile: ", profile)
+        setUserProfile(profile)
       }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const getUserAvatar = async (token) => {
-    try {
-      const response = await fetch(
-        'https://www.googleapis.com/oauth2/v2/userinfo',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const profile = await response.json();
-      console.log("Profile: ", profile)
-      setUserProfile(profile)
     } catch (error) {
       console.log(error)
     }
