@@ -1,31 +1,40 @@
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Text, TextInput, SegmentedButtons, Button } from 'react-native-paper'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { MaterialIcons } from '@expo/vector-icons'
 
 const add = () => {
   const [facing, setFacing] = useState('back');
-  const [permission, requestPermission] = useCameraPermissions();
-  const [permissionResponse, mediaRequestPermission] = MediaLibrary.usePermissions();
+  const [cameraPermission, setCameraPermission] = useCameraPermissions();
+  const [mediaPermission, setMediaPermission] = MediaLibrary.usePermissions();
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [value, setValue] = useState('')
-  const [showCalindar, setShowCalindar] = useState(false)
-
+  const [limit, setLimit] = useState("7000")
 
   const handleAvatarPress = async () => {
-    if (permissionResponse.status !== 'granted') {
-      await mediaRequestPermission();
-    }
 
-    if (!permission.granted) {
-      requestPermission();
-    }
+    console.log("Camera Permission: ", cameraPermission)
+    console.log("Camera Permission: ", mediaPermission)
 
+    if (!cameraPermission.granted || !mediaPermission.granted) {
+      Alert.alert(
+        'Persmission needed',
+        'Please enable the permission in the app settings.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'ok',
+            style: 'default',
+            onPress: () => { Linking.openSettings() }
+          },
+        ]
+      )
+    }
+    await setCameraPermission()
+    await setMediaPermission()
   }
 
   const Calindar = () => {
@@ -34,29 +43,29 @@ const add = () => {
 
     return (
       <View style={{ alignItems: 'center', alignSelf: 'center', borderWidth: 1, marginVertical: 20, borderRadius: 10 }}>
-        <View style={{ alignSelf: 'stretch', alignItems: 'center', paddingVertical: 10, backgroundColor: 'gray', borderTopLeftRadius: 9, borderTopRightRadius: 9 }}>
-          <Text variant='titleSmall' style={{ color: 'white' }}>Pick a day</Text>
+        <View style={{ alignSelf: 'stretch', alignItems: 'center', paddingVertical: 10, backgroundColor: '#5959B2', borderTopLeftRadius: 9, borderTopRightRadius: 9 }}>
+          <Text variant='titleSmall' style={{ color: 'white' }}>Payment schedule</Text>
         </View>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', width: 300 }}>
+
           {days.map((day) => {
             return (
-              <TouchableOpacity 
-              onPress={() => {
-                if(daySelected.includes(day)){
-                  const filtered = daySelected.filter((number) => number !== day)
-                  console.log("filtered: ", filtered)
-                  return setDaySelected(filtered)
-                }
-              
-                setDaySelected([...daySelected, day])
-              }}
-              key={day.toString()} 
-              style={{ width: 30, height: 50, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                { daySelected.includes(day) &&
-                <View style={{borderWidth: 1, height: 20, width: 20, borderRadius: 10, position: 'absolute', backgroundColor: 'rgba(50, 252, 252, 1)'}}></View>
-                }
+              <TouchableOpacity
+                onPress={() => {
+                  if (daySelected.includes(day)) {
+                    const filtered = daySelected.filter((number) => number !== day)
+                    console.log("filtered: ", filtered)
+                    return setDaySelected(filtered)
+                  }
 
-                <Text>{day}</Text>
+                  setDaySelected([...daySelected, day])
+                }}
+                key={day.toString()}
+                style={{ width: 30, height: 50, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                {daySelected.includes(day) &&
+                  <View style={{ height: 20, width: 20, borderRadius: 10, position: 'absolute', backgroundColor: '#5959B2' }}></View>
+                }
+                <Text style={{ color: daySelected.includes(day) ? 'white' : 'black' }}>{day}</Text>
               </TouchableOpacity>
             )
           })}
@@ -66,55 +75,55 @@ const add = () => {
   }
 
   return (
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
-        <TouchableOpacity
-          onPress={handleAvatarPress}
-          style={{ alignItems: 'center', alignSelf: 'center', position: 'relative', height: 90, width: 90, borderRadius: 45, marginBottom: 20 }}>
-          <Image source={require('@/assets/images/avatar.png')} />
-          <View style={{ backgroundColor: 'white', borderRadius: '50%', position: 'absolute', right: -7, bottom: 10 }}>
-            <MaterialIcons name='camera-alt' size={20} color='gray' style={{ padding: 5 }} />
-          </View>
-        </TouchableOpacity >
-          <TextInput
-            mode='outlined'
-            label='First Name'
-            value={firstName}
-            onChangeText={setFirstName}
-            style={styles.nameInput}
-          />
+    <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+      <TouchableOpacity
+        onPress={handleAvatarPress}
+        style={{ alignItems: 'center', alignSelf: 'center', position: 'relative', height: 90, width: 90, borderRadius: 45, marginBottom: 20 }}>
+        <Image source={require('@/assets/images/avatar.png')} />
+        <View style={{ backgroundColor: 'white', borderRadius: '50%', position: 'absolute', right: -7, bottom: 10 }}>
+          <MaterialIcons name='camera-alt' size={20} color='gray' style={{ padding: 5 }} />
+        </View>
+      </TouchableOpacity >
+      <TextInput
+        mode='outlined'
+        label='First Name'
+        value={firstName}
+        onChangeText={setFirstName}
+        style={styles.nameInput}
+      />
 
-          <TextInput
-            mode='outlined'
-            label='Last Name'
-            value={lastName}
-            onChangeText={setLastName}
-            style={styles.nameInput}
-          />
+      <TextInput
+        mode='outlined'
+        label='Last Name'
+        keyboardType='numeric'
+        value={lastName}
+        onChangeText={setLastName}
+        style={styles.nameInput}
+      />
+      <Text
+        style={{
+          alignSelf: 'center',
+          marginTop: 20,
+          color: '#5959B2',
+          fontWeight: '800'
+        }}
+        variant='titleLarge'
+      >
+        Credit Limit
+      </Text>
 
-<Text variant='headlineMedium'>Limit</Text>
-             <TextInput
-            mode='outlined'
-            label='limit'
-            value={firstName}
-            onChangeText={setFirstName}
-            style={styles.nameInput}
-          />
+      <TextInput
+        style={{ width: 100, alignSelf: 'center' }}
+        mode='outlined'
+        label='Limit'
+        value={limit}
+        keyboardType='numeric'
+        onChangeText={setLimit}
+      />
 
-        <Text variant='headlineMedium'>Due Date</Text>
-        <SegmentedButtons
-          value={value}
-          onValueChange={setValue}
-          buttons={[
-            { value: 'weekly', label: 'Weekly', },
-            { value: 'biweekly', label: 'Biweekly', },
-            { value: 'montly', label: 'Monthly' },
-          ]}
-        />
-        <Text variant='headlineMedium'>Select Day</Text>
-        <Button mode='outlined' onPress={() => setShowCalindar(prev => !prev)}>Pick Day</Button>
-        {true && <Calindar />}
-        <Button mode='contained' style={{marginBottom: 90}}>Save</Button>
-      </ScrollView>
+      {true && <Calindar />}
+      <Button mode='contained' style={{ marginBottom: 90, backgroundColor: '#5959B2' }}>Save</Button>
+    </ScrollView>
   )
 }
 

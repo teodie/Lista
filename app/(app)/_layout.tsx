@@ -96,12 +96,15 @@ export default function ScreenLayout() {
                 <Tabs.Screen
                   name='add'
                   options={{
-                    title: 'Add',
+                    headerTitle: 'Create new client',
                     tabBarIcon: ({ color }) => <Ionicons name="person-add" size={24} color={color} />,
                     headerShown: true,
                     headerTintColor: 'white',
-                    headerStyle: {backgroundColor: '#5959B2'}
-                  }} />
+                    headerStyle: {backgroundColor: '#5959B2'},
+                    headerTitleAlign: 'center'
+                  }} 
+    
+                  />
 
                 <Tabs.Screen
                   name='settings'

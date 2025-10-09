@@ -17,9 +17,8 @@ export default function Settings() {
         <Text variant='headlineLarge'>{`${user.prefs?.given_name} ${user.prefs?.family_name}`}</Text>
       </View>
 
-
       <TouchableOpacity style={styles.logout} onPress={signOut}>
-        <MaterialIcons name="logout" size={35} color='red' />
+        <MaterialIcons name="logout" size={35} color='white' />
         <Text variant='titleLarge' style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -29,20 +28,25 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 10,
+    justifyContent: 'space-between',
+    flex: 1,
   },
   avatarContainer: {
     alignItems: 'center',
     marginVertical: 20,
   },
   logoutText: {
-    color: 'red'
+    color: 'white'
   },
   logout: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 20,
-    borderTopWidth: 1,
-    borderTopColor: 'gray',
     paddingVertical: 5,
+    borderRadius: 5,
+    paddingLeft: 15,
+    backgroundColor: '#5959B2',
+    marginBottom: 20,
+
   }
 })
