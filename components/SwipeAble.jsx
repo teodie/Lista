@@ -8,6 +8,7 @@ import { CustomModal } from "./ModalContainer";
 import { share } from "@/utils/jsonToCsv";
 import { useClient } from "@/utils/client-context";
 
+
 const SwipeAble = ({ data, scrollRef }) => {
     const { deleteClient, updateClient } = useClient()
     const [modalVisible, setModalVisible] = useState(false)

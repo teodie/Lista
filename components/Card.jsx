@@ -1,16 +1,19 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { MODE } from '@/constants/mode';
 import { router } from 'expo-router';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import { useItems } from '@/utils/items-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { storage } from "@/utils/appWrite";
 
-const Card = ({data}) => {
-    const {setMode, setPersonData} = useData()
+const Card = ({ data }) => {
+    const { setMode, setPersonData } = useData()
     const { setClientId } = useClient()
     const { fetchClientItems } = useItems()
+    const [avatar, setAvatar] = useState(null)
 
     const handleAddItems = () => {
         setClientId(data.$id)
@@ -23,21 +26,70 @@ const Card = ({data}) => {
         const response = await fetchClientItems(data.$id, false)
 
         setClientId(data.$id)
-        if(!response) {
+        if (!response) {
             console.log("No unpaid items found")
             setPersonData([])
         } else {
-        setPersonData( response.sort( (a, b) =>  b.$createdAt - a.$createdAt) )
+            setPersonData(response.sort((a, b) => b.$createdAt - a.$createdAt))
+        }
+
+        router.navigate({ pathname: '/items', })
     }
-    
-    router.navigate({ pathname: '/items', })
+
+    const fetchClientAvatar = async (id) => {
+        try {
+            const response = storage.getFileViewURL(
+                process.env.EXPO_PUBLIC_BUCKET_ID,
+                id,
+            ).href
+
+            if (!response) return setAvatar(null) && console.log("no avatar found")
+
+            // console.log(`${response.toString()}`)
+
+            setAvatar(response)
+        } catch (error) {
+            console.log(error)
+            setAvatar(null)
+        }
     }
+
+    const imageExist = async (id) => {
+        try {
+            const file = await storage.getFile(
+                process.env.EXPO_PUBLIC_BUCKET_ID,
+                id,
+            )
+            console.log(JSON.stringify(file, null, 2))
+
+            if (!file) return false
+
+            return true
+        } catch (error) {
+            console.log(JSON.stringify(error, null, 2))
+            setAvatar(null)
+        }
+    }
+
+    useEffect(() => {
+        if (imageExist(data.$id)) {
+            console.log(data.name)
+            fetchClientAvatar(data.$id)
+        }
+    }, [])
 
     return (
         <View style={styles.card}>
-                <TouchableOpacity style={styles.headerTxtContainer} onPress={handleNamePress}>
-                    <Text style={styles.headerTxt}>{data.name}</Text>
-                </TouchableOpacity>
+
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 20, flex: 3, height: '100%', marginLeft: 5 }} onPress={handleNamePress}>
+                {
+                    avatar
+                        ? <Image source={{ uri: avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} />
+                        : <Ionicons name="person-circle-sharp" size={55} color='#5959B2' />
+                }
+
+                <Text style={styles.headerTxt}>{data.name}</Text>
+            </TouchableOpacity>
 
             <View style={styles.balanceContainer} >
                 <Text style={styles.balanceTxt} > Payable: </Text>
@@ -61,7 +113,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#fff',
         paddingHorizontal: 10,
-        borderRadius: 20,
+        borderRadius: 10,
         marginBottom: 10,
         marginHorizontal: 10,
         elevation: 4,

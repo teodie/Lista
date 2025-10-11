@@ -75,13 +75,20 @@ export const ClientProvider = ({ children }) => {
     }
 
 
-    const createClient = async (name, id) => {
+    const createClient = async (name, id, limit, paymentDays) => {
+        console.log(typeof (limit))
         try {
             await tablesDB.createRow(
                 DATABASE_ID,
                 CLIENTS_TABLE_ID,
                 id,
-                { userId: user.$id, name: name, isSynced: false },
+                {
+                    userId: user.$id,
+                    name: name,
+                    isSynced: false,
+                    creditLimit: limit,
+                    paymentSchedule: [...paymentDays]
+                },
                 [
                     Permission.read(Role.user(user.$id)),
                     Permission.update(Role.user(user.$id)),
@@ -134,7 +141,7 @@ export const ClientProvider = ({ children }) => {
 
 
     return (
-        <ClientContext.Provider value={{ clients, clientId , setClientId, createClient, fetchClients, deleteClient, updateClient, fetchClientById }}>
+        <ClientContext.Provider value={{ clients, clientId, setClientId, createClient, fetchClients, deleteClient, updateClient, fetchClientById }}>
             {children}
         </ClientContext.Provider>)
 }
