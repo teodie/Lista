@@ -11,6 +11,7 @@ import { useClient } from '@/utils/client-context';
 import { ID, Permission, Role } from 'react-native-appwrite';
 import { storage } from '@/utils/appWrite';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import KeyBoardDismisView from '@/components/KeyBoardDismis';
 
 const add = () => {
   const [cameraPermission, setCameraPermission] = useCameraPermissions();
@@ -247,7 +248,7 @@ const add = () => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <KeyBoardDismisView>
       <View style={{ position: 'relative', flex: 1 }}>
 
         {
@@ -315,7 +316,7 @@ const add = () => {
 
         {bottomSheet && <BottomSheet />}
       </View>
-    </TouchableWithoutFeedback>
+    </KeyBoardDismisView>
   )
 }
 

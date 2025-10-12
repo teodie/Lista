@@ -1,4 +1,4 @@
-import { TouchableWithoutFeedback, View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, Pressable, StatusBar, Keyboard, } from 'react-native'
+import { TouchableWithoutFeedback, View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, Pressable, StatusBar, Keyboard, Image } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
@@ -13,6 +13,7 @@ import { exportToCSV } from '@/utils/jsonToCsv';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import * as Notifications from 'expo-notifications';
+import KeyBoardDismisView from '@/components/KeyBoardDismis';
 
 const explore = () => {
   const { mode, setMode, utang, personData } = useData()
@@ -66,7 +67,7 @@ const explore = () => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss}>
+    <KeyBoardDismisView>
       <View style={styles.container}>
         <StatusBar barStyle={'light-content'} />
         <View style={styles.headerContainer}>
@@ -82,7 +83,6 @@ const explore = () => {
               placeholder='Search Here...'
               placeholderTextColor='gray'
               value={search}
-              autoFocus={false}
             />
           </View>
 
@@ -93,6 +93,12 @@ const explore = () => {
         </View>
 
         <View style={styles.cardContainer}>
+          {filteredClients.length === 0 &&
+            <Image
+              style={{height: 300, width: '100%', alignSelf: 'center', marginTop: 100}}
+              source={require('@/assets/gifs/Empty.gif')}
+            />
+          }
           <Animated.FlatList
             ref={scrollRef}
             showsVerticalScrollIndicator={false}
@@ -102,6 +108,7 @@ const explore = () => {
               <SwipeAble data={item} scrollRef={scrollRef} />}
             keyExtractor={item => item.$id.toString()}
           />
+
         </View>
 
         {mode === MODE.ADD_ITEM && personData && < AddItems />}
@@ -112,7 +119,7 @@ const explore = () => {
           setMode={setMode} />
 
       </View>
-    </TouchableWithoutFeedback>
+    </KeyBoardDismisView>
   )
 }
 

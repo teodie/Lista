@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import 'react-native-reanimated';
 import Payment from '@/components/Payment';
 import { router } from 'expo-router';
@@ -9,10 +9,10 @@ import { ClientProvider } from '@/utils/client-context';
 import { ItemsProvider } from '@/utils/items-context';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function RouteGaurd({ children }: { children: React.ReactNode }) {
   const { user, isLoadingUser } = useAuth()
-
 
   useEffect(() => {
     console.log("(app)/layout mounted and checking initiated")
@@ -42,19 +42,20 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
 }
 
 export default function ScreenLayout() {
+  const router = useRouter()
 
   return (
-    <RouteGaurd>
-      <ClientProvider>
-        <ItemsProvider>
-              <Tabs screenOptions={{ tabBarActiveTintColor: '#5959B2'}}>
+    <SafeAreaProvider>
+        <RouteGaurd>
+          <ClientProvider>
+            <ItemsProvider>
+              <Tabs screenOptions={{ tabBarActiveTintColor: '#5959B2' }}>
                 <Tabs.Screen
                   name='index'
                   options={{
                     title: "Home",
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
                     headerShown: false,
-                    
                   }}
                 />
 
@@ -80,16 +81,14 @@ export default function ScreenLayout() {
                   name='record'
                   options={{
                     title: 'Record',
-                    tabBarIcon: ({ color }) =>
-                      <TouchableOpacity style={{ height: 70, width: 70, alignItems: 'center', justifyContent: 'center', borderRadius: 35, position: 'absolute', bottom: 0, backgroundColor: '#5959B2', overflow: 'hidden' }}>
+                    tabBarIcon: ({ color, focused }) =>
+                      <TouchableOpacity
+                        onPress={() => { router.navigate('/record') }}
+                        style={{ height: 70, width: 70, alignItems: 'center', justifyContent: 'center', borderRadius: 35, position: 'absolute', bottom: 0, backgroundColor: '#5959B2', overflow: 'hidden' }}
+                      >
                         <MaterialIcons name="mic" size={40} color="white" />
                       </TouchableOpacity>,
                     headerShown: false,
-                  }}
-                  listeners={{
-                    tabPress: (e) => {
-                      e.preventDefault();
-                    },
                   }}
                 />
 
@@ -100,11 +99,11 @@ export default function ScreenLayout() {
                     tabBarIcon: ({ color }) => <Ionicons name="person-add" size={24} color={color} />,
                     headerShown: true,
                     headerTintColor: 'white',
-                    headerStyle: {backgroundColor: '#5959B2'},
+                    headerStyle: { backgroundColor: '#5959B2' },
                     headerTitleAlign: 'center'
-                  }} 
-    
-                  />
+                  }}
+
+                />
 
                 <Tabs.Screen
                   name='settings'
@@ -114,8 +113,9 @@ export default function ScreenLayout() {
                     headerShown: false,
                   }} />
               </Tabs>
-        </ItemsProvider>
-      </ClientProvider>
-    </RouteGaurd>
+            </ItemsProvider>
+          </ClientProvider>
+        </RouteGaurd>
+    </SafeAreaProvider>
   );
 }

@@ -71,6 +71,13 @@ const Card = ({ data }) => {
         }
     }
 
+    const format = (fullname) =>{
+        const firstName = fullname.split(" ")[0]
+        const firstLetterCapital = firstName.charAt(0).toUpperCase() + firstName.slice(1)
+        console.log(firstLetterCapital)
+        return firstLetterCapital
+    }
+
     useEffect(() => {
         if (imageExist(data.$id)) {
             console.log(data.name)
@@ -84,11 +91,11 @@ const Card = ({ data }) => {
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 20, flex: 3, height: '100%', marginLeft: 5 }} onPress={handleNamePress}>
                 {
                     avatar
-                        ? <Image source={{ uri: avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} />
+                        ? <Image source={{ uri: avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} /> 
                         : <Ionicons name="person-circle-sharp" size={55} color='#5959B2' />
                 }
 
-                <Text style={styles.headerTxt}>{data.name}</Text>
+                <Text style={styles.headerTxt}>{format(data.name)}</Text>
             </TouchableOpacity>
 
             <View style={styles.balanceContainer} >

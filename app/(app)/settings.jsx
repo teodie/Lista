@@ -2,26 +2,39 @@ import { View, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ActivityIndicator, Text } from 'react-native-paper'
-import { MaterialIcons } from '@expo/vector-icons'
+import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { useAuth } from '@/utils/auth-context'
 import { account } from '@/utils/appWrite'
+
 
 export default function Settings() {
   const { signOut, user } = useAuth()
 
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
 
       <View style={styles.avatarContainer} >
-        <Image style={{ height: 90, width: 90, borderRadius: 65 }} src={user.prefs?.picture} />
-        <Text variant='headlineLarge'>{`${user.prefs?.given_name} ${user.prefs?.family_name}`}</Text>
+        {
+          user.prefs.picture
+            ? <>
+              <Image style={{ height: 90, width: 90, borderRadius: 65 }} src={user.prefs?.picture} />
+              <Text variant='headlineLarge'>{`${user.prefs?.given_name} ${user.prefs?.family_name}`}</Text>
+            </>
+            : <>
+              <Ionicons name="person-circle-sharp" size={90} color='#5959B2' />
+              <Text variant='headlineLarge'>{`${user.name}`}</Text>
+            </>
+        }
+
+
       </View>
 
       <TouchableOpacity style={styles.logout} onPress={signOut}>
         <MaterialIcons name="logout" size={35} color='white' />
         <Text variant='titleLarge' style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   )
 }
 
