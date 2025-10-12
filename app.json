@@ -43,28 +43,22 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Allow $(Lista App) to access your microphone."
+          "microphonePermission": "Allow $(Lista) to access your microphone."
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(Lista App) to access your camera",
-          "microphonePermission": "Allow $(Lista App) to access your microphone",
+          "cameraPermission": "Allow $(Lista) to access your camera",
+          "microphonePermission": "Allow $(Lista) to access your microphone",
           "recordAudioAndroid": true
-        }
-      ],
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(Lista App) to use your location."
         }
       ],
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "photosPermission": "Allow $(Lista) to access your photos.",
+          "savePhotosPermission": "Allow $(Lista) to save photos.",
           "isAccessMediaLocationEnabled": true,
           "granularPermissions": ["audio", "photo"]
         }
@@ -84,7 +78,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Allow $(Lista App) to use Face ID."
+          "faceIDPermission": "Allow $(Lista) to use Face ID."
         }
       ]
     ],

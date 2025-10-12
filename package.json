@@ -39,7 +39,6 @@
     "expo-image-picker": "~16.1.4",
     "expo-linking": "~7.1.7",
     "expo-local-authentication": "~16.0.5",
-    "expo-location": "~18.1.6",
     "expo-media-library": "~17.1.7",
     "expo-notifications": "~0.31.4",
     "expo-print": "~14.1.4",
@@ -55,6 +54,7 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.5",
     "react-native-appwrite": "^0.13.0",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-keyboard-controller": "^1.18.6",
     "react-native-paper": "^5.14.5",
@@ -64,7 +64,8 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-uuid": "^2.0.3",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "whisper.rn": "^0.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
