@@ -40,6 +40,6 @@ yarn-error.*
 *.tsbuildinfo
 
 # ignore whisper model
-assets/models/*
+assets/models/
 
 app-example
