@@ -15,8 +15,6 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
   const { user, isLoadingUser } = useAuth()
 
   useEffect(() => {
-    console.log("(app)/layout mounted and checking initiated")
-
     if (!user && !isLoadingUser) {
       router.replace("/login");
     } else if (user && !isLoadingUser) {

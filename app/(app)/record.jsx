@@ -1,29 +1,18 @@
-import { StyleSheet, Text, TextInput } from 'react-native'
-import React, { useState, useRef, useEffect } from 'react'
+import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Button } from 'react-native-paper'
 
 const record = () => {
-  const [text, setText] = useState('')
-  const inputRef = useRef(null)
 
-  useEffect(()=>{
-    inputRef.current.focus()
-  }, [])
 
   return (
-    <SafeAreaView style={{alignItems: 'center'}}>
-      <Text>record</Text>
-      <TextInput 
-        ref={inputRef}
-        keyboardType='default'
-        value={text}
-        onChangeText={setText}
-        style={{display: 'flex', borderWidth: 1}}
-      />
+    <SafeAreaView style={{ alignItems: 'center', justifyContent: 'center', flex: 1, borderWidth: 1, gap: 20, flexDirection: 'row' }}>
+      <Button
+        mode='contained'
+        onPress={() => {}}
+      >Save</Button>
     </SafeAreaView>
   )
 }
 
 export default record
-
-const styles = StyleSheet.create({})
