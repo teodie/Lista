@@ -12,7 +12,7 @@ export default function Settings() {
 
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
 
       <View style={styles.avatarContainer} >
         {
@@ -34,7 +34,7 @@ export default function Settings() {
         <MaterialIcons name="logout" size={35} color='white' />
         <Text variant='titleLarge' style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   )
 }
 
