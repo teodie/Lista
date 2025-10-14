@@ -3,10 +3,13 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ActivityIndicator, Button, Text } from 'react-native-paper'
 import { initWhisper } from 'whisper.rn'
 import { PermissionsAndroid, View, Alert, Linking } from 'react-native'
+import { useAudioRecorder, RecordingPresets } from 'expo-audio'
 
 const record = () => {
   const [text, setText] = useState('')
   const [transcribing, setTranscribing] = useState(false)
+  const [recordingPath, setRecordingPath] = useState(null)
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY)
 
   const transcribe = async () => {
     setTranscribing(true)
@@ -50,8 +53,8 @@ const record = () => {
     const audioRecordingPermitted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO)
 
     console.log("Current Permission: ", audioRecordingPermitted)
-    
-    if(audioRecordingPermitted) return console.log("Permission already granted")
+
+    if (audioRecordingPermitted) return "granted"
 
     try {
       const granted = await PermissionsAndroid.request(
@@ -67,10 +70,6 @@ const record = () => {
         },
       )
 
-      if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-        changePermissionInSettings()
-      }
-
       return granted
 
     } catch (error) {
@@ -81,15 +80,27 @@ const record = () => {
   }
 
   const startRecord = async () => {
-    
-    
+
     const result = await requestAudioPermission()
 
+    if (result !== PermissionsAndroid.RESULTS.GRANTED) return changePermissionInSettings()
 
+    if (result === PermissionsAndroid.RESULTS.GRANTED) {
+
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
+
+    }
+  }
+
+  const stopRecording = async () => {
+    console.log(`Audio recording is available in ${audioRecorder.uri}`)
+    setRecordingPath(audioRecorder.uri)
+    await audioRecorder.stop();
   }
 
   return (
-    <SafeAreaView style={{ alignItems: 'center', justifyContent: 'center', flex: 1, borderWidth: 1, gap: 20 }}>
+    <SafeAreaView style={{ alignItems: 'center', justifyContent: 'flex-end', flex: 1, borderWidth: 1, gap: 20, paddingBottom: 50}}>
 
       {
         transcribing
@@ -102,6 +113,11 @@ const record = () => {
           mode='contained'
           onPress={startRecord}
         >Record</Button>
+
+        <Button
+          mode='contained'
+          onPress={stopRecording}
+        >Stop</Button>
 
         <Button
           mode='contained'
