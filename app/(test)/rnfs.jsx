@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from 'react-native-paper'
 import * as RNFS from 'react-native-fs'
 
-const record = () => {
+const rnfs = () => {
 
   const saveFile = async (filename) => {
     const path = RNFS.DownloadDirectoryPath + `${filename}`
@@ -42,4 +42,4 @@ const record = () => {
   )
 }
 
-export default record
+export default rnfs

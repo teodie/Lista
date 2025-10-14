@@ -6,6 +6,7 @@ export default function TestLayout() {
 
   return (
     <Stack>
+      <Stack.Screen name='rnfs' options={{ headerShown: false }} />
       <Stack.Screen name='online' options={{ headerShown: false }} />
       <Stack.Screen name='camera' options={{ headerShown: false }} />
       <Stack.Screen name='print' options={{ headerShown: false }} />
@@ -15,7 +16,6 @@ export default function TestLayout() {
       <Stack.Screen name='medialib' options={{ headerShown: false }} />
       <Stack.Screen name='datepick' options={{ headerShown: false }} />
       <Stack.Screen name='biometrics' options={{ headerShown: false }} />
-      <Stack.Screen name='rnfs' options={{ headerShown: false }} />
     </Stack>
   );
 }
