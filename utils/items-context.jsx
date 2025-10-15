@@ -31,7 +31,7 @@ export const ItemsProvider = ({ children }) => {
             )
                 
             if(response.total === 0) return null
-            console.log(JSON.stringify(response, null, 2))
+            // console.log(JSON.stringify(response, null, 2))
 
             return response.rows
         } catch (error) {

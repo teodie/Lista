@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useData } from '@/utils/userdata-context';
 import NoItems from '@/components/NoItems'
 import { useClient } from '@/utils/client-context';
+import { useItems } from '@/utils/items-context';
 
 
 const ProductOverview = ({ item }) => {
@@ -62,10 +63,28 @@ const PaymentView = ({ personData, clientData }) => {
 }
 
 const items = () => {
-  const { personData } = useData()
+  const { personData, archieveVisible } = useData()
+  const { fetchClientItems } = useItems()
   const [clientData, setClientData] = useState(null)
-  const { fetchClientById } = useClient()
+  const { fetchClientById, clientId } = useClient()
+  const [paidItems, setPaidItems] = useState([])
 
+  useEffect(() => {
+    const fetchPaidItems = async () => {
+
+      if (!archieveVisible) return
+
+      const paidItems = await fetchClientItems(clientId, true)
+
+      if (!paidItems) return
+
+      setPaidItems(paidItems)
+
+    }
+
+    fetchPaidItems()
+
+  }, [archieveVisible])
 
   useEffect(() => {
     const fetchClientData = async () => {
@@ -84,8 +103,19 @@ const items = () => {
 
       <View >
 
-        {personData !== null && clientData !== null
+        {personData !== null && clientData !== null && !archieveVisible
           && <PaymentView personData={personData} clientData={clientData} />
+        }
+        
+        {
+          archieveVisible &&
+          <View >
+            <Text style={[styles.totalTxt, {alignSelf: 'center', marginBottom: 20}]}>Paid Items</Text>
+            <FlatList
+            data={paidItems}
+            renderItem={({ item }) => <ProductOverview item={ item } />}
+            />
+          </View>
         }
 
       </View>

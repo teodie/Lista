@@ -17,6 +17,7 @@ const PaymentInput = () => {
     const { fetchClientItems, updateItem } = useItems()
     const { fetchClientById, updateClient, clientId } = useClient()
     const [total, setTotal] = useState(0)
+    const [paidItems, setPaidItems] = useState([])
 
     const payment = useRef('0')
 
@@ -137,5 +138,6 @@ const styles = StyleSheet.create({
     paymentIcons: {
         flexDirection: 'row-reverse',
         gap: 20,
+        marginRight: 20,
     }
 })
