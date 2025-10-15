@@ -11,7 +11,7 @@ const record = () => {
   const [recordingPath, setRecordingPath] = useState(null)
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY)
   const [onGoingRecording, setOnGoingRecording] = useState(false)
-  const modelPath = require('@/assets/models/ggml-tiny.bin')
+  const modelPath = require('@/assets/models/ggml-base.en.bin')
 
   const realTimeTranscriber = async () => {
     console.log("RealTime Transcription")
