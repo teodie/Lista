@@ -54,7 +54,7 @@ export const ClientProvider = ({ children }) => {
                 DATABASE_ID,
                 CLIENTS_TABLE_ID,
                 id,
-                {name: data}
+                data
             )
 
             console.log(result)
