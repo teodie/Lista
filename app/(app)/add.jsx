@@ -59,7 +59,6 @@ const add = () => {
   }
 
   const handleSavePress = async () => {
-    // Validation code needed
     if (firstName.trim() === "") return Alert.alert("Firstname Field is empty")
     if (lastName.trim() === "") return Alert.alert("Lastname Field is empty")
 

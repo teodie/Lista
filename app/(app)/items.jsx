@@ -35,7 +35,7 @@ const Total = ({ title, amount }) => {
 }
 
 const PaymentView = ({ personData, clientData }) => {
-  console.log(clientData)
+
   return (
     <>
       <View style={styles.header}>
@@ -77,7 +77,7 @@ const items = () => {
     console.log("Items component has been mounted")
     fetchClientData()
 
-  }, [])
+  }, [personData])
 
   return (
     <View style={styles.container}>

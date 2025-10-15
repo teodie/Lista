@@ -18,7 +18,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
     if (!user && !isLoadingUser) {
       router.replace("/login");
     } else if (user && !isLoadingUser) {
-      router.replace("/record");
+      router.replace("/");
     }
   }, [user, isLoadingUser]);
 

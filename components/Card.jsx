@@ -15,6 +15,7 @@ const Card = ({ data }) => {
     const { fetchClientItems } = useItems()
     const [avatar, setAvatar] = useState(null)
 
+    // set the client ID and change the mode so that Add item modal will pop up
     const handleAddItems = () => {
         setClientId(data.$id)
         setMode(MODE.ADD_ITEM)
@@ -36,16 +37,13 @@ const Card = ({ data }) => {
         router.navigate({ pathname: '/items', })
     }
 
+    // fetch the client avatar url from appwrite
     const fetchClientAvatar = async (id) => {
         try {
             const response = storage.getFileViewURL(
                 process.env.EXPO_PUBLIC_BUCKET_ID,
                 id,
             ).href
-
-            if (!response) return setAvatar(null) && console.log("no avatar found")
-
-            // console.log(`${response.toString()}`)
 
             setAvatar(response)
         } catch (error) {
@@ -54,33 +52,36 @@ const Card = ({ data }) => {
         }
     }
 
+    // check if the image exist in the appwrite storage
     const imageExist = async (id) => {
         try {
             const file = await storage.getFile(
                 process.env.EXPO_PUBLIC_BUCKET_ID,
                 id,
             )
-            console.log(JSON.stringify(file, null, 2))
 
             if (!file) return false
 
             return true
         } catch (error) {
-            console.log(JSON.stringify(error, null, 2))
-            setAvatar(null)
+            if (error.code === 404) {
+                // no avatar is saved for this user
+                setAvatar(null)
+            }
+
         }
     }
 
-    const format = (fullname) =>{
+    // Capitalize the firstname of the client
+    const format = (fullname) => {
         const firstName = fullname.split(" ")[0]
         const firstLetterCapital = firstName.charAt(0).toUpperCase() + firstName.slice(1)
-        console.log(firstLetterCapital)
         return firstLetterCapital
     }
 
+    // check profile exist and if it does get the client avatar
     useEffect(() => {
         if (imageExist(data.$id)) {
-            console.log(data.name)
             fetchClientAvatar(data.$id)
         }
     }, [])
@@ -91,7 +92,7 @@ const Card = ({ data }) => {
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 20, flex: 3, height: '100%', marginLeft: 5 }} onPress={handleNamePress}>
                 {
                     avatar
-                        ? <Image source={{ uri: avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} /> 
+                        ? <Image source={{ uri: avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} />
                         : <Ionicons name="person-circle-sharp" size={55} color='#5959B2' />
                 }
 
