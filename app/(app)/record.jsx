@@ -1,62 +1,24 @@
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ActivityIndicator, Button, Text } from 'react-native-paper'
-import { initWhisper } from 'whisper.rn'
 import { PermissionsAndroid, View, Alert, Linking } from 'react-native'
 import { useAudioRecorder, RecordingPresets } from 'expo-audio'
 
 
 const record = () => {
-  const [text, setText] = useState('Sample text')
+  const [text, setText] = useState('')
   const [transcribing, setTranscribing] = useState(false)
   const [recordingPath, setRecordingPath] = useState(null)
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY)
   const [onGoingRecording, setOnGoingRecording] = useState(false)
-
+  const modelPath = require('@/assets/models/ggml-tiny.bin')
 
   const realTimeTranscriber = async () => {
-    const modelPath = require('@/assets/models/ggml-tiny.bin')
-
-    const whisperContext = await initWhisper({
-      filePath: modelPath,
-    })
-
-    const options = { language: null }
-
-    const { stop, subscribe } = await whisperContext.transcribeRealtime(options)
-
-    subscribe((evt) => {
-      const { isCapturing, data, processTime, recordingTime } = evt
-      console.log(
-        `Realtime transcribing: ${isCapturing ? 'ON' : 'OFF'}\n` +
-        `Result: ${data.result}\n\n` +
-        `Process time: ${processTime}ms\n` +
-        `Recording time: ${recordingTime}ms`,
-      )
-      if (!isCapturing) console.log('Finished realtime transcribing')
-    })
-
-
+    console.log("RealTime Transcription")
   }
 
   const transcribe = async () => {
-    setTranscribing(true)
-    const modelPath = require('@/assets/models/ggml-tiny.bin')
-
-    const whisperContext = await initWhisper({
-      filePath: modelPath,
-    })
-
-    const soundWav = require('@/assets/recordings/samples_jfk.wav')
-    const options = { language: 'en' }
-
-    const { stop, promise } = whisperContext.transcribe(soundWav, options)
-
-    const { result } = await promise
-
-    setText(result)
-
-    setTranscribing(false)
+    console.log("transcribe Audio")
   }
 
   const changePermissionInSettings = () => {
@@ -142,14 +104,18 @@ const record = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, borderWidth: 1, gap: 20, paddingBottom: 50 }}>
+    <SafeAreaView style={{ flex: 1, gap: 20, paddingBottom: 50 }}>
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        {
-          transcribing
-            ? <ActivityIndicator />
-            : <Text>{text}</Text>
-        }
+        <Text variant='headlineLarge'>Results</Text>
+        <View style={{borderWidth: 1, height: '50%', width: '90%', borderRadius: 10, padding: 5}}>
+          {
+            transcribing
+              ? <ActivityIndicator />
+              : <Text>{text}</Text>
+          }
+        </View>
+
       </View>
       <View style={{ flexDirection: 'row', gap: 20, justifyContent: 'center' }}>
         <Button
@@ -159,8 +125,13 @@ const record = () => {
 
         <Button
           mode='contained'
-          onPress={realTimeTranscriber}
+          onPress={transcribe}
         >Transcribe</Button>
+
+        <Button
+          mode='contained'
+          onPress={realTimeTranscriber}
+        >RealTime</Button>
       </View>
     </SafeAreaView>
   )
