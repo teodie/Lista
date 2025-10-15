@@ -9,7 +9,8 @@ import { account } from '@/utils/appWrite'
 
 export default function Settings() {
   const { signOut, user } = useAuth()
-
+  const firstName = user.prefs?.given_name.charAt(0).toUpperCase() + user.prefs?.given_name.slice(1)
+  const lastName = user.prefs?.family_name.charAt(0).toUpperCase() + user.prefs?.family_name.slice(1)
 
   return (
     <SafeAreaView style={styles.container}>
@@ -19,7 +20,7 @@ export default function Settings() {
           user.prefs.picture
             ? <>
               <Image style={{ height: 90, width: 90, borderRadius: 65 }} src={user.prefs?.picture} />
-              <Text variant='headlineLarge'>{`${user.prefs?.given_name} ${user.prefs?.family_name}`}</Text>
+              <Text variant='headlineLarge'>{`${firstName} ${lastName}`}</Text>
             </>
             : <>
               <Ionicons name="person-circle-sharp" size={90} color='#5959B2' />
