@@ -41,7 +41,7 @@ const SwipeAble = ({ data, scrollRef }) => {
     }
 
     const handleSaveEdit = () => {
-        updateClient(name, data.$id)
+        updateClient(data.$id, name)
         setName('')
         setModalVisible(!modalVisible)
         swipeRef.current?.reset()

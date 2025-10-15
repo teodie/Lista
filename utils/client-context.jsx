@@ -47,12 +47,14 @@ export const ClientProvider = ({ children }) => {
     }
 
     const updateClient = async (id, data) => {
+        console.log(`Updating the user id: ${id}`)
+        console.log("Data: ", JSON.stringify(data, null, 2))
         try {
             const result = await tablesDB.updateRow(
                 DATABASE_ID,
                 CLIENTS_TABLE_ID,
                 id,
-                data
+                {name: data}
             )
 
             console.log(result)
