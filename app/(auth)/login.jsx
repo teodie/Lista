@@ -60,6 +60,7 @@ const login = () => {
         transform: [{translateX: offset.value}],
     }))
 
+    
     const onChange = (field) => (value) => {
         dispatch({ type: 'SET-FILLED', fieldName: field, fieldValue: value })
     }
