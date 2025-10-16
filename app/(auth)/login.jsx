@@ -1,117 +1,202 @@
-import { StyleSheet, TouchableOpacity, View, useWindowDimensions, Image, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, useWindowDimensions, Image, KeyboardAvoidingView, Keyboard } from 'react-native'
 import React, { useState, useReducer } from 'react'
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { router } from 'expo-router'
 import { TextInput, Button, Text, useTheme } from 'react-native-paper'
 import { useAuth } from '@/utils/auth-context'
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {Redirect} from 'expo-router'
+import { Redirect } from 'expo-router'
+import KeyBoardDismisView from '@/components/KeyBoardDismis'
+import * as Haptics from 'expo-haptics';
+import ErrorMessage from '@/components/ErrorMessage'
+import { withTiming, Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence  } from 'react-native-reanimated';
+
+
 
 const googleIcon = require('@/assets/images/google-icon.png')
 
+const initialValue = {
+    email: '',
+    emailError: '',
+    password: '',
+    passwordError: '',
+    eyeIsOpen: false,
+    error: '',
+
+
+}
+
+const reducer = (state, action) => {
+
+    switch (action.type) {
+        case "SET-FILLED":
+            return { ...state, [action.fieldName]: action.fieldValue }
+        case "TOGGLE-EYE":
+            return { ...state, eyeIsOpen: !state.eyeIsOpen }
+        case "ERROR":
+            return { ...state, error: action.errorMsg }
+        case "SET-ERROR":
+            return { ...state, [action.errorField]: action.errorMessage }
+        case "CLEAR-ERROR":
+            return { ...state, emailError: '', passwordError: '', error: '' }
+        default:
+            console.warn(`Invalid action: ${action.type}`)
+            return state
+    }
+}
 
 const login = () => {
     // return <Redirect href="/notif" />
     const { logIn, googleSignUp, setIsLoadingUser } = useAuth()
-    const [eyeIsOpen, setEyes] = useState(true);
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [error, setError] = useState(null)
-
     const theme = useTheme()
 
+    const [state, dispatch] = useReducer(reducer, initialValue)
+
+    const offset = useSharedValue(0)
+
+    const startAnimation = useAnimatedStyle(() => ({
+        transform: [{translateX: offset.value}],
+    }))
+
+    const onChange = (field) => (value) => {
+        dispatch({ type: 'SET-FILLED', fieldName: field, fieldValue: value })
+    }
+
+    const isValidEmail = (email) => {
+        if (!email.trim()) {
+            dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: "Email can't be empty." })
+            return false
+        } else if (!email.includes('@gmail.com')) {
+            dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage:  "Invalid Email address." })
+            return false
+        }
+        
+        return true
+    }
+
+    const isValidPassword = (password) => {
+        if (password.trim().length <= 8) {
+            dispatch({ type: 'SET-ERROR', errorField: 'passwordError', errorMessage: "Password must be atleast 8 characters long." })
+            return false
+        } else if (!password.trim()) {
+            dispatch({ type: 'SET-ERROR', errorField: 'passwordError', errorMessage: "Password can't be empty." })
+            return false
+        }
+
+        return true
+
+    }
+
+
+
     const handleLogin = async () => {
-        if (!email.includes('@gmail.com')) return setError("Invalid email address.")
-        if (!email.trim()) return setError("Email can't be empty.")
-        if (!password.trim()) return setError("Password can't be empty.")
-        if (password.trim().length <= 8) return setError("Password must be atleast 8 characters long.")
 
-        setError(null)
+        const duration = 50
+        offset.value = withSequence(
+            withTiming(-5, {duration: duration/2}),
+            withRepeat(withTiming(5, {duration: duration}), 5, true),
+            withTiming(0, {duration: duration/2})
+        )
 
-        const error = await logIn(email, password)
-        console.log(typeof (error))
-        if (error) return setError(error)
+        Keyboard.dismiss()
+        dispatch({type: 'CLEAR-ERROR'})
+
+        // Check if the email and password are valid
+        if (!isValidEmail(state.email) || !isValidPassword(state.password)) return Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+        
+        const error = await logIn(state.email, state.password)
+        if (error) return dispatch({ type: 'ERROR', errorMsg: error })
+        dispatch({ type: 'CLEAR-ERROR' })
 
         router.replace('/')
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.upper}>
-                <Animated.Image entering={FadeInUp.duration(100).springify()} style={styles.logo} source={require('@/assets/images/splash-icon-light.png')} />
-            </View>
-            <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={-90} >
-
-                <View style={styles.lower}>
-                    <Animated.View entering={FadeInUp.duration(1000).springify()} >
-                        <TextInput
-                            label='email'
-                            autoCapitalize='none'
-                            keyboardType='email-address'
-                            placeholder='youremail@gmail.com'
-                            outlineColor='white'
-                            mode="outlined"
-                            value={email}
-                            onChangeText={setEmail}
-                            left={<TextInput.Icon icon="email-outline" />}
-                        />
-                    </Animated.View>
-
-                    <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} >
-                        <TextInput
-                            label='password'
-                            autoCapitalize='none'
-                            secureTextEntry={eyeIsOpen}
-                            mode="outlined"
-                            value={password}
-                            placeholder='Type your password'
-                            outlineColor='white'
-                            onChangeText={setPassword}
-                            left={<TextInput.Icon icon="lock-outline" />}
-                            right={<TextInput.Icon icon={eyeIsOpen ? 'eye' : 'eye-off'} onPress={() => setEyes(prev => !prev)} />}
-                        />
-                    </Animated.View>
-
-                    {error
-                        ? <Text style={{ color: theme.colors.error }}>{error}</Text>
-                        : null
-                    }
-
-                    <Animated.View style={styles.forgotWrapper} entering={FadeInUp.delay(400).duration(1000).springify()}  >
-                        <TouchableOpacity onPress={() => router.navigate('fpass')}>
-                            <Text style={styles.forgotTxt}>Forgot Password?</Text>
-                        </TouchableOpacity>
-                    </Animated.View>
-                    
-                    <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()}>
-                        <Button mode='contained' buttonColor='#5959B2' onPress={handleLogin} >
-                            Log in
-                        </Button>
-                    </Animated.View>
-
-                    <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()}>
-                        <Button mode='outlined' icon={googleIcon} labelStyle={{ color: '' }} onPress={async () => {
-                            setError(null);
-                            const error = await googleSignUp();
-                            if (error) setError(error);
-                            router.replace('/')
-            
-                        }} >
-                            Sign in with Google
-                        </Button>
-                    </Animated.View>
-
-                    <Animated.View entering={FadeInUp.delay(1000).duration(1000).springify()} style={styles.signupWrapper}>
-                        <Text>Dont have an account? </Text>
-                        <TouchableOpacity onPress={() => router.replace('signup')}>
-                            <Text style={styles.signupTxt} >Sign Up</Text>
-                        </TouchableOpacity>
-                    </Animated.View>
+        <KeyBoardDismisView >
+            <View style={styles.container}>
+                <View style={styles.upper}>
+                    <Animated.Image entering={FadeInUp.duration(100).springify()} style={styles.logo} source={require('@/assets/images/splash-icon-light.png')} />
                 </View>
-            </KeyboardAvoidingView>
-        </View>
+                <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={-90} >
+
+                    <View style={styles.lower}>
+                        <Animated.View entering={FadeInUp.duration(1000).springify()} style={state.emailError !== '' &&startAnimation}>
+                            <TextInput
+                                label='email'
+                                autoCapitalize='none'
+                                keyboardType='email-address'
+                                placeholder='youremail@gmail.com'
+                                outlineColor={state.emailError !== '' ? theme.colors.error : 'white'}
+                                mode="outlined"
+                                value={state.email}
+                                onChangeText={onChange('email')}
+                                left={<TextInput.Icon icon="email-outline" />}
+                            />
+                        </Animated.View>
+
+                        {state.emailError !== '' && <ErrorMessage errorMessage={state.emailError} />
+                        }
+
+                        <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} style={state.passwordError !== '' && startAnimation } >
+                            <TextInput
+                                label='password'
+                                autoCapitalize='none'
+                                secureTextEntry={state.eyeIsOpen}
+                                mode="outlined"
+                                value={state.password}
+                                placeholder='Type your password'
+                                outlineColor={state.passwordError !== '' ? theme.colors.error : 'white'}
+                                onChangeText={onChange('password')}
+                                left={<TextInput.Icon icon="lock-outline" />}
+                                right={
+                                    <TextInput.Icon icon={state.eyeIsOpen ? 'eye' : 'eye-off'}
+                                        onPress={() => dispatch({ type: 'TOGGLE-EYE' })} />
+                                }
+                            />
+                        </Animated.View>
+
+                        {state.passwordError !== '' && <ErrorMessage errorMessage={state.passwordError} />
+                        }
+
+                        {state.error !== '' && <ErrorMessage errorMessage={state.error} />}
+
+                        <Animated.View style={styles.forgotWrapper} entering={FadeInUp.delay(400).duration(1000).springify()}  >
+                            <TouchableOpacity onPress={() => router.navigate('fpass')}>
+                                <Text style={styles.forgotTxt}>Forgot Password?</Text>
+                            </TouchableOpacity>
+                        </Animated.View>
+
+                        <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()}>
+                            <Button mode='contained' buttonColor='#5959B2' onPress={handleLogin} >
+                                Log in
+                            </Button>
+                        </Animated.View>
+
+                        <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()}>
+                            <Button mode='outlined' icon={googleIcon} labelStyle={{ color: '' }} onPress={async () => {
+
+                                const error = await googleSignUp();
+                                if (error) return dispatch({ type: 'ERROR', errorMsg: error });
+
+                                router.replace('/')
+
+                            }} >
+                                Sign in with Google
+                            </Button>
+                        </Animated.View>
+
+                        <Animated.View entering={FadeInUp.delay(1000).duration(1000).springify()} style={styles.signupWrapper}>
+                            <Text>Dont have an account? </Text>
+                            <TouchableOpacity onPress={() => router.replace('signup')}>
+                                <Text style={styles.signupTxt} >Sign Up</Text>
+                            </TouchableOpacity>
+                        </Animated.View>
+                    </View>
+                </KeyboardAvoidingView>
+            </View>
+        </KeyBoardDismisView>
     )
 }
 
