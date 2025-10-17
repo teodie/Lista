@@ -9,14 +9,14 @@ import { Redirect } from 'expo-router'
 import KeyBoardDismisView from '@/components/KeyBoardDismis'
 import * as Haptics from 'expo-haptics';
 import ErrorMessage from '@/components/ErrorMessage'
-import { withTiming, Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence  } from 'react-native-reanimated';
+import { withTiming, Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence } from 'react-native-reanimated';
 
 
 
 const googleIcon = require('@/assets/images/google-icon.png')
 
 const initialValue = {
-    email: '',
+    email: 'kunyare@gmail.com',
     emailError: '',
     password: '',
     passwordError: '',
@@ -57,10 +57,10 @@ const login = () => {
     const offset = useSharedValue(0)
 
     const startAnimation = useAnimatedStyle(() => ({
-        transform: [{translateX: offset.value}],
+        transform: [{ translateX: offset.value }],
     }))
 
-    
+
     const onChange = (field) => (value) => {
         dispatch({ type: 'SET-FILLED', fieldName: field, fieldValue: value })
     }
@@ -70,10 +70,10 @@ const login = () => {
             dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: "Email can't be empty." })
             return false
         } else if (!email.includes('@gmail.com')) {
-            dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage:  "Invalid Email address." })
+            dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: "Invalid Email address." })
             return false
         }
-        
+
         return true
     }
 
@@ -90,27 +90,57 @@ const login = () => {
 
     }
 
+    const emailIsListed = async (userEmail) => {
+        const url = process.env.EXPO_PUBLIC_APPWRITE_EMAIL_EXISTENCE_CHECKER_END_POINT
+        const data = {email: userEmail}
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+                
+            }
+            )
+
+            const result = await response.json()
+            console.log("Checking Result: ", result.exist)
+            return result.exist
+        } catch (error) {
+            console.log("Erro when checking if the email exist: ", error)
+            return false
+        }
+
+    }
 
 
     const handleLogin = async () => {
 
         const duration = 50
         offset.value = withSequence(
-            withTiming(-5, {duration: duration/2}),
-            withRepeat(withTiming(5, {duration: duration}), 5, true),
-            withTiming(0, {duration: duration/2})
+            withTiming(-5, { duration: duration / 2 }),
+            withRepeat(withTiming(5, { duration: duration }), 5, true),
+            withTiming(0, { duration: duration / 2 })
         )
 
         Keyboard.dismiss()
-        dispatch({type: 'CLEAR-ERROR'})
+        dispatch({ type: 'CLEAR-ERROR' })
 
         // Check if the email and password are valid
         if (!isValidEmail(state.email) || !isValidPassword(state.password)) return Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
-        
-        const error = await logIn(state.email, state.password)
-        if (error) return dispatch({ type: 'ERROR', errorMsg: error })
-        dispatch({ type: 'CLEAR-ERROR' })
 
+        const emailExist = await emailIsListed(state.email)
+
+        const error = await logIn(state.email, state.password)
+
+        if(!emailExist) return dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: "Your email is not regitered yet. Would you like to sign-up?" })
+
+        if(error.includes("Invalid credentials") && emailExist ){
+           return dispatch({ type: 'ERROR', errorMsg: "Wrong Password" })
+        }
+
+        if (error) return dispatch({ type: 'ERROR', errorMsg: error })
+
+        dispatch({ type: 'CLEAR-ERROR' })
         router.replace('/')
     }
 
@@ -123,7 +153,7 @@ const login = () => {
                 <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={-90} >
 
                     <View style={styles.lower}>
-                        <Animated.View entering={FadeInUp.duration(1000).springify()} style={state.emailError !== '' &&startAnimation}>
+                        <Animated.View entering={FadeInUp.duration(1000).springify()} style={state.emailError !== '' && startAnimation}>
                             <TextInput
                                 label='email'
                                 autoCapitalize='none'
@@ -140,7 +170,7 @@ const login = () => {
                         {state.emailError !== '' && <ErrorMessage errorMessage={state.emailError} />
                         }
 
-                        <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} style={state.passwordError !== '' && startAnimation } >
+                        <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} style={state.passwordError !== '' && startAnimation} >
                             <TextInput
                                 label='password'
                                 autoCapitalize='none'
