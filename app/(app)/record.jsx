@@ -3,7 +3,27 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ActivityIndicator, Button, Text } from 'react-native-paper'
 import { PermissionsAndroid, View, Alert, Linking } from 'react-native'
 import { useAudioRecorder, RecordingPresets } from 'expo-audio'
+import { FFmpegKit, ReturnCode } from 'kroog-ffmpeg-kit-react-native';
 
+
+const convertM4AToWav = async (inputUri) => {
+  const outputPath = inputUri.replace(/\.m4a$/i, '.wav');
+  console.log("outPutPath: ", outputPath)
+  // Build a command: e.g., convert with PCM 16-bit, 16000 Hz, mono for transcription
+  const cmd = `-y -i "${inputUri}" -ac 1 -ar 16000 -sample_fmt s16 "${outputPath}"`;
+
+  const session = await FFmpegKit.execute(cmd);
+  const returnCode = await session.getReturnCode();
+
+  if (ReturnCode.isSuccess(returnCode)) {
+    console.log('Conversion succeeded:', outputPath);
+    return outputPath;
+  } else {
+    const log = await session.getAllLogsAsString();
+    console.error('Conversion failed. Return code:', returnCode, 'Log:', log);
+    throw new Error('Audio conversion failed');
+  }
+}
 
 const record = () => {
   const [text, setText] = useState('')
@@ -69,9 +89,6 @@ const record = () => {
 
   }
 
-  const convertAudioM4aToWav = () => {
-
-  }
 
   const startRecord = async () => {
     setOnGoingRecording(true)
@@ -90,6 +107,7 @@ const record = () => {
   const stopRecording = async () => {
     console.log(`Audio recording is available in ${audioRecorder.uri}`)
     setRecordingPath(audioRecorder.uri)
+
     await audioRecorder.stop();
 
     setOnGoingRecording(false)
@@ -108,16 +126,19 @@ const record = () => {
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text variant='headlineLarge'>Results</Text>
-        <View style={{borderWidth: 1, height: '50%', width: '90%', borderRadius: 10, padding: 5}}>
+        <View style={{ borderWidth: 1, height: '50%', width: '90%', borderRadius: 10, padding: 5 }}>
           {
             transcribing
               ? <ActivityIndicator />
               : <Text>{text}</Text>
           }
+          {
+            recordingPath && <Text>{recordingPath}</Text>
+          }
         </View>
 
       </View>
-      <View style={{ flexDirection: 'row', gap: 20, justifyContent: 'center' }}>
+      <View style={{ flexDirection: 'row', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
         <Button
           mode='contained'
           onPress={handleRecordPress}
@@ -127,6 +148,11 @@ const record = () => {
           mode='contained'
           onPress={transcribe}
         >Transcribe</Button>
+
+        <Button
+          mode='contained'
+          onPress={ () => convertM4AToWav(audioRecorder.uri)}
+        >Convert</Button>
 
         <Button
           mode='contained'
