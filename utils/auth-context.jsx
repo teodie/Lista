@@ -13,7 +13,6 @@ const AuthContext = createContext(undefined)
 export default AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [isLoadingUser, setIsLoadingUser] = useState(true)
-  const [userProfile, setUserProfile] = useState(null)
 
   const android_OAuth = async () => {
 
@@ -190,13 +189,12 @@ export default AuthProvider = ({ children }) => {
   const signUp = async (email, password, username) => {
     try {
       await account.create(ID.unique(), email, password, username);
-      return null
+      return {status: 'SUCCESS'}
     } catch (error) {
-      if (error.code === 400) return "Email account already exist. Please proceed to login"
       if (error instanceof Error) return error.message
 
-      return "Error occured while creating account."
-    }
+      return {status: 'FAILED'}
+    } 
   };
 
   const logIn = async (email, password) => {

@@ -10,13 +10,14 @@ import KeyBoardDismisView from '@/components/KeyBoardDismis'
 import * as Haptics from 'expo-haptics';
 import ErrorMessage from '@/components/ErrorMessage'
 import { withTiming, Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence } from 'react-native-reanimated';
+import { toastCenter } from '@/utils/toast'
 
 
 
 const googleIcon = require('@/assets/images/google-icon.png')
 
 const initialValue = {
-    email: 'kunyare@gmail.com',
+    email: '',
     emailError: '',
     password: '',
     passwordError: '',
@@ -92,13 +93,13 @@ const login = () => {
 
     const emailIsListed = async (userEmail) => {
         const url = process.env.EXPO_PUBLIC_APPWRITE_EMAIL_EXISTENCE_CHECKER_END_POINT
-        const data = {email: userEmail}
+        const data = { email: userEmail }
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-                
+
             }
             )
 
@@ -132,10 +133,11 @@ const login = () => {
 
         const error = await logIn(state.email, state.password)
 
-        if(!emailExist) return dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: "Your email is not regitered yet. Would you like to sign-up?" })
+        if (!emailExist) return dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: "Your email is not regitered yet. Would you like to sign-up?" })
 
-        if(error.includes("Invalid credentials") && emailExist ){
-           return dispatch({ type: 'ERROR', errorMsg: "Wrong Password" })
+        if (error.includes("Invalid credentials") && emailExist) {
+            toastCenter("Invalid credentials please check your email and password.")
+            return dispatch({ type: 'ERROR', errorMsg: "Wrong Password" })
         }
 
         if (error) return dispatch({ type: 'ERROR', errorMsg: error })
