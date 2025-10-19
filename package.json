@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
+    "@fugood/react-native-audio-pcm-stream": "^1.1.4",
     "@json2csv/plainjs": "^7.0.6",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "8.4.1",
