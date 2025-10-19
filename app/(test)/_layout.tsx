@@ -11,11 +11,11 @@ export default function TestLayout() {
       <Stack.Screen name='camera' options={{ headerShown: false }} />
       <Stack.Screen name='print' options={{ headerShown: false }} />
       <Stack.Screen name='notif' options={{ headerShown: false }} />
-      <Stack.Screen name='location' options={{ headerShown: false }} />
       <Stack.Screen name='docpic' options={{ headerShown: false }} />
       <Stack.Screen name='medialib' options={{ headerShown: false }} />
       <Stack.Screen name='datepick' options={{ headerShown: false }} />
       <Stack.Screen name='biometrics' options={{ headerShown: false }} />
+      <Stack.Screen name='bench' options={{ headerShown: false }} />
     </Stack>
   );
 }
