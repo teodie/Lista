@@ -4,14 +4,17 @@ import { ActivityIndicator, Button, Text } from 'react-native-paper'
 import { PermissionsAndroid, View, Alert, Linking } from 'react-native'
 import { useAudioRecorder, RecordingPresets } from 'expo-audio'
 import { FFmpegKit, ReturnCode } from 'kroog-ffmpeg-kit-react-native';
-import { initWhisper } from 'whisper.rn'
+import { initWhisper, initWhisperVad } from 'whisper.rn'
+import { AudioPcmStreamAdapter } from 'whisper.rn/realtime-transcription/adapters/AudioPcmStreamAdapter.js'
 import * as RNFS from 'react-native-fs'
 import { fileDir } from '@/app/(test)/util'
 import { useRouter } from 'expo-router'
+import { RealtimeTranscriber } from 'whisper.rn/realtime-transcription/RealtimeTranscriber.js'
+import LiveAudioStream from '@fugood/react-native-audio-pcm-stream';
 
 const record = () => {
   const router = useRouter()
-
+  const [transcribingRealtime, setTranscribingRealtime] = useState(false)
   const [text, setText] = useState('')
   const [transcribing, setTranscribing] = useState(false)
   const [recordingPath, setRecordingPath] = useState('')
@@ -19,8 +22,46 @@ const record = () => {
   const [onGoingRecording, setOnGoingRecording] = useState(false)
   const modelPath = `${fileDir}/ggml-medium-q8_0.bin`
   const sampleFilePath = require('@/assets/recordings/samples_jfk.wav')
-  const realTimeTranscriber = async () => {
-    console.log("RealTime Transcription")
+  
+
+
+  const RealTimeTranscribe = async () => {
+
+    const whisperContext = await initWhisper({ filePath: modelPath })
+
+    const vadContext = await initWhisperVad({
+      filePath: require('@/assets/models/ggml-silero-v5.1.2.bin'), // VAD model file
+      useGpu: true, // Use GPU acceleration (iOS only)
+      nThreads: 2, // Number of threads for processing
+    })
+
+    const audioStream = new AudioPcmStreamAdapter()
+
+    // Create transcriber
+    const transcriber = new RealtimeTranscriber(
+      { whisperContext, vadContext, audioStream, fs: RNFS },
+      {
+        audioSliceSec: 30,
+        vadPreset: 'default',
+        autoSliceOnSpeechEnd: true,
+        transcribeOptions: { language: 'en' },
+      },
+      {
+        onTranscribe: (event) => console.log('Transcription:', event.data?.result),
+        onVad: (event) => console.log('VAD:', event.type, event.confidence),
+        onStatusChange: (isActive) =>
+          console.log('Status:', isActive ? 'ACTIVE' : 'INACTIVE'),
+        onError: (error) => console.error('Error:', error),
+      },
+    )
+
+    console.log("Inialization complete!")
+  //  await transcriber.start()
+
+    // setTimeout( async () => {
+    //  await transcriber.stop()
+    // }, 5000);
+
   }
 
   const convertM4AToWav = async (inputUri) => {
@@ -42,9 +83,12 @@ const record = () => {
     }
   }
 
+
   const transcribe = async () => {
     setTranscribing(true)
 
+    if(!(await RNFS.exists(modelPath))) return Alert.alert("Model medium-q8.bin doesnot exist") 
+      
     const uri = await convertM4AToWav(audioRecorder.uri)
     const whisperContext = await initWhisper({ filePath: modelPath, })
 
@@ -139,6 +183,10 @@ const record = () => {
     }
   }
 
+
+
+
+
   return (
     <SafeAreaView style={{ flex: 1, gap: 20, paddingBottom: 50 }}>
 
@@ -163,6 +211,10 @@ const record = () => {
           mode='contained'
           onPress={() => router.push('/(test)/bench')}
         >Download model</Button>
+        <Button
+          mode='contained'
+          onPress={() => router.push('/(test)/vad')}
+        >Vad</Button>
 
       </View>
       <View style={{ flexDirection: 'row', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -179,7 +231,7 @@ const record = () => {
 
         <Button
           mode='contained'
-          onPress={realTimeTranscriber}
+          onPress={() => router.replace('/(test)/livestream')}
         >RealTime</Button>
       </View>
     </SafeAreaView>

@@ -16,6 +16,8 @@ export default function TestLayout() {
       <Stack.Screen name='datepick' options={{ headerShown: false }} />
       <Stack.Screen name='biometrics' options={{ headerShown: false }} />
       <Stack.Screen name='bench' options={{ headerShown: false }} />
+      <Stack.Screen name='livestream' options={{ headerShown: false }} />
+      <Stack.Screen name='vad' options={{ headerShown: false }} />
     </Stack>
   );
 }
