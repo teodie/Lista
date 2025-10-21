@@ -1,18 +1,14 @@
 import { StyleSheet, TouchableOpacity, View, useWindowDimensions, Image, KeyboardAvoidingView, Keyboard } from 'react-native'
 import React, { useState, useReducer } from 'react'
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
-import { router } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { TextInput, Button, Text, useTheme } from 'react-native-paper'
 import { useAuth } from '@/utils/auth-context'
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Redirect } from 'expo-router'
 import KeyBoardDismisView from '@/components/KeyBoardDismis'
 import * as Haptics from 'expo-haptics';
 import ErrorMessage from '@/components/ErrorMessage'
 import { withTiming, Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence } from 'react-native-reanimated';
 import { toastCenter } from '@/utils/toast'
-
-
 
 const googleIcon = require('@/assets/images/google-icon.png')
 
@@ -48,6 +44,7 @@ const reducer = (state, action) => {
 
 const login = () => {
     // return <Redirect href="/notif" />
+    const router = useRouter()
     const { logIn, googleSignUp, setIsLoadingUser } = useAuth()
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
@@ -79,16 +76,16 @@ const login = () => {
     }
 
     const isValidPassword = (password) => {
-        if (password.trim().length <= 8) {
-            dispatch({ type: 'SET-ERROR', errorField: 'passwordError', errorMessage: "Password must be atleast 8 characters long." })
-            return false
-        } else if (!password.trim()) {
+
+        if (!password.trim()) {
             dispatch({ type: 'SET-ERROR', errorField: 'passwordError', errorMessage: "Password can't be empty." })
             return false
-        }
+        } else if (password.trim().length <= 8) {
+            dispatch({ type: 'SET-ERROR', errorField: 'passwordError', errorMessage: "Password must be atleast 8 characters long." })
+            return false
+        }  
 
         return true
-
     }
 
     const emailIsListed = async (userEmail) => {
@@ -104,7 +101,6 @@ const login = () => {
             )
 
             const result = await response.json()
-            console.log("Checking Result: ", result.exist)
             return result.exist
         } catch (error) {
             console.log("Erro when checking if the email exist: ", error)
@@ -135,15 +131,16 @@ const login = () => {
 
         if (!emailExist) return dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: "Your email is not regitered yet. Would you like to sign-up?" })
 
-        if (error.includes("Invalid credentials") && emailExist) {
+
+        if (error?.includes("Invalid credentials") && emailExist) {
             toastCenter("Invalid credentials please check your email and password.")
             return dispatch({ type: 'ERROR', errorMsg: "Wrong Password" })
         }
 
         if (error) return dispatch({ type: 'ERROR', errorMsg: error })
-
-        dispatch({ type: 'CLEAR-ERROR' })
+        
         router.replace('/')
+
     }
 
     return (
