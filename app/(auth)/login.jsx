@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, useWindowDimensions, Image, KeyboardAvoidingView, Keyboard } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, useWindowDimensions, Alert, KeyboardAvoidingView, Keyboard } from 'react-native'
 import React, { useState, useReducer } from 'react'
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { useRouter } from 'expo-router'
@@ -129,7 +129,22 @@ const login = () => {
 
         const error = await logIn(state.email, state.password)
 
-        if (!emailExist) return dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: "Your email is not regitered yet. Would you like to sign-up?" })
+        if (!emailExist) {
+            Alert.alert(
+                "Unregistered Emial",
+                `Can't find your email ${state.email} in the database. Want to login instead?`,
+                [
+                    {text: "Cancel", style: 'cancel'},
+                    {
+                        text: 'Ok', 
+                        style: 'default',
+                        onPress: () => { router.replace('/(auth)/signup') }
+                    },
+                ]
+            )
+
+
+            return dispatch({ type: 'SET-ERROR', errorField: 'emailError', errorMessage: `Can't find your email ${state.email} in the database. Want to login instead?` }) }
 
 
         if (error?.includes("Invalid credentials") && emailExist) {
