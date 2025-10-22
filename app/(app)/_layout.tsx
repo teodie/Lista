@@ -19,7 +19,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
     if (!user && !isLoadingUser) {
       router.replace("/login");
     } else if (user && !isLoadingUser) {
-      router.replace("/");
+      router.replace("/voicetype");
     }
   }, [user, isLoadingUser]);
 
@@ -95,7 +95,7 @@ export default function ScreenLayout() {
                   title: 'Record',
                   tabBarIcon: ({ color, focused }) =>
                     <TouchableOpacity
-                      onPress={() => { router.navigate('/record') }}
+                      onPress={() => { router.navigate('/(app)/voicetype') }}
                       style={{ height: 70, width: 70, alignItems: 'center', justifyContent: 'center', borderRadius: 35, position: 'absolute', bottom: 0, backgroundColor: '#5959B2', overflow: 'hidden' }}
                     >
                       <MaterialIcons name="mic" size={40} color="white" />
@@ -124,6 +124,21 @@ export default function ScreenLayout() {
                   tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
                   headerShown: false,
                 }} />
+
+
+              <Tabs.Screen
+                name='voicetype'
+                options={{
+                  headerTitleAlign: 'center',
+                  title: 'Add Items',
+                  headerShown: true,
+                  headerTintColor: 'white',
+                  headerLeft: () => <BackIcon />,
+                  headerStyle: {backgroundColor: '#5959B2'},
+                  href: null,
+                  tabBarStyle: {display: 'none'}
+                }}
+              />
             </Tabs>
           </ItemsProvider>
         </ClientProvider>

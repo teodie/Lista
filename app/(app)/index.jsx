@@ -109,6 +109,8 @@ const explore = () => {
             keyExtractor={item => item.$id.toString()}
           />
 
+
+
         </View>
 
         {mode === MODE.ADD_ITEM && personData && < AddItems />}
