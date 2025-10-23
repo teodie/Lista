@@ -77,7 +77,7 @@ export const ClientProvider = ({ children }) => {
     }
 
 
-    const createClient = async (name, id, limit, paymentDays) => {
+    const createClient = async (name, id, limit, paymentDays, avatar) => {
         console.log(typeof (limit))
         try {
             await tablesDB.createRow(
@@ -89,7 +89,8 @@ export const ClientProvider = ({ children }) => {
                     name: name,
                     isSynced: false,
                     creditLimit: limit,
-                    paymentSchedule: [...paymentDays]
+                    paymentSchedule: [...paymentDays],
+                    avatar
                 },
                 [
                     Permission.read(Role.user(user.$id)),

@@ -58,6 +58,21 @@ const add = () => {
     }
   }
 
+  // fetch the client avatar url from appwrite
+  const fetchClientAvatar = async (id) => {
+    try {
+      const response = storage.getFileViewURL(
+        process.env.EXPO_PUBLIC_BUCKET_ID,
+        id,
+      ).href
+
+      return response
+    } catch (error) {
+      console.log(error)
+      setAvatar('')
+    }
+  }
+
   const handleSavePress = async () => {
     if (firstName.trim() === "") return Alert.alert("Firstname Field is empty")
     if (lastName.trim() === "") return Alert.alert("Lastname Field is empty")
@@ -67,11 +82,15 @@ const add = () => {
 
     if (nameAlreadyExist(name)) return Alert.alert("Name already exist")
 
+    let avatar = null
     setLoading(true)
     if (image) {
       await saveClientImageToStorage(id)
+      // fetch the newly created image uri
+      avatar = await fetchClientAvatar(id)
     }
-    await createClient(name, id, parseInt(limit), daySelected)
+
+    await createClient(name, id, parseInt(limit), daySelected, avatar)
     setLoading(false)
 
     navigation.navigate('index')

@@ -37,62 +37,28 @@ const Card = ({ data }) => {
         router.navigate({ pathname: '/items', })
     }
 
-    // fetch the client avatar url from appwrite
-    const fetchClientAvatar = async (id) => {
-        try {
-            const response = storage.getFileViewURL(
-                process.env.EXPO_PUBLIC_BUCKET_ID,
-                id,
-            ).href
-
-            setAvatar(response)
-        } catch (error) {
-            console.log(error)
-            setAvatar(null)
-        }
-    }
-
-    // check if the image exist in the appwrite storage
-    const imageExist = async (id) => {
-        try {
-            const file = await storage.getFile(
-                process.env.EXPO_PUBLIC_BUCKET_ID,
-                id,
-            )
-
-            if (!file) return false
-
-            return true
-        } catch (error) {
-            if (error.code === 404) {
-                // no avatar is saved for this user
-                setAvatar(null)
-            }
-
-        }
-    }
 
     // Capitalize the firstname of the client
-    const format = (fullname) => {
-        const firstName = fullname.split(" ")[0]
-        const firstLetterCapital = firstName.charAt(0).toUpperCase() + firstName.slice(1)
-        return firstLetterCapital
+    const format = (name) => {
+        const nameArr = name.split(" ")
+        const firstName = nameArr.shift()
+        const lastName = nameArr.join("")
+
+        const fName = firstName.charAt(0).toUpperCase() + firstName.slice(1)
+        const lName = lastName.charAt(0).toUpperCase() + lastName.slice(1)
+        const combined = `${fName} ${lName}`
+        return combined
     }
 
-    // check profile exist and if it does get the client avatar
-    useEffect(() => {
-        if (imageExist(data.$id)) {
-            fetchClientAvatar(data.$id)
-        }
-    }, [])
+
 
     return (
         <View style={styles.card}>
 
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 20, flex: 3, height: '100%', marginLeft: 5 }} onPress={handleNamePress}>
                 {
-                    avatar
-                        ? <Image source={{ uri: avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} />
+                    data.avatar
+                        ? <Image source={{ uri: data.avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} />
                         : <Ionicons name="person-circle-sharp" size={55} color='#5959B2' />
                 }
 
