@@ -1,4 +1,4 @@
-import { View, TextInput, Image, TouchableOpacity, FlatList, Keyboard } from 'react-native'
+import { View, TextInput, Image, TouchableOpacity, FlatList, Keyboard, ScrollView } from 'react-native'
 import { Button, Divider, Text } from 'react-native-paper';
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { KeyboardProvider, KeyboardStickyView } from "react-native-keyboard-controller";
@@ -210,15 +210,21 @@ const voicetype = () => {
                 />
               </View>
             </Animated.View>
-            <View style={{ gap: 40 }}>
-              <FlatList
+
+
+            <ScrollView style={{ gap: 40 }}>
+              {/* <FlatList
                 data={items}
                 renderItem={({ item }) => <Item deleteItem={deleteItem} item={item} editItem={editItem} />}
-              />
+              /> */}
+
+              {
+                items.map((item, index) => <Item key={index} deleteItem={deleteItem} item={item} editItem={editItem} />) 
+              }
               <Button mode='contained' disabled={items.length === 0 ? true : false}
                 onPress={handleSavePress}
               >Save</Button>
-            </View>
+            </ScrollView>
 
 
           </View>

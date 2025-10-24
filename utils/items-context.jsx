@@ -12,7 +12,7 @@ const ItemsContext = createContext(undefined)
 // create a wrapper component
 export const ItemsProvider = ({ children }) => {
     const [items, setItems] = useState([])
-    const {user} = useAuth()
+    const { user } = useAuth()
     const { clientId, setClientId } = useClient()
 
     const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID
@@ -25,12 +25,13 @@ export const ItemsProvider = ({ children }) => {
                 DATABASE_ID,
                 ITEMS_TABLE_ID,
                 [
-                    Query.equal('clientId', clientId),
-                    Query.equal('paid', isPaid),
-                ]
+                    Query.equal('client', [clientId]),
+                    Query.equal('paid', [isPaid]),
+                    Query.limit(100),
+                ],
             )
-                
-            if(response.total === 0) return null
+
+            if (response.total === 0) return null
             // console.log(JSON.stringify(response, null, 2))
 
             return response.rows
@@ -49,8 +50,8 @@ export const ItemsProvider = ({ children }) => {
                     Query.equal('clientId', clientId),
                 ]
             )
-                
-            if(response.total === 0) return null
+
+            if (response.total === 0) return null
 
             return response.rows
         } catch (error) {
@@ -59,7 +60,7 @@ export const ItemsProvider = ({ children }) => {
         }
     }
 
-    
+
     const updateItem = async (id, data) => {
         console.log("updating items now")
         try {
@@ -82,7 +83,7 @@ export const ItemsProvider = ({ children }) => {
                 DATABASE_ID,
                 ITEMS_TABLE_ID,
                 id,
-                {...data, userId: user.$id, paid: false, clientId: clientId, isSynced: false, client:  clientId},
+                { ...data, userId: user.$id, paid: false, clientId: clientId, isSynced: false, client: clientId },
                 [
                     Permission.read(Role.user(user.$id)),
                     Permission.update(Role.user(user.$id)),
@@ -110,7 +111,7 @@ export const ItemsProvider = ({ children }) => {
 
 
     return (
-        <ItemsContext.Provider value={{items, createItem, fetchClientItems, updateItem  }}>
+        <ItemsContext.Provider value={{ items, createItem, fetchClientItems, updateItem, fetchAllItems }}>
             {children}
         </ItemsContext.Provider>
     )

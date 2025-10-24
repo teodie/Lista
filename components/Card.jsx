@@ -7,12 +7,11 @@ import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import { useItems } from '@/utils/items-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { storage } from "@/utils/appWrite";
 
 const Card = ({ data }) => {
     const { setMode, setPersonData } = useData()
     const { setClientId } = useClient()
-    const { fetchClientItems } = useItems()
+    const { fetchClientItems, fetchAllItems } = useItems()
     const [avatar, setAvatar] = useState(null)
 
     // set the client ID and change the mode so that Add item modal will pop up
@@ -26,6 +25,7 @@ const Card = ({ data }) => {
         console.log("Fetching items of the clients")
         const response = await fetchClientItems(data.$id, false)
 
+        console.log(JSON.stringify(response.length, null, 2))
         setClientId(data.$id)
         if (!response) {
             console.log("No unpaid items found")
