@@ -15,7 +15,6 @@ export default function RootLayout() {
               statusBarStyle: segment.includes("add") || segment.length === 1  ? 'light' : 'dark' 
               }} />
             <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-            <Stack.Screen name='(test)' options={{ headerShown: false }} />
           </Stack>
         </AuthProvider>
       </DataProvider>

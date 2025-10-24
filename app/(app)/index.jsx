@@ -69,7 +69,6 @@ const explore = () => {
   return (
     <KeyBoardDismisView>
       <View style={styles.container}>
-        <StatusBar barStyle={'light-content'} />
         <View style={styles.headerContainer}>
           <View style={styles.topHeader}>
             <Text style={styles.titleTxt}>Lista</Text>
