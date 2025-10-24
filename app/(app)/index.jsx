@@ -16,7 +16,7 @@ import * as Notifications from 'expo-notifications';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
 
 const explore = () => {
-  const { mode, setMode, utang, personData } = useData()
+  const { mode, setMode, personData } = useData()
   const [id, setId] = useState(null);
   const { clients } = useClient()
 
@@ -94,7 +94,7 @@ const explore = () => {
         <View style={styles.cardContainer}>
           {filteredClients.length === 0 &&
             <Image
-              style={{height: 300, width: '100%', alignSelf: 'center', marginTop: 100}}
+              style={{ height: 300, width: '100%', alignSelf: 'center', marginTop: 100 }}
               source={require('@/assets/gifs/Empty.gif')}
             />
           }

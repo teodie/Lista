@@ -1,12 +1,12 @@
-
 import { MaterialIcons } from '@expo/vector-icons'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, FlatList, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView } from 'react-native'
 import NewItemsView from './NewItemsView';
 import NoItems from './NoItems';
 import { MODE } from '../constants/mode';
 import VoiceTyping from './VoiceTyping';
 import ManualInput from './ManualInput';
+import { Divider } from 'react-native-paper'
 import Toggle from './Toggle';
 import { useData } from '@/utils/userdata-context';
 import { useItems } from '@/utils/items-context';
@@ -22,6 +22,8 @@ const AddItems = () => {
   const [productName, setProductName] = useState('');
   const [price, setPrice] = useState('');
   const [clientName, setClientName] = useState()
+  const [avatar, setAvatar] = useState()
+  const [subTotal, setSubTotal] = useState(0)
 
   const editItem = (id) => {
     setEnableVoiceType(false)
@@ -69,28 +71,76 @@ const AddItems = () => {
     const client = async () => {
       const response = await fetchClientById(clientId)
       setClientName(response.name)
+      setAvatar(response.avatar)
     }
 
     client()
   }, [])
 
+  useEffect(() => {
+    setSubTotal(items.reduce((acc, item) => {
+      return acc + Number(item.price)
+    }, 0))
+  }, [items])
+
   return (
-    <View style={styles.processingOverlay}>
+    <View style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: '#EBEFF0',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000,
+    }}>
+      <View style={{
+        height: '50%',
+        width: '80%',
+        elevation: 10,
+        borderRadius: 10,
+        backgroundColor: 'white',
+      }}>
 
-      <KeyboardAvoidingView behavior='padding'>
-        <View style={styles.addItemContainer}>
+        <View style={{
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          height: 70,
+          backgroundColor: '#5959B2',
+          borderColor: 'red',
+          borderTopLeftRadius: 9,
+          borderTopRightRadius: 9,
+        }} >
 
-          <View style={styles.header} >
+          <TouchableOpacity onPress={handleExitPress} >
+            < MaterialIcons name="chevron-left" size={40} color="white" />
+          </TouchableOpacity>
 
-            <TouchableOpacity style={styles.exitBtn} onPress={handleExitPress} >
-              < MaterialIcons name="exit-to-app" size={30} color="white" />
-            </TouchableOpacity>
+          {
+            avatar && <Image source={{ uri: avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} />
+          }
 
-            <Text style={styles.headerTxt}>{clientName}</Text>
+          
+          <Text style={{
+            color: 'white',
+            fontSize: 20,
+            fontWeight: 600
+          }}
+          >
+            {clientName}
+          </Text>
 
-            <Toggle enableVoiceType={enableVoiceType} setEnableVoiceType={setEnableVoiceType} />
+          <Toggle enableVoiceType={enableVoiceType} setEnableVoiceType={setEnableVoiceType} />
 
-          </View>
+        </View>
+
+        <View style={{
+          paddingHorizontal: 20,
+          flex: 1,
+        }}>
 
           {enableVoiceType
             ? <VoiceTyping setItems={setItems} items={items} />
@@ -101,24 +151,38 @@ const AddItems = () => {
             />
           }
 
-          {items.length === 0
-            ? <NoItems />
-            : <FlatList
-              data={items}
-              renderItem={({ item }) => <NewItemsView item={item} deleteItem={deleteItem} editItem={editItem} />}
-              keyExtractor={item => item.id}
-            />
-          }
+          <View style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }}>
+              {
+                items.map((item) => <NewItemsView key={item.id} item={item} deleteItem={deleteItem} editItem={editItem} />)
+              }
+            </ScrollView>
+          </View>
+
+
+          <Divider style={{ height: 1.5, marginBottom: 10 }} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ fontSize: 20, color: '#281344' }}>Subtotal:</Text>
+            <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#281344' }}>{subTotal}.00</Text>
+          </View>
+          <View style={{
+            alignSelf: 'center',
+            height: 40,
+            elevation: 3,
+            paddingHorizontal: 25,
+            borderRadius: 20,
+            marginVertical: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#5959B2',
+          }} >
+            <TouchableOpacity onPress={() => saveItems(clientId)} >
+              <Text style={styles.saveTxt} > Save </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-
-        <View style={styles.saveBtn} >
-          <TouchableOpacity onPress={() => saveItems(clientId)} >
-            <Text style={styles.saveTxt} > Save </Text>
-          </TouchableOpacity>
-        </View>
-
-      </KeyboardAvoidingView>
+      </View>
 
     </View>
   )
@@ -133,32 +197,27 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#EBEFF0',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   addItemContainer: {
-    borderWidth: 1,
     minHeight: 250,
     maxHeight: 450,
     width: '80%',
-    alignItems: 'center',
+    elevation: 10,
     borderRadius: 10,
     backgroundColor: 'white',
   },
 
-
-  exitBtn: {
-    transform: [{ rotate: '180deg' }],
-  },
   saveBtn: {
-    // borderWidth: 1,
-    alignSelf: 'flex-end',
+    alignSelf: 'center',
     height: 40,
-    width: 90,
-    marginTop: 10,
+    elevation: 2,
+    paddingHorizontal: 25,
     borderRadius: 20,
+    marginVertical: 20,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#5959B2',
@@ -166,17 +225,19 @@ const styles = StyleSheet.create({
   saveTxt: {
     color: 'white',
     fontSize: 24,
+    fontWeight: 'bold'
   },
   header: {
     width: '100%',
+    borderWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#5959B2',
     height: 70,
-    borderTopEndRadius: 8,
-    borderTopStartRadius: 8,
+    backgroundColor: 'papayawhip',
+    borderColor: 'red',
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   headerTxt: {
     color: 'white',

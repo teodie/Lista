@@ -1,4 +1,4 @@
-import { StyleSheet, View, TextInput, TouchableOpacity, Pressable } from 'react-native'
+import { StyleSheet, View, TextInput, TouchableOpacity,Text, Pressable } from 'react-native'
 import React, { useState, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import Animated, { FadeIn, FadeOut, runOnJS } from 'react-native-reanimated';
@@ -17,7 +17,7 @@ const converToObj = (txt) => {
     if (Number.isNaN(Number(currentItem))) {
       words.push(currentItem)
     } else {
-      item.push({id: ID.unique(), productName: words.toString().replaceAll(",", " "), price: Number(currentItem) })
+      item.push({ id: ID.unique(), productName: words.toString().replaceAll(",", " "), price: Number(currentItem) })
       words = []
     }
 
@@ -51,7 +51,12 @@ const VoiceTyping = ({ setItems, items }) => {
     >
 
       <TextInput
-        style={styles.transcribeInput}
+        style={{
+          borderWidth: 1.5,
+          borderColor: '#5959B2',
+          flex: 1,
+          borderRadius: 20,
+        }}
         ref={voiceTypingRef}
         onChangeText={setTranscribeTxt}
         autoFocus={false}
@@ -63,10 +68,11 @@ const VoiceTyping = ({ setItems, items }) => {
       />
 
       <Pressable
+        style={{ height: 40, width: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#5959B2', marginHorizontal: 5}}
         opacity={transcribeTxt.length === 0 ? 0.7 : 1}
         disabled={transcribeTxt.length === 0 ? true : false}
         onPress={() => { voiceTypingRef.current?.blur(); transcribeItems(transcribeTxt) }} >
-        <MaterialIcons name='add-circle' size={40} color='#5959B2' />
+        <Text style={{fontWeight: 500, color: 'white'}}>Add</Text>
       </Pressable>
     </Animated.View>
   )
@@ -84,8 +90,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
     marginBottom: 10,
-    paddingLeft: 10,
-    paddingRight: 10,
   },
 
 })

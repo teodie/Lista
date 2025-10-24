@@ -34,7 +34,7 @@ const Toggle = ({ enableVoiceType, setEnableVoiceType }) => {
     }
 
     return (
-        <TouchableOpacity onPress={handleTogglePress}>
+        <TouchableOpacity style={{paddingRight: 10}} onPress={handleTogglePress}>
             <View style={{ backgroundColor: enableVoiceType ? 'white' : '#D9D9E0', justifyContent: 'center', height: circleDiameter/2, width: containerTotalWidth, borderRadius: circleDiameter / 2 }}>
                 <Animated.View style={startAnimation}>
                     <MaterialIcons name={enableVoiceType ? 'mic' : 'mic-off'} size={20} color='white' />

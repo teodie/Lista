@@ -1,34 +1,32 @@
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native'
-import React from 'react'
-import { MaterialIcons } from '@expo/vector-icons'
+import { StyleSheet, Text, View, TouchableOpacity, Alert, Pressable, TextInput } from 'react-native'
+import React, { useState } from 'react'
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const NewItemsView = ({ item, deleteItem, editItem }) => {
 
     return (
-        <View style={styles.container} >
+        <Pressable style={styles.container} >
 
             <View style={styles.textContainer} >
                 <Text style={styles.txt} >{item.productName}</Text>
                 <Text style={styles.txt} >{item.price}.00</Text>
             </View>
 
-            <View style={styles.iconContainer} >
-
+            <View style={{flexDirection: 'row', gap: 5}}>
                 <TouchableOpacity
+                    style={{ backgroundColor: '#5959B2', height: 30, width: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', }}
                     onPress={() => editItem(item.id)}
                 >
-                    <MaterialIcons name='edit-document' size={30} color="#5959B2" />
+                    <FontAwesome6 name="pencil" size={18} color="white" />
                 </TouchableOpacity>
-
                 <TouchableOpacity
+                    style={{ backgroundColor: '#DF444B', height: 30, width: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' }}
                     onPress={() => deleteItem(item.id)}
                 >
-                    <MaterialIcons name='delete' size={30} color="#5959B2" />
+                    <FontAwesome6 name="trash-alt" size={18} color="white" />
                 </TouchableOpacity>
-
             </View>
-
-        </View>
+        </Pressable>
     )
 }
 
@@ -42,7 +40,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginBottom: 10,
         // borderWidth: 1,
-
     },
     txt: {
         fontSize: 20
@@ -54,13 +51,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginRight: 40,
     },
-    iconContainer: {
-        flexDirection: 'row',
-        gap: 20,
-        // borderWidth: 1,
 
-
-    }
 
 })
 

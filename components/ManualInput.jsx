@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, View, TouchableOpacity, Alert } from 'react-native'
+import { StyleSheet, TextInput, View, TouchableOpacity, Alert, Text } from 'react-native'
 import uuid from 'react-native-uuid'
 import React, { useState, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -23,7 +23,7 @@ const ManualInput = ({ setItems, items, productName, setProductName, price, setP
 
     const saveEditedItem = (id) => {
         const foundPersonItem = items.find((element) => element.id === id)
-        setItems([{...foundPersonItem, productName: productName, price: price}, ...items])
+        setItems([{ ...foundPersonItem, productName: productName, price: price }, ...items])
 
         setProductName('')
         setPrice('')
@@ -51,7 +51,7 @@ const ManualInput = ({ setItems, items, productName, setProductName, price, setP
             })}
             exiting={FadeOut}
         >
-            
+
             <TextInput style={styles.textInputProduct}
                 ref={productInputRef}
                 placeholder='Product Name'
@@ -74,8 +74,10 @@ const ManualInput = ({ setItems, items, productName, setProductName, price, setP
                 onSubmitEditing={() => newItem()}
             />
 
-            <TouchableOpacity onPress={handleSavePres} >
-                <MaterialIcons name='add-box' size={40} color='#5959B2' />
+            <TouchableOpacity
+                style={{ height: 40, width: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#5959B2', marginHorizontal: 5 }}
+                onPress={handleSavePres} >
+                <Text style={{ fontWeight: 500, color: 'white' }}>Add</Text>
             </TouchableOpacity>
 
         </Animated.View>
@@ -94,14 +96,15 @@ const styles = StyleSheet.create({
         // borderWidth: 1,
     },
     textInputProduct: {
-        borderWidth: 1,
+        borderWidth: 1.5,
+        borderColor: '#5959B2',
         flex: 2,
         borderRadius: 10,
     },
     textInputPrice: {
-        borderWidth: 1,
+        borderWidth: 1.5,
+        borderColor: '#5959B2',
         flex: 1,
         borderRadius: 10,
-        borderColor: 'black'
     },
 })
