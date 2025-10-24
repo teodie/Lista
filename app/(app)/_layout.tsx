@@ -81,13 +81,6 @@ export default function ScreenLayout() {
                   href: null,
                 }} />
 
-              <Tabs.Screen
-                name='analytics'
-                options={{
-                  title: 'Analytics',
-                  tabBarIcon: ({ color }) => <MaterialIcons name="analytics" size={24} color={color} />,
-                  headerShown: false
-                }} />
 
               <Tabs.Screen
                 name='record'
