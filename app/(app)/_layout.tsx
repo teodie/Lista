@@ -76,7 +76,7 @@ export default function ScreenLayout() {
                   title: 'Transactions',
                   headerLeft: () => <BackIcon />,
                   headerRight: () =>
-                    <View style={{flexDirection: 'row', margin: 10, gap: 15}}>
+                    <View style={{ flexDirection: 'row', margin: 10, gap: 15 }}>
                       <Feather name="download" size={24} color="white" />
                       <Entypo name="dots-three-vertical" size={24} color="white" />
                     </View>,
@@ -86,31 +86,16 @@ export default function ScreenLayout() {
                   tabBarStyle: { display: 'none' }
                 }} />
 
-
-              <Tabs.Screen
-                name='record'
-                options={{
-                  title: 'Record',
-                  tabBarIcon: ({ color, focused }) =>
-                    <TouchableOpacity
-                      onPress={() => { router.navigate('/(app)/voicetype') }}
-                      style={{ height: 70, width: 70, alignItems: 'center', justifyContent: 'center', borderRadius: 35, position: 'absolute', bottom: 0, backgroundColor: '#5959B2', overflow: 'hidden' }}
-                    >
-                      <MaterialIcons name="mic" size={40} color="white" />
-                    </TouchableOpacity>,
-                  headerShown: false,
-                }}
-              />
-
               <Tabs.Screen
                 name='add'
                 options={{
+                  title: 'Add',
                   headerTitle: 'Create new client',
                   tabBarIcon: ({ color }) => <Ionicons name="person-add" size={24} color={color} />,
                   headerShown: true,
                   headerTintColor: 'white',
                   headerStyle: { backgroundColor: '#5959B2' },
-                  headerTitleAlign: 'center'
+                  headerTitleAlign: 'center',
                 }}
 
               />
@@ -121,22 +106,9 @@ export default function ScreenLayout() {
                   title: 'Settings',
                   tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
                   headerShown: false,
+                  tabBarStyle: { display: 'none' },
                 }} />
 
-
-              <Tabs.Screen
-                name='voicetype'
-                options={{
-                  headerTitleAlign: 'center',
-                  title: 'Add Items',
-                  headerShown: true,
-                  headerTintColor: 'white',
-                  headerLeft: () => <BackIcon />,
-                  headerStyle: { backgroundColor: '#5959B2' },
-                  href: null,
-                  tabBarStyle: { display: 'none' }
-                }}
-              />
             </Tabs>
           </ItemsProvider>
         </ClientProvider>
