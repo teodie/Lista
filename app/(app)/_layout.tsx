@@ -2,12 +2,12 @@ import { Tabs, useNavigation, useRouter } from 'expo-router';
 import 'react-native-reanimated';
 import Payment from '@/components/Payment';
 import { router } from 'expo-router';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View, ActivityIndicator, TouchableOpacity, StatusBar } from 'react-native';
 import { useAuth } from '@/utils/auth-context'
 import { ClientProvider } from '@/utils/client-context';
 import { ItemsProvider } from '@/utils/items-context';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome, MaterialIcons, Feather, Entypo } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -71,14 +71,19 @@ export default function ScreenLayout() {
               <Tabs.Screen
                 name='items'
                 options={{
-                  headerBackButtonDisplayMode: 'default',
+                  headerTitleAlign: 'center',
                   headerShown: true,
-                  title: 'Details',
+                  title: 'Transactions',
                   headerLeft: () => <BackIcon />,
-                  headerRight: () => <Payment />,
+                  headerRight: () =>
+                    <View style={{flexDirection: 'row', margin: 10, gap: 15}}>
+                      <Feather name="download" size={24} color="white" />
+                      <Entypo name="dots-three-vertical" size={24} color="white" />
+                    </View>,
                   headerStyle: { backgroundColor: '#5959B2' },
                   headerTintColor: 'white',
                   href: null,
+                  tabBarStyle: { display: 'none' }
                 }} />
 
 
@@ -127,9 +132,9 @@ export default function ScreenLayout() {
                   headerShown: true,
                   headerTintColor: 'white',
                   headerLeft: () => <BackIcon />,
-                  headerStyle: {backgroundColor: '#5959B2'},
+                  headerStyle: { backgroundColor: '#5959B2' },
                   href: null,
-                  tabBarStyle: {display: 'none'}
+                  tabBarStyle: { display: 'none' }
                 }}
               />
             </Tabs>

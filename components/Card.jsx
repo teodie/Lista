@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState } from 'react'
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { MODE } from '@/constants/mode';
 import { router } from 'expo-router';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import { useItems } from '@/utils/items-context';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { setParams } from 'expo-router/build/global-state/routing';
 
 const Card = ({ data }) => {
     const { setMode, setPersonData } = useData()
@@ -22,10 +22,8 @@ const Card = ({ data }) => {
 
     const handleNamePress = async () => {
         // fetch data from the database
-        console.log("Fetching items of the clients")
-        const response = await fetchClientItems(data.$id, false)
-
-        console.log(JSON.stringify(response.length, null, 2))
+        console.log("Fetching all items of the clients")
+        const response = await fetchAllItems(data.$id)
         setClientId(data.$id)
         if (!response) {
             console.log("No unpaid items found")
