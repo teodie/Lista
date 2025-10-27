@@ -19,7 +19,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
     if (!user && !isLoadingUser) {
       router.replace("/login");
     } else if (user && !isLoadingUser) {
-      router.replace("/");
+      router.replace("/(settings)/changepass");
     }
   }, [user, isLoadingUser]);
 
@@ -101,7 +101,7 @@ export default function ScreenLayout() {
               />
 
               <Tabs.Screen
-                name='settings'
+                name='(settings)'
                 options={{
                   title: 'Settings',
                   tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
