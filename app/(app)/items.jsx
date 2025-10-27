@@ -191,8 +191,8 @@ const items = () => {
 
           {
             filteredItems.map((item, index) =>
-              <>
-                <View key={index} style={{
+              <View key={index} >
+                <View  style={{
                   flexDirection: 'row', marginVertical: 8,
                 }}>
                   <Text style={{ flex: 3 }} >{item.productName}</Text>
@@ -205,7 +205,7 @@ const items = () => {
                   }
                 </View>
                 <Divider />
-              </>
+              </View>
 
             )
           }
