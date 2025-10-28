@@ -90,7 +90,7 @@ const login = () => {
 
     const emailIsListed = async (userEmail) => {
         const url = process.env.EXPO_PUBLIC_APPWRITE_EMAIL_EXISTENCE_CHECKER_END_POINT
-        const data = { email: userEmail }
+        const data = { email: userEmail, action: 'CHECK-EMAIL' }
         try {
             const response = await fetch(url, {
                 method: 'POST',
