@@ -8,9 +8,6 @@ import { useAuth } from '@/utils/auth-context'
 import { useRouter } from 'expo-router'
 
 const initialValue = {
-  oldPassword: '',
-  oldPasswordError: '',
-  oldPasswordEyeOpen: true,
   newPassword: '',
   newPasswordError: '',
   newPasswordEyeOpen: true,
@@ -42,14 +39,6 @@ const changepass = () => {
   const { user } = useAuth()
   const router = useRouter()
 
-  const oldPasswordIsValid = async () => {
-    if (state.oldPassword.trim() === '') {
-      dispatch({ type: 'SET-ERROR', field: 'oldPasswordError', errorMsg: 'New password is empty.' })
-      return false
-    }
-
-    return true
-  }
 
   const newPasswordIsValid = () => {
     if (state.newPassword.trim() === '') {
@@ -62,7 +51,6 @@ const changepass = () => {
 
     return true
   }
-
 
   const confirmPasswordIsValid = () => {
     if (state.confirmPassword.trim() === '') {
@@ -78,14 +66,32 @@ const changepass = () => {
 
   const handleSubmit = async () => {
     dispatch({ type: 'CLEAR-ERROR' })
-    console.log("error Cleared")
-    if (!oldPasswordIsValid()) return
+
     if (!newPasswordIsValid()) return
     if (!confirmPasswordIsValid()) return
     console.log("passed the test")
 
-    const url = process.env.EXPO_PUBLIC_APPWRITE_EMAIL_EXISTENCE_CHECKER_END_POINT
 
+    Alert.alert(
+      "You will be log out",
+      "You will be log out after successfull password change.",
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Ok',
+          style: 'default',
+          onPress: async () => { await updatePassword() }
+        },
+      ]
+    )
+
+
+  }
+
+  const updatePassword = async () => {
+    const url = process.env.EXPO_PUBLIC_APPWRITE_EMAIL_EXISTENCE_CHECKER_END_POINT
+    router.replace('/waiting')
+    
     console.log("Starting Change password")
     try {
       const response = await fetch(url, {
@@ -94,15 +100,13 @@ const changepass = () => {
         body: JSON.stringify({
           userId: user.$id,
           password: state.newPassword,
-          oldPassword: state.oldPassword,
-          email: user.email,
           action: 'UPDATE-PASSWORD'
         })
       })
 
       const result = await response.json()
 
-      if(result.status !== 'successful' && result.message.includes('incorrect'))  return dispatch({ type: 'SET-ERROR', field: 'oldPasswordError', errorMsg: result.message })
+      if (result.status !== 'successful' && result.message.includes('incorrect')) return dispatch({ type: 'SET-ERROR', field: 'oldPasswordError', errorMsg: result.message })
 
       Alert.alert("Password has been updated")
       router.dismissTo('/(auth)/login')
@@ -149,21 +153,6 @@ const changepass = () => {
               }}>Please ensure that the new password is defferent from the previous passwords that you have been used.</Text>
             </View>
 
-            <TextInput
-              style={{ marginTop: 10 }}
-              outlineColor={state.oldPasswordError !== '' ? theme.colors.error : null}
-              mode='outlined'
-              label='Old Password'
-              secureTextEntry={state.oldPasswordEyeOpen}
-              right={<TextInput.Icon icon={state.oldPasswordEyeOpen ? 'eye-off' : 'eye'} onPress={() => {
-                dispatch({ type: 'TOGGLE-EYE', eye: 'oldPasswordEyeOpen' })
-              }} />}
-              value={state.oldPassword}
-              onChangeText={handleChange('oldPassword')}
-            />
-            {
-              state.oldPasswordError !== '' && <Text style={{ color: theme.colors.error }}>{state.oldPasswordError}</Text>
-            }
             <TextInput
               style={{ marginTop: 10 }}
               outlineColor={state.newPasswordError !== '' ? theme.colors.error : null}

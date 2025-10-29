@@ -15,8 +15,10 @@ const sampleData = [
 
 export default function Settings() {
   const { signOut, user } = useAuth()
-  const firstName = user.prefs?.given_name.charAt(0).toUpperCase() + user.prefs?.given_name.slice(1)
-  const lastName = user.prefs?.family_name.charAt(0).toUpperCase() + user.prefs?.family_name.slice(1)
+
+
+  const firstName = user.prefs.given_name?.charAt(0).toUpperCase() + user.prefs.given_name?.slice(1)
+  const lastName = user.prefs.family_name?.charAt(0).toUpperCase() + user.prefs?.family_name?.slice(1)
 
   const router = useRouter()
 
