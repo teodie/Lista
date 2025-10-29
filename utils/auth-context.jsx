@@ -13,7 +13,7 @@ const AuthContext = createContext(undefined)
 export default AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [isLoadingUser, setIsLoadingUser] = useState(true)
-
+  
   const android_OAuth = async () => {
 
     const deepLink = new URL(makeRedirectUri({ preferLocalhost: true, path: 'waiting' }));
@@ -198,6 +198,7 @@ export default AuthProvider = ({ children }) => {
   };
 
   const logIn = async (email, password) => {
+    setIsLoadingUser(true)
     try {
       await account.createEmailPasswordSession(email, password)
       const session = await account.get()
@@ -209,6 +210,8 @@ export default AuthProvider = ({ children }) => {
         return error.message
       }
       return "There is an issue during log in"
+    } finally {
+      setIsLoadingUser(false)
     }
 
   }

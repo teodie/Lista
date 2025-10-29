@@ -111,7 +111,7 @@ const login = () => {
 
 
     const handleLogin = async () => {
-
+    
         const duration = 50
         offset.value = withSequence(
             withTiming(-5, { duration: duration / 2 }),
@@ -128,7 +128,7 @@ const login = () => {
         const emailExist = await emailIsListed(state.email)
 
         const error = await logIn(state.email, state.password)
-
+        
         if (!emailExist) {
             Alert.alert(
                 "Unregistered Emial",
