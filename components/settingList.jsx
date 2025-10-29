@@ -3,7 +3,7 @@ import React from 'react'
 import { Ionicons, MaterialIcons, Entypo } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 
-const SettingList = ({ icon, title, navigate }) => {
+const SettingList = ({ icon, title, navigate, value }) => {
   const router = useRouter()
 
   const handlePress = () => {
@@ -12,7 +12,7 @@ const SettingList = ({ icon, title, navigate }) => {
   return (
 
     <TouchableOpacity
-    onPress={handlePress}
+      onPress={handlePress}
     >
       <View style={{
         flexDirection: 'row',
@@ -31,7 +31,16 @@ const SettingList = ({ icon, title, navigate }) => {
             fontSize: 20
           }}>{title}</Text>
         </View>
-        <Entypo name="chevron-right" size={30} color="gray" />
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 15,
+        }}>
+          {
+            value && <Text style={{color: 'gray'}}>{value}</Text>
+          }
+          <Entypo name="chevron-right" size={30} color="gray" />
+        </View>
       </View>
     </TouchableOpacity>
 

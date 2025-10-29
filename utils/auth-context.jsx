@@ -154,7 +154,7 @@ export default AuthProvider = ({ children }) => {
     }
   }
 
-  const getUser = async () => {
+ const getUser = async () => {
     try {
       const session = await account.get();
       setUser(session);
@@ -257,7 +257,7 @@ export default AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoadingUser, logIn, signUp, signOut, googleSignUp, getUserProfile }}>
+    <AuthContext.Provider value={{ user, isLoadingUser, logIn, signUp, signOut, googleSignUp, getUserProfile, getUser }}>
       {children}
     </AuthContext.Provider>
   );

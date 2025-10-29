@@ -8,19 +8,34 @@ import { account } from '@/utils/appWrite'
 import { useRouter } from 'expo-router'
 import SettingList from '@/components/settingList'
 
-const sampleData = [
-  { icon: 'person-outline', title: 'Name', navigate: 'name' },
-  { icon: 'lock-outline', title: 'Change Password', navigate: 'changepass' },
-]
+
 
 export default function Settings() {
   const { signOut, user } = useAuth()
+
+  const sampleData = [
+    { icon: 'person-outline', title: 'Name', navigate: 'name', value: user.name },
+    { icon: 'lock-outline', title: 'Change Password', navigate: 'changepass', value: null },
+  ]
+
+  const [list, setList] = useState([...sampleData])
+
 
 
   const firstName = user.prefs.given_name?.charAt(0).toUpperCase() + user.prefs.given_name?.slice(1)
   const lastName = user.prefs.family_name?.charAt(0).toUpperCase() + user.prefs?.family_name?.slice(1)
 
   const router = useRouter()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const session = await account.get()
+      setList( list.map((item) => item.title === Name ? {...item, value: session.name} : item))
+    }
+
+    fetchUser()
+    
+  }, [user])
 
   return (
     <SafeAreaView style={{
@@ -58,10 +73,10 @@ export default function Settings() {
           borderRadius: 20
         }}>
           {
-            sampleData.map((item, index) => {
+            list.map((item, index) => {
 
-              return <View  key={index} >
-                <SettingList icon={item.icon} title={item.title} navigate={item.navigate}/>
+              return <View key={index} >
+                <SettingList icon={item.icon} title={item.title} navigate={item.navigate} value={item.value} />
                 {
                   index !== sampleData.length - 1 && <Divider />
                 }
