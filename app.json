@@ -18,7 +18,8 @@
         "softwareKeyboardLayoutMode": "resize"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.teodi.Lista"
+      "package": "com.teodi.Lista",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
