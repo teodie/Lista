@@ -1,7 +1,6 @@
-import { TouchableWithoutFeedback, View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, FlatList, Pressable, StatusBar, Keyboard, Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput,Image } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
-import { AudioModule, useAudioRecorder, RecordingPresets } from 'expo-audio';
 import AddItems from '@/components/AddItems';
 import { MODE } from '@/constants/mode';
 import ModalContainer from '@/components/ModalContainer';
@@ -9,10 +8,8 @@ import AddName from '@/components/AddName';
 import ExportArchieve from '@/components/ExportArchieve';
 import SwipeAble from '@/components/SwipeAble';
 import Animated, { LinearTransition } from 'react-native-reanimated';
-import { exportToCSV } from '@/utils/jsonToCsv';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
-import * as Notifications from 'expo-notifications';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
 
 const explore = () => {
@@ -26,35 +23,6 @@ const explore = () => {
 
   const scrollRef = useRef(null);
 
-
-  useEffect(() => {
-
-    const getPermission = async () => {
-      try {
-        // Audio Permission
-        const status = await AudioModule.requestRecordingPermissionsAsync();
-        if (!status.granted) {
-          Alert.alert('Permission needed', 'This app needs access to your microphone to record audio.');
-        }
-
-        //Notification Permission
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-
-        if (finalStatus !== 'granted') {
-          alert('Permission for notifications not granted');
-        }
-      } catch (err) {
-        console.error('Failed to get permission:', err);
-      }
-    };
-    getPermission();
-  }, []);
 
   useEffect(() => {
     filterClient()
