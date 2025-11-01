@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Pressable, Alert } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
+import { MaterialIcons, Feather } from '@expo/vector-icons'
 import React from 'react'
 import { exportToCSV } from '@/utils/jsonToCsv'
 import { fetchArchieveData } from '@/utils/fetchArchieveData'
@@ -16,7 +16,7 @@ const ExportArchieve = () => {
     return (
         <View style={{ flexDirection: 'row', gap: 20, alignSelf: 'center', position: 'relative' }}>
             <Pressable onPress={handlePress}>
-                <MaterialIcons name='save' size={30} color='#ffffff' />
+                <Feather name='download' size={30} color='#ffffff' />
             </Pressable>
             <MaterialIcons name="cloud" size={30} color="white" />
             <View style={{height: 10, width: 10, backgroundColor: isConnected ? '#00FF01' : 'gray', borderRadius: 5, position: 'absolute', right: 0, top: 5,}}/>
