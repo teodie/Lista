@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lista",
     "slug": "Lista",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/Lista-icon.png",
     "scheme": "appwrite-callback-68bfe83f0000c8279419",
