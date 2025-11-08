@@ -22,14 +22,14 @@ const SwipeAble = ({ data, scrollRef }) => {
             const hasHardware = await LocalAuthentication.hasHardwareAsync();
             if (!hasHardware) {
                 console.log("❌ No biometric hardware available on this device");
-                return;
+                return true;
             }
 
             // Check if any biometrics are enrolled
             const enrolled = await LocalAuthentication.isEnrolledAsync();
             if (!enrolled) {
                 console.log("⚠️ No biometrics set up on this device");
-                return;
+                return true;
             }
 
             // Prompt user for authentication
