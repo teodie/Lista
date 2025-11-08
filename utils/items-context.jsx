@@ -110,9 +110,8 @@ export const ItemsProvider = ({ children }) => {
         }
     }
 
-
     return (
-        <ItemsContext.Provider value={{ items, createItem, fetchClientItems, updateItem, fetchAllItems }}>
+        <ItemsContext.Provider value={{ items, createItem, fetchClientItems, updateItem, fetchAllItems, deleteItem }}>
             {children}
         </ItemsContext.Provider>
     )

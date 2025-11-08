@@ -3,40 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import { useItems } from '@/utils/items-context';
-import { Ionicons, FontAwesome6, FontAwesome } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 import { ScrollView } from 'react-native-gesture-handler';
-
 import { Modal, Portal, Text, Button, PaperProvider, Divider, SegmentedButtons, TextInput } from 'react-native-paper';
 import { CustomModal } from '@/components/ModalContainer';
 import { useRouter } from 'expo-router';
-
-function formatAppwriteDate(createdAt) {
-  const date = new Date(createdAt);
-  return date.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "short",
-  });
-}
-
-const Paid = () => (
-  <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', gap: 5 }} >
-    <View style={{ borderRadius: 10, backgroundColor: '#43A55A', padding: 2, alignItems: 'center', justifyContent: 'center', height: 20, width: 20 }}>
-      <FontAwesome name="check" size={12} color="white" />
-    </View>
-    <Text style={{ fontWeight: 500, color: '#43A55A' }}>Paid</Text>
-  </View>
-)
-
-const Unpaid = () => (
-  <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', gap: 5 }} >
-    <View style={{
-      borderRadius: 10, padding: 2, height: 15, width: 15,
-      borderWidth: 3, borderColor: '#C44250',
-    }}
-    />
-    <Text style={{ fontWeight: 500, color: '#C44250' }}>Unpaid</Text>
-  </View>
-)
+import ItemList from '@/components/itemList';
 
 const items = () => {
   const { personData, setPersonData } = useData()
@@ -47,6 +19,9 @@ const items = () => {
   const [filteredItems, setFilteredItems] = useState([])
   const [visible, setVisible] = useState(false)
   const [total, setTotal] = useState(0)
+
+  const [editItemModalShow, setEditItemModalShow] = useState(false)
+  const [editItem, setEditItem] = useState({productName: '', price: '', id: '', date: ''})
 
   const router = useRouter()
 
@@ -135,7 +110,6 @@ const items = () => {
             justifyContent: 'space-between',
             flexDirection: 'row',
             backgroundColor: '#A9DDEA',
-
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -190,24 +164,12 @@ const items = () => {
           <Divider />
 
           {
-            filteredItems.map((item, index) =>
-              <View key={index} >
-                <View  style={{
-                  flexDirection: 'row', marginVertical: 8,
-                }}>
-                  <Text style={{ flex: 3 }} >{item.productName}</Text>
-                  <Text style={{ flex: 1, textAlign: 'center' }} >{item.price}.00</Text>
-                  <Text style={{ flex: 1, textAlign: 'center' }} >{formatAppwriteDate(item.$createdAt)}</Text>
-                  {
-                    item.paid
-                      ? <Paid />
-                      : <Unpaid />
-                  }
-                </View>
-                <Divider />
-              </View>
-
-            )
+            filteredItems.map((item, index) => <ItemList
+              key={index}
+              item={item}
+              setEditItemModalShow={setEditItemModalShow}
+              setEditItem={setEditItem}
+            />)
           }
 
         </View>
@@ -241,6 +203,16 @@ const items = () => {
             </View>
           }
           visible={visible} setVisible={setVisible} />
+
+        <CustomModal
+          children={
+            <View sty>
+              <Text>{`Product ID: ${editItem?.id}`}</Text>
+            </View>
+          }
+          visible={editItemModalShow}
+          setVisible={setEditItemModalShow}
+        />
 
       </ScrollView>
     </PaperProvider>
