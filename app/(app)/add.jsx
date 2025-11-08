@@ -74,10 +74,15 @@ const add = () => {
   }
 
   const handleSavePress = async () => {
+    let name
     if (firstName.trim() === "") return Alert.alert("Firstname Field is empty")
-    if (lastName.trim() === "") return Alert.alert("Lastname Field is empty")
 
-    const name = firstName.trim().toLowerCase() + " " + lastName.trim().toLowerCase()
+    if (lastName.trim() === "") {
+      name = firstName.trim().toLowerCase()
+    } else {
+      name = firstName.trim().toLowerCase() + " " + lastName.trim().toLowerCase()
+    }
+
     const id = ID.unique()
 
     if (nameAlreadyExist(name)) return Alert.alert("Name already exist")
