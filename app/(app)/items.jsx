@@ -1,14 +1,19 @@
-import { View, StyleSheet, FlatList, Alert, TouchableOpacity, Image } from 'react-native'
+import { View, StyleSheet, FlatList, Alert, TouchableOpacity, Image, } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import { useItems } from '@/utils/items-context';
 import { Ionicons } from '@expo/vector-icons'
 import { ScrollView } from 'react-native-gesture-handler';
-import { Modal, Portal, Text, Button, PaperProvider, Divider, SegmentedButtons, TextInput } from 'react-native-paper';
+import { Text, Button, PaperProvider, Divider, SegmentedButtons, TextInput, useAnimatedKeyboardInset, IconButton,MD3Colors } from 'react-native-paper';
 import { CustomModal } from '@/components/ModalContainer';
 import { useRouter } from 'expo-router';
 import ItemList from '@/components/itemList';
+import vibrate from '@/utils/vibrate';
+import EditItemRow from '@/components/editItemRow';
+import { KeyboardAvoidingView, KeyboardStickyView } from 'react-native-keyboard-controller';
+import KeyBoardDismisView from '@/components/KeyBoardDismis';
+
 
 const items = () => {
   const { personData, setPersonData } = useData()
@@ -20,8 +25,8 @@ const items = () => {
   const [visible, setVisible] = useState(false)
   const [total, setTotal] = useState(0)
 
-  const [editItemModalShow, setEditItemModalShow] = useState(false)
-  const [editItem, setEditItem] = useState({productName: '', price: '', id: '', date: ''})
+  const [editItemModalShow, setEditItemModalShow] = useState(true)
+  const [selectedItem, setSelectedItem] = useState()
 
   const router = useRouter()
 
@@ -29,40 +34,40 @@ const items = () => {
 
 
 
-  useEffect(() => {
-    const fetchClientData = async () => {
-      try {
-        const clientRow = await fetchClientById()
-        const balance = Number(clientRow.balance) || 0
-        setClientData(clientRow)
+  // useEffect(() => {
+  //   const fetchClientData = async () => {
+  //     try {
+  //       const clientRow = await fetchClientById()
+  //       const balance = Number(clientRow.balance) || 0
+  //       setClientData(clientRow)
 
-        // Calculate unpaid total safely
-        const unpaidTotal = personData.reduce((acc, item) => {
-          const price = Number(item.price) || 0
-          return !item.paid ? acc + price : acc
-        }, 0)
+  //       // Calculate unpaid total safely
+  //       const unpaidTotal = personData.reduce((acc, item) => {
+  //         const price = Number(item.price) || 0
+  //         return !item.paid ? acc + price : acc
+  //       }, 0)
 
-        setTotal(unpaidTotal + balance)
-      } catch (error) {
-        console.log("Error fetching client data:", error)
-      }
-    }
+  //       setTotal(unpaidTotal + balance)
+  //     } catch (error) {
+  //       console.log("Error fetching client data:", error)
+  //     }
+  //   }
 
-    console.log("Items component has been mounted")
-    fetchClientData()
-  }, [personData])
+  //   console.log("Items component has been mounted")
+  //   fetchClientData()
+  // }, [personData])
 
 
-  useEffect(() => {
-    if (value === 'paid') {
-      setFilteredItems(personData.filter((item) => item.paid === true))
-    } else if (value === 'unpaid') {
-      setFilteredItems(personData.filter((item) => item.paid === false))
-    } else {
-      setFilteredItems(personData)
-    }
+  // useEffect(() => {
+  //   if (value === 'paid') {
+  //     setFilteredItems(personData.filter((item) => item.paid === true))
+  //   } else if (value === 'unpaid') {
+  //     setFilteredItems(personData.filter((item) => item.paid === false))
+  //   } else {
+  //     setFilteredItems(personData)
+  //   }
 
-  }, [value, personData])
+  // }, [value, personData])
 
   const setItemsToPaid = () => {
     const response = personData.filter((item) => item.paid === false)
@@ -97,8 +102,16 @@ const items = () => {
     router.replace('/')
   }
 
+  const hanldeLongPress = (item) => {
+    vibrate()
+    setSelectedItem(item)
+    setEditItemModalShow(true)
+  }
+
   return (
-    <PaperProvider>
+    <PaperProvider style={{
+      position: 'relative'
+    }}>
       <ScrollView style={styles.container}>
         <View
           style={{
@@ -167,8 +180,7 @@ const items = () => {
             filteredItems.map((item, index) => <ItemList
               key={index}
               item={item}
-              setEditItemModalShow={setEditItemModalShow}
-              setEditItem={setEditItem}
+              onLongPress={() => hanldeLongPress(item)}
             />)
           }
 
@@ -204,17 +216,84 @@ const items = () => {
           }
           visible={visible} setVisible={setVisible} />
 
-        <CustomModal
-          children={
-            <View sty>
-              <Text>{`Product ID: ${editItem?.id}`}</Text>
-            </View>
-          }
-          visible={editItemModalShow}
-          setVisible={setEditItemModalShow}
-        />
-
       </ScrollView>
+
+      {
+        editItemModalShow &&
+        <KeyBoardDismisView>
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.3)',
+              justifyContent: 'center'
+            }}
+          >
+            <KeyboardAvoidingView
+              behavior={"padding"}
+              keyboardVerticalOffset={100}
+            >
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  padding: 10,
+                  width: '90%',
+                  maxWidth: 350,
+                  alignSelf: 'center',
+                  borderRadius: 10,
+                  elevation: 4,
+                }}
+              >
+                <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+                >
+                  <Text
+                    variant='titleLarge'
+                    style={{
+                      fontWeight: 'bold',
+                    }}
+                  >Item Details</Text>
+                  <IconButton
+                    icon="trash-can"
+                    mode='contained'
+                    size={20}
+                    onPress={() => console.log('Pressed')}
+                  />
+                </View>
+                <EditItemRow label='Name:' value="Mantika" />
+                <EditItemRow label='Price:' value="50" />
+                <EditItemRow label='Purchase Date:' value="2024-01-15" />
+
+                <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                  gap: 10,
+                  marginTop: 15,
+                }}>
+                  <Button
+                    mode='contained'
+                    buttonColor='lightgray'
+                    textColor='black' 
+                    onPress={() => setEditItemModalShow(false)}
+                    >Cancel</Button>
+                  <Button mode='contained' style={{
+                  }}>Edit Item</Button>
+                </View>
+
+              </View>
+            </KeyboardAvoidingView>
+          </View>
+        </KeyBoardDismisView>
+      }
+
+
     </PaperProvider>
   )
 }

@@ -2,7 +2,7 @@ import { Pressable, View, Alert, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import { Text, Divider, Button } from 'react-native-paper';
-import vibrate from '@/utils/vibrate'
+
 
 
 function formatAppwriteDate(createdAt) {
@@ -33,16 +33,11 @@ const Unpaid = () => (
   </View>
 )
 
-const ItemList = ({ item, setEditItemModalShow, setEditItem }) => {
+const ItemList = ({ item, onLongPress}) => {
 
-  const handleItemLongPress = () => {
-    vibrate()
-    setEditItem({productName: item.productName, price: item.price, id: item.$id})
-    setEditItemModalShow(true)
-  }
 
   return (
-    <Pressable onLongPress={handleItemLongPress}>
+    <Pressable onLongPress={onLongPress}>
       <View style={{
         flexDirection: 'row',
         paddingVertical: 8,

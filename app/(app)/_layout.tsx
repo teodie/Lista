@@ -1,6 +1,5 @@
 import { Tabs, useNavigation, useRouter } from 'expo-router';
 import 'react-native-reanimated';
-import Payment from '@/components/Payment';
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator, TouchableOpacity, StatusBar } from 'react-native';
@@ -9,6 +8,7 @@ import { ClientProvider } from '@/utils/client-context';
 import { ItemsProvider } from '@/utils/items-context';
 import { FontAwesome, MaterialIcons, Feather, Entypo } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -19,7 +19,7 @@ function RouteGaurd({ children }: { children: React.ReactNode }) {
     if (!user && !isLoadingUser) {
       router.replace("/login");
     } else if (user && !isLoadingUser) {
-      router.replace("/");
+      router.replace("/items");
     }
   }, [user, isLoadingUser]);
 

@@ -123,7 +123,6 @@ const changepass = () => {
   }
 
   return (
-    <KeyboardProvider>
       <KeyBoardDismisView>
         <SafeAreaView style={{ flex: 1, paddingHorizontal: 10 }}>
 
@@ -191,7 +190,6 @@ const changepass = () => {
 
         </SafeAreaView>
       </KeyBoardDismisView>
-    </KeyboardProvider>
   )
 }
 

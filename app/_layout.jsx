@@ -3,6 +3,7 @@ import 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AuthProvider from '@/utils/auth-context'
 import DataProvider from '@/utils/userdata-context'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 
 export default function RootLayout() {
   const segment = useSegments()
@@ -10,12 +11,15 @@ export default function RootLayout() {
     <GestureHandlerRootView>
       <DataProvider>
         <AuthProvider>
-          <Stack>
-            <Stack.Screen name='(app)' options={{ headerShown: false, 
-              statusBarStyle: segment.includes("add") || segment.length === 1  ? 'light' : 'dark' 
+          <KeyboardProvider>
+            <Stack>
+              <Stack.Screen name='(app)' options={{
+                headerShown: false,
+                statusBarStyle: segment.includes("add") || segment.length === 1 ? 'light' : 'dark'
               }} />
-            <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-          </Stack>
+              <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+            </Stack>
+          </KeyboardProvider>
         </AuthProvider>
       </DataProvider>
     </GestureHandlerRootView >

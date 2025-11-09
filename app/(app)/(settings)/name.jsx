@@ -41,7 +41,6 @@ const name = () => {
   }
 
   return (
-    <KeyboardProvider>
       <KeyBoardDismisView>
         <SafeAreaView style={{ flex: 1, paddingHorizontal: 10}}>
 
@@ -91,7 +90,6 @@ const name = () => {
 
         </SafeAreaView>
       </KeyBoardDismisView>
-    </KeyboardProvider>
   )
 }
 
