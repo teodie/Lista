@@ -1,8 +1,14 @@
 import { View, Text, TextInput } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Divider } from 'react-native-paper'
 
-const EditItemRow = ({ value, label }) => {
+const EditItemRow = ({ value, label, field,  handleOnchageText }) => {
+  const [val, setVal] = useState(value)
+  
+  useEffect(() => {
+    handleOnchageText(field, val)
+  }, [val])
+
   return (
     <View>
       <View style={{
@@ -12,11 +18,9 @@ const EditItemRow = ({ value, label }) => {
       }}>
         <Text>{label}</Text>
         <TextInput
-          style={{
-            flex: 1,
-            textAlign: 'right'
-          }}
-          value={value}
+          style={{ flex: 1, textAlign: 'right' }}
+          value={val}
+          onChangeText={setVal}
         />
       </View>
       <Divider />

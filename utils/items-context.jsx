@@ -61,7 +61,6 @@ export const ItemsProvider = ({ children }) => {
         }
     }
 
-
     const updateItem = async (id, data) => {
         console.log("updating items now")
         try {
@@ -71,8 +70,6 @@ export const ItemsProvider = ({ children }) => {
                 id,
                 data
             )
-
-            console.log("response back: ", response)
         } catch (error) {
             console.log(error)
         }
@@ -84,7 +81,7 @@ export const ItemsProvider = ({ children }) => {
                 DATABASE_ID,
                 ITEMS_TABLE_ID,
                 id,
-                { ...data, userId: user.$id, paid: false, clientId: clientId, isSynced: false, client: clientId },
+                { ...data, userId: user.$id, paid: false, clientId: clientId, isSynced: false, client: clientId ,date: new Date().toLocaleDateString("en-US")},
                 [
                     Permission.read(Role.user(user.$id)),
                     Permission.update(Role.user(user.$id)),

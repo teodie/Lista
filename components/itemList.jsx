@@ -2,16 +2,8 @@ import { Pressable, View, Alert, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import { Text, Divider, Button } from 'react-native-paper';
+import { formatDate_MM_DD } from '@/utils/formatDate'
 
-
-
-function formatAppwriteDate(createdAt) {
-  const date = new Date(createdAt);
-  return date.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "short",
-  });
-}
 
 const Paid = () => (
   <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', gap: 5 }} >
@@ -45,7 +37,7 @@ const ItemList = ({ item, onLongPress}) => {
       }}>
         <Text style={{ flex: 3 }} >{item.productName}</Text>
         <Text style={{ flex: 1, textAlign: 'center' }} >{item.price}.00</Text>
-        <Text style={{ flex: 1, textAlign: 'center' }} >{formatAppwriteDate(item.$createdAt)}</Text>
+        <Text style={{ flex: 1, textAlign: 'center' }} >{formatDate_MM_DD(item.$createdAt)}</Text>
         {
           item.paid
             ? <Paid />

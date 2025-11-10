@@ -5,7 +5,7 @@ import { useClient } from '@/utils/client-context';
 import { useItems } from '@/utils/items-context';
 import { Ionicons } from '@expo/vector-icons'
 import { ScrollView } from 'react-native-gesture-handler';
-import { Text, Button, PaperProvider, Divider, SegmentedButtons, TextInput, useAnimatedKeyboardInset, IconButton,MD3Colors } from 'react-native-paper';
+import { Text, Button, PaperProvider, Divider, SegmentedButtons, TextInput, IconButton } from 'react-native-paper';
 import { CustomModal } from '@/components/ModalContainer';
 import { useRouter } from 'expo-router';
 import ItemList from '@/components/itemList';
@@ -13,19 +13,22 @@ import vibrate from '@/utils/vibrate';
 import EditItemRow from '@/components/editItemRow';
 import { KeyboardAvoidingView, KeyboardStickyView } from 'react-native-keyboard-controller';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
+import { formatDate_MM_DD_YYYY } from '@/utils/formatDate';
+import toast from '@/utils/toast';
+import Overlay from '@/components/Overlay';
 
 
 const items = () => {
   const { personData, setPersonData } = useData()
   const [clientData, setClientData] = useState([])
-  const { updateItem } = useItems()
+  const { updateItem, deleteItem } = useItems()
   const { fetchClientById, clientId, updateClient } = useClient()
   const [value, setValue] = useState('unpaid');
   const [filteredItems, setFilteredItems] = useState([])
   const [visible, setVisible] = useState(false)
   const [total, setTotal] = useState(0)
 
-  const [editItemModalShow, setEditItemModalShow] = useState(true)
+  const [editItemModalShow, setEditItemModalShow] = useState(false)
   const [selectedItem, setSelectedItem] = useState()
 
   const router = useRouter()
@@ -34,40 +37,40 @@ const items = () => {
 
 
 
-  // useEffect(() => {
-  //   const fetchClientData = async () => {
-  //     try {
-  //       const clientRow = await fetchClientById()
-  //       const balance = Number(clientRow.balance) || 0
-  //       setClientData(clientRow)
+  useEffect(() => {
+    const fetchClientData = async () => {
+      try {
+        const clientRow = await fetchClientById()
+        const balance = Number(clientRow.balance) || 0
+        setClientData(clientRow)
 
-  //       // Calculate unpaid total safely
-  //       const unpaidTotal = personData.reduce((acc, item) => {
-  //         const price = Number(item.price) || 0
-  //         return !item.paid ? acc + price : acc
-  //       }, 0)
+        // Calculate unpaid total safely
+        const unpaidTotal = personData.reduce((acc, item) => {
+          const price = Number(item.price) || 0
+          return !item.paid ? acc + price : acc
+        }, 0)
 
-  //       setTotal(unpaidTotal + balance)
-  //     } catch (error) {
-  //       console.log("Error fetching client data:", error)
-  //     }
-  //   }
+        setTotal(unpaidTotal + balance)
+      } catch (error) {
+        console.log("Error fetching client data:", error)
+      }
+    }
 
-  //   console.log("Items component has been mounted")
-  //   fetchClientData()
-  // }, [personData])
+    console.log("Items component has been mounted")
+    fetchClientData()
+  }, [personData])
 
 
-  // useEffect(() => {
-  //   if (value === 'paid') {
-  //     setFilteredItems(personData.filter((item) => item.paid === true))
-  //   } else if (value === 'unpaid') {
-  //     setFilteredItems(personData.filter((item) => item.paid === false))
-  //   } else {
-  //     setFilteredItems(personData)
-  //   }
+  useEffect(() => {
+    if (value === 'paid') {
+      setFilteredItems(personData.filter((item) => item.paid === true))
+    } else if (value === 'unpaid') {
+      setFilteredItems(personData.filter((item) => item.paid === false))
+    } else {
+      setFilteredItems(personData)
+    }
 
-  // }, [value, personData])
+  }, [value, personData])
 
   const setItemsToPaid = () => {
     const response = personData.filter((item) => item.paid === false)
@@ -108,6 +111,90 @@ const items = () => {
     setEditItemModalShow(true)
   }
 
+  const confirmAlert = (title, message) => {
+    return new Promise((resolve) => {
+      Alert.alert(
+        title,
+        message,
+        [
+          { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+          { text: 'Delete', style: 'default', onPress: () => resolve(true) },
+        ],
+        { cancelable: false }
+      )
+    }
+    )
+  }
+
+  const deleteItemToTheDatabase = async (id, item) => {
+
+    const confirmed = await confirmAlert(
+      `Delete Item`,
+      `This action is ireversable. Deleting item ${item.productName} with a cost of ${item.price} will be permanently deleted.`
+    )
+
+    if (!confirmed) return 'failed'
+
+    await deleteItem(id)
+    toast("Item deleted")
+    return 'success'
+  }
+
+  const deleteItemToLocalState = (id) => {
+    setPersonData(
+      personData.filter(
+        (item) =>
+          item.$id !== id
+      )
+    )
+  }
+
+  const updateClientBalance = async (newItemsTotal) => {
+
+    await updateClient(clientId, { itemsTotal: newItemsTotal })
+  }
+
+  const handleDeleteItem = async (id, item) => {
+
+    if (await deleteItemToTheDatabase(id, item) === 'failed') return console.log("Failed to delete")
+
+    deleteItemToLocalState(id)
+
+    updateClientBalance(total - item.price)
+
+    setEditItemModalShow(false)
+  }
+
+  const handleOnchageText = (field, value) => {
+    setSelectedItem({ ...selectedItem, [field]: field === 'price' ? Number(value) : value })
+  }
+
+  const calculateTheItemsTotal = (items) => {
+    const itemsTotal = items.reduce((acc, item) => {
+
+      if (item.$id !== selectedItem.$id) {
+        return acc + item.price
+      }
+      return acc + 0
+    }, 0)
+
+    return itemsTotal
+  }
+
+  const handleSubmit = () => {
+
+    // update the item to the database
+    updateItem(selectedItem.$id, selectedItem)
+    // update the local state
+    setPersonData(personData.map((item) => item.$id === selectedItem.$id ? selectedItem : item))
+
+    const itemsTotal = calculateTheItemsTotal(personData)
+
+    updateClientBalance(itemsTotal + selectedItem.price)
+
+    setEditItemModalShow(false)
+  }
+
   return (
     <PaperProvider style={{
       position: 'relative'
@@ -116,7 +203,6 @@ const items = () => {
         <View
           style={{
             height: 90,
-            // borderWidth: 1,
             marginVertical: 10,
             paddingHorizontal: 10,
             borderRadius: 10,
@@ -220,77 +306,58 @@ const items = () => {
 
       {
         editItemModalShow &&
-        <KeyBoardDismisView>
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0,0,0,0.3)',
-              justifyContent: 'center'
-            }}
+        <Overlay>
+          <KeyboardAvoidingView
+            behavior={"padding"}
+            keyboardVerticalOffset={100}
           >
-            <KeyboardAvoidingView
-              behavior={"padding"}
-              keyboardVerticalOffset={100}
+            <View
+              style={{
+                backgroundColor: 'white',
+                padding: 10,
+                width: '90%',
+                maxWidth: 350,
+                alignSelf: 'center',
+                borderRadius: 10,
+                elevation: 4,
+              }}
             >
-              <View
-                style={{
-                  backgroundColor: 'white',
-                  padding: 10,
-                  width: '90%',
-                  maxWidth: 350,
-                  alignSelf: 'center',
-                  borderRadius: 10,
-                  elevation: 4,
-                }}
-              >
-                <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-                >
-                  <Text
-                    variant='titleLarge'
-                    style={{
-                      fontWeight: 'bold',
-                    }}
-                  >Item Details</Text>
-                  <IconButton
-                    icon="trash-can"
-                    mode='contained'
-                    size={20}
-                    onPress={() => console.log('Pressed')}
-                  />
-                </View>
-                <EditItemRow label='Name:' value="Mantika" />
-                <EditItemRow label='Price:' value="50" />
-                <EditItemRow label='Purchase Date:' value="2024-01-15" />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }} >
 
-                <View style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-end',
-                  gap: 10,
-                  marginTop: 15,
-                }}>
-                  <Button
-                    mode='contained'
-                    buttonColor='lightgray'
-                    textColor='black' 
-                    onPress={() => setEditItemModalShow(false)}
-                    >Cancel</Button>
-                  <Button mode='contained' style={{
-                  }}>Edit Item</Button>
-                </View>
+                <Text variant='titleLarge' style={{ fontWeight: 'bold', }} >Item Details</Text>
+                <IconButton icon="trash-can" mode='contained' size={20} onPress={() => handleDeleteItem(selectedItem.$id, selectedItem)} />
 
               </View>
-            </KeyboardAvoidingView>
-          </View>
-        </KeyBoardDismisView>
+
+              <EditItemRow label='Name:' value={selectedItem.productName} field="productName"
+                handleOnchageText={handleOnchageText}
+              />
+              <EditItemRow label='Price:' value={String(selectedItem.price)} field="price" handleOnchageText={handleOnchageText} />
+              <EditItemRow label='Purchase Date:' value={formatDate_MM_DD_YYYY(selectedItem.date)} field='date' handleOnchageText={handleOnchageText} />
+
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                gap: 10,
+                marginTop: 15,
+              }}>
+
+                <Button
+                  mode='outlined'
+                  textColor='black'
+                  onPress={() => setEditItemModalShow(false)}
+                >Cancel</Button>
+
+                <Button
+                  mode='contained'
+                  onPress={handleSubmit}
+                >Edit Item</Button>
+              </View>
+
+            </View>
+          </KeyboardAvoidingView>
+        </Overlay>
+
       }
 
 
@@ -307,58 +374,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
-  nameText: {
-    fontSize: 30,
-    fontWeight: "bold",
-  },
-  overView: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'lightgray',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
   },
-  headerTxt: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#5959B2',
-  },
-  itemsTxt: {
-    flex: 1,
-    textAlign: 'center'
-  },
-  totalTxt: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#5959B2',
-  },
-  totalContainer: {
-    alignItems: 'center'
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 15,
-  },
-  archieveContainer: {
-    borderWidth: 1,
-  },
-  bottomShadow: {
-    position: 'absolute',
-    bottom: 25, // distance from bottom of parent
-    left: 30,
-    right: 30,
-    height: 6,
-    borderRadius: 10,
-    backgroundColor: '#000',
-    opacity: 0.2,
-    elevation: 6,
-  },
-
 });
