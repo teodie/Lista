@@ -1,4 +1,4 @@
-import { Pressable, View, Alert, TextInput } from 'react-native'
+import { Pressable, View, Alert, TextInput, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import { Text, Divider, Button } from 'react-native-paper';
@@ -29,7 +29,7 @@ const ItemList = ({ item, onLongPress}) => {
 
 
   return (
-    <Pressable onLongPress={onLongPress}>
+    <TouchableOpacity onLongPress={onLongPress}>
       <View style={{
         flexDirection: 'row',
         paddingVertical: 8,
@@ -45,7 +45,7 @@ const ItemList = ({ item, onLongPress}) => {
         }
       </View>
       <Divider />
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 

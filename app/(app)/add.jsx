@@ -1,4 +1,4 @@
-import { Alert, Image, Keyboard, Linking, ScrollView, StyleSheet, TouchableOpacity, View, TouchableWithoutFeedback, ActivityIndicator } from 'react-native'
+import { Alert, Image, Keyboard, Linking, ScrollView, StyleSheet, TouchableOpacity, View, TouchableWithoutFeedback, ActivityIndicator, Pressable } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import React, { useState } from 'react'
@@ -12,6 +12,9 @@ import { ID, Permission, Role } from 'react-native-appwrite';
 import { storage } from '@/utils/appWrite';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomSheet from '@/components/BottomSheet';
+import Animated, { useSharedValue } from 'react-native-reanimated';
 
 const add = () => {
   const [cameraPermission, setCameraPermission] = useCameraPermissions();
@@ -25,11 +28,15 @@ const add = () => {
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
 
-  const [bottomSheet, showBottomSheet] = useState(false)
-
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [limit, setLimit] = useState("7000")
+
+  const isOpen = useSharedValue(false);
+
+  const bottomSheetVisible = (value) => {
+    isOpen.value = value
+  };
 
   const nameAlreadyExist = (name) => {
     const nameAlreadyExist = clients.find((item) => item.name.toLowerCase() === name.trim().toLowerCase())
@@ -194,7 +201,7 @@ const add = () => {
     // console.log("camera: ", JSON.stringify(cameraPermission, null, 2))
     // console.log("media: ", JSON.stringify(mediaPermission, null, 2))
     hideTabBar()
-    showBottomSheet(true)
+    bottomSheetVisible(true)
   }
 
   const Calindar = () => {
@@ -233,34 +240,48 @@ const add = () => {
     )
   }
 
-  const BottomSheet = () => {
-
-    const handleUploadPress = () => {
-      askMediaPermission()
-      pickImage()
-      showBottomSheet(false)
-      showTabBar()
-    }
-
-    const handleTakeAPhotoPress = () => {
-      askCameraPermission()
-      takeAPhoto()
-      showBottomSheet(false)
-      showTabBar()
-    }
-
-    return (
-      <View style={{ backgroundColor: 'rgba(61, 55, 55, 0.23)', zIndex: 1 }}>
-        <View style={{ width: '100%', backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 10, zIndex: 2 }}>
-
-          <View style={{ height: 5, backgroundColor: 'gray', width: 50, alignSelf: 'center', borderRadius: 2.5, marginTop: 10, marginBottom: 10 }} />
-          <Button mode='outlined' onPress={handleTakeAPhotoPress} style={{ marginBottom: 20 }}>Take a photo</Button>
-          <Button mode='outlined' onPress={handleUploadPress} style={{ marginBottom: 30 }} >Upload</Button>
-        </View>
-
-      </View>
-    )
+  const handleUploadPress = () => {
+    askMediaPermission()
+    pickImage()
+    showTabBar()
+    bottomSheetVisible(false)
   }
+
+  const handleTakeAPhotoPress = () => {
+    askCameraPermission()
+    takeAPhoto()
+    showTabBar()
+    bottomSheetVisible(false)
+  }
+
+  // const BottomSheet = () => {
+
+  //   const handleUploadPress = () => {
+  //     askMediaPermission()
+  //     pickImage()
+  //     showBottomSheet(false)
+  //     showTabBar()
+  //   }
+
+  //   const handleTakeAPhotoPress = () => {
+  //     askCameraPermission()
+  //     takeAPhoto()
+  //     showBottomSheet(false)
+  //     showTabBar()
+  //   }
+
+  //   return (
+  //     <View style={{ backgroundColor: 'rgba(61, 55, 55, 0.23)', zIndex: 1 }}>
+  //       <View style={{ width: '100%', backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 10, zIndex: 2 }}>
+
+  //         <View style={{ height: 5, backgroundColor: 'gray', width: 50, alignSelf: 'center', borderRadius: 2.5, marginTop: 10, marginBottom: 10 }} />
+  // <Button mode='outlined' onPress={handleTakeAPhotoPress} style={{ marginBottom: 20 }}>Take a photo</Button>
+  // <Button mode='outlined' onPress={handleUploadPress} style={{ marginBottom: 30 }} >Upload</Button>
+  // </View>
+
+  //     </View>
+  //   )
+  // }
 
   const hideTabBar = () => {
     navigation.setOptions({ tabBarStyle: { display: 'none' } });
@@ -271,6 +292,7 @@ const add = () => {
   }
 
   return (
+
     <KeyBoardDismisView>
       <View style={{ position: 'relative', flex: 1 }}>
 
@@ -283,9 +305,12 @@ const add = () => {
         }
 
 
-        <View style={{ paddingHorizontal: 10, backgroundColor: bottomSheet ? 'black' : '', opacity: bottomSheet ? .2 : 1 }}>
+        <View style={{ paddingHorizontal: 10 }}>
           <TouchableOpacity
-            onPress={handleAvatarPress}
+            onPress={() => {
+              hideTabBar()
+              bottomSheetVisible(true)
+            }}
             style={{ alignItems: 'center', alignSelf: 'center', position: 'relative', height: 90, width: 90, borderRadius: 45, marginBottom: 20 }}>
 
             {image
@@ -337,9 +362,15 @@ const add = () => {
           <Button mode='contained' onPress={handleSavePress} style={{ backgroundColor: '#5959B2' }}>Save</Button>
         </View>
 
-        {bottomSheet && <BottomSheet />}
+        <BottomSheet isOpen={isOpen} bottomSheetVisible={bottomSheetVisible}>
+          <Button mode='outlined' onPress={handleTakeAPhotoPress} style={{ marginBottom: 20 }}>Take a photo</Button>
+          <Button mode='outlined' onPress={handleUploadPress} style={{ marginBottom: 30 }} >Upload</Button>
+        </BottomSheet>
+
+
       </View>
     </KeyBoardDismisView>
+
   )
 }
 
@@ -351,5 +382,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     marginBottom: 15,
+  },
+  buttonContainer: {
+    marginTop: 16,
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-around',
+  },
+  bottomSheetButton: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingBottom: 2,
+  },
+  bottomSheetButtonText: {
+    fontWeight: 600,
+    textDecorationLine: 'underline',
   },
 })
