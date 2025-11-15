@@ -11,6 +11,7 @@ import Toggle from './Toggle';
 import { useData } from '@/utils/userdata-context';
 import { useItems } from '@/utils/items-context';
 import { useClient } from '@/utils/client-context';
+import TextScaled from './TextScaled';
 
 const AddItems = () => {
   const { createItem, fetchClientItems } = useItems()
@@ -162,8 +163,8 @@ const AddItems = () => {
 
           <Divider style={{ height: 1.5, marginBottom: 10 }} />
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, color: '#281344' }}>Subtotal:</Text>
-            <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#281344' }}>{subTotal}.00</Text>
+            <TextScaled fontSize={20} style={{ color: '#281344' }}>Subtotal:</TextScaled>
+            <TextScaled fontSize={30} style={{fontWeight: 'bold', color: '#281344' }}>{subTotal}.00</TextScaled>
           </View>
           <View style={{
             alignSelf: 'center',

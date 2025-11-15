@@ -15,6 +15,7 @@ import { KeyboardAvoidingView, KeyboardStickyView } from 'react-native-keyboard-
 import { formatDate_MM_DD_YYYY } from '@/utils/formatDate';
 import toast from '@/utils/toast';
 import Overlay from '@/components/Overlay';
+import TextScaled from '@/components/TextScaled';
 
 
 const items = () => {
@@ -217,14 +218,19 @@ const items = () => {
                 : <Ionicons name="person-circle-sharp" size={55} color='#5959B2' />
             }
             <View>
-              <Text style={{color: 'black', fontSize: 25, fontWeight: 500, color: 'black' }}>{clientData.name}</Text>
-              <Text style={{color: 'black'}} >Balance: {clientData.balance}</Text>
+              <TextScaled 
+              style={{ color: 'black', fontWeight: 500, color: 'black' }} 
+              fontSize={25}
+              >{clientData.name}</TextScaled>
+              <TextScaled style={{ color: 'black' }} >Balance: {clientData.balance}</TextScaled>
             </View>
           </View>
 
           <View style={{ justifyContent: 'center', }}>
-            <Text style={{color: 'black'}}>Balance Due</Text>
-            <Text style={{ color: 'back', fontSize: 30, fontWeight: 700 }}>{total}.00</Text>
+            <TextScaled style={{ color: 'black' }}>Balance Due</TextScaled>
+            <TextScaled style={{ color: 'back', fontWeight: 700 }}
+              fontSize={30}
+            >{total}.00</TextScaled>
           </View>
         </View>
 
@@ -253,10 +259,9 @@ const items = () => {
           <View style={{
             flexDirection: 'row', marginVertical: 8,
           }}>
-            <Text style={{ color: 'black', fontWeight: 700, flex: 3, textAlign: 'center' }} >Item</Text>
-            <Text style={{color: 'black', fontWeight: 700, flex: 1, textAlign: 'center' }} >Amount</Text>
-            <Text style={{color: 'black', fontWeight: 700, flex: 1, textAlign: 'center' }} >Date</Text>
-            <Text style={{color: 'black', fontWeight: 700, flex: 1, textAlign: 'center' }} >Status</Text>
+            <TextScaled style={{ color: 'black', fontWeight: 700, flex: 3, textAlign: 'center' }} >Item</TextScaled>
+            <TextScaled style={{ color: 'black', fontWeight: 700, flex: 1, textAlign: 'center' }} >Amount</TextScaled>
+            <TextScaled style={{ color: 'black', fontWeight: 700, flex: 1, textAlign: 'center' }} >Date</TextScaled>
           </View>
 
           <Divider />
@@ -285,18 +290,18 @@ const items = () => {
           children={
             <View style={{ width: '80%', gap: 20, alignSelf: 'center' }}>
               <View style={{ alignSelf: 'center', alignItems: 'center' }}>
-                <Text>Total Amount:</Text>
-                <Text style={{ fontSize: 30, fontWeight: 700 }}>{total}</Text>
+                <TextScaled>Total Amount:</TextScaled>
+                <TextScaled style={{ fontWeight: 700 }} fontSize={30}>{total}</TextScaled>
               </View>
               <TextInput
-                label="Tendered Amount"
+                label="Binayad"
                 keyboardType='numeric'
                 value={payment}
                 onChangeText={setPayment}
               />
               <Button mode='contained'
                 onPress={handlePaymentPress}
-              >Submit</Button>
+              >Pay</Button>
             </View>
           }
           visible={visible} setVisible={setVisible} />
@@ -323,7 +328,7 @@ const items = () => {
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }} >
 
-                <Text variant='titleLarge' style={{color: 'black', fontWeight: 'bold', }} >Item Details</Text>
+                <Text variant='titleLarge' style={{ color: 'black', fontWeight: 'bold', }} >Item Details</Text>
                 <IconButton icon="trash-can" mode='contained' size={20} onPress={() => handleDeleteItem(selectedItem.$id, selectedItem)} />
 
               </View>

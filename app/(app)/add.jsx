@@ -12,7 +12,6 @@ import { ID, Permission, Role } from 'react-native-appwrite';
 import { storage } from '@/utils/appWrite';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomSheet from '@/components/BottomSheet';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 
@@ -197,13 +196,6 @@ const add = () => {
     }
   }
 
-  const handleAvatarPress = () => {
-    // console.log("camera: ", JSON.stringify(cameraPermission, null, 2))
-    // console.log("media: ", JSON.stringify(mediaPermission, null, 2))
-    hideTabBar()
-    bottomSheetVisible(true)
-  }
-
   const Calindar = () => {
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
@@ -243,45 +235,16 @@ const add = () => {
   const handleUploadPress = () => {
     askMediaPermission()
     pickImage()
-    showTabBar()
     bottomSheetVisible(false)
+    showTabBar()
   }
 
   const handleTakeAPhotoPress = () => {
     askCameraPermission()
     takeAPhoto()
-    showTabBar()
     bottomSheetVisible(false)
+    showTabBar()
   }
-
-  // const BottomSheet = () => {
-
-  //   const handleUploadPress = () => {
-  //     askMediaPermission()
-  //     pickImage()
-  //     showBottomSheet(false)
-  //     showTabBar()
-  //   }
-
-  //   const handleTakeAPhotoPress = () => {
-  //     askCameraPermission()
-  //     takeAPhoto()
-  //     showBottomSheet(false)
-  //     showTabBar()
-  //   }
-
-  //   return (
-  //     <View style={{ backgroundColor: 'rgba(61, 55, 55, 0.23)', zIndex: 1 }}>
-  //       <View style={{ width: '100%', backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 10, zIndex: 2 }}>
-
-  //         <View style={{ height: 5, backgroundColor: 'gray', width: 50, alignSelf: 'center', borderRadius: 2.5, marginTop: 10, marginBottom: 10 }} />
-  // <Button mode='outlined' onPress={handleTakeAPhotoPress} style={{ marginBottom: 20 }}>Take a photo</Button>
-  // <Button mode='outlined' onPress={handleUploadPress} style={{ marginBottom: 30 }} >Upload</Button>
-  // </View>
-
-  //     </View>
-  //   )
-  // }
 
   const hideTabBar = () => {
     navigation.setOptions({ tabBarStyle: { display: 'none' } });
@@ -366,7 +329,6 @@ const add = () => {
           <Button mode='outlined' onPress={handleTakeAPhotoPress} style={{ marginBottom: 20 }}>Take a photo</Button>
           <Button mode='outlined' onPress={handleUploadPress} style={{ marginBottom: 30 }} >Upload</Button>
         </BottomSheet>
-
 
       </View>
     </KeyBoardDismisView>

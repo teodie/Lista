@@ -1,3 +1,4 @@
+import { useNavigation } from 'expo-router';
 import React from 'react';
 import {
   StyleSheet,
@@ -20,6 +21,8 @@ function BottomSheet({ isOpen, bottomSheetVisible, duration = 500, children }) {
     withTiming(isOpen.value ? 0 : 1, { duration })
   );
 
+  const navigation = useNavigation()
+
   const insets = useSafeAreaInsets();
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: progress.value * 2 * height.value }],
@@ -36,11 +39,16 @@ function BottomSheet({ isOpen, bottomSheetVisible, duration = 500, children }) {
       : withDelay(duration, withTiming(-1, { duration: 0 })),
   }));
 
+    const showTabBar = () => {
+    navigation.setOptions({ tabBarStyle: { display: 'flex' } })
+  }
+
   return (
     <>
       <Animated.View style={[sheetStyles.backdrop, backdropStyle]}>
         <TouchableOpacity style={{ flex: 1 }} onPress={ () => {
-          isOpen.value && bottomSheetVisible(false)
+          isOpen.value && bottomSheetVisible(false) 
+          showTabBar()
           }} />
       </Animated.View>
       <Animated.View
@@ -61,7 +69,7 @@ const sheetStyles = StyleSheet.create({
   sheet: {
     paddingRight: '2rem',
     paddingLeft: '2rem',
-    height: 150,
+    height: 200,
     width: '100%',
     position: 'absolute',
     bottom: 0,

@@ -11,6 +11,7 @@ import Animated, { LinearTransition } from 'react-native-reanimated';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
+import TextScaled from '@/components/TextScaled';
 
 const explore = () => {
   const { mode, setMode, personData } = useData()

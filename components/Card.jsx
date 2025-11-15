@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image, TouchableWithoutFeedback } from 'react-native'
 import React, { useState } from 'react'
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { MODE } from '@/constants/mode';
@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import { useItems } from '@/utils/items-context';
-import { setParams } from 'expo-router/build/global-state/routing';
+import TextScaled from './TextScaled';
 
 const Card = ({ data }) => {
     const { setMode, setPersonData } = useData()
@@ -49,29 +49,41 @@ const Card = ({ data }) => {
     }
 
 
-
     return (
-        <View style={styles.card}>
+        <TouchableWithoutFeedback>
+            <View style={styles.card}>
 
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 20, flex: 3, height: '100%', marginLeft: 5 }} onPress={handleNamePress}>
-                {
-                    data.avatar
-                        ? <Image source={{ uri: data.avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} />
-                        : <Ionicons name="person-circle-sharp" size={55} color='#5959B2' />
-                }
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 20, flex: 3, height: '100%', marginLeft: 5 }} onPress={handleNamePress}>
+                    {
+                        data.avatar
+                            ? <Image source={{ uri: data.avatar }} style={{ height: 45, width: 45, borderRadius: 23 }} />
+                            : <Ionicons name="person-circle-sharp" size={55} color='#5959B2' />
+                    }
 
-                <Text style={styles.headerTxt}>{format(data.name)}</Text>
-            </TouchableOpacity>
+                    <TextScaled
+                        style={{ fontWeight: "bold", }}
+                        fontSize={15}
+                    >{format(data.name)}
+                    </TextScaled>
+                </TouchableOpacity>
 
-            <View style={styles.balanceContainer} >
-                <Text style={styles.balanceTxt} > Payable: </Text>
-                <Text style={styles.totalBalanceTxt} >{data.itemsTotal + data.balance}</Text>
+                <View style={styles.balanceContainer} >
+                    <TextScaled style={{
+                        fontWeight: "300"
+                    }} 
+                    fontSize={15}
+                    > Payable: </TextScaled>
+                    <TextScaled
+                        style={{ fontWeight: "bold", color: "green" }}
+                        fontSize={25}
+                    >{data.itemsTotal + data.balance}</TextScaled>
+                </View>
+
+                <TouchableOpacity style={styles.addIcon} onPress={handleAddItems}>
+                    <MaterialIcons name='add' size={40} color="#E8E8E8" />
+                </TouchableOpacity>
             </View>
-
-            <TouchableOpacity style={styles.addIcon} onPress={handleAddItems}>
-                <MaterialIcons name='add' size={40} color="#E8E8E8" />
-            </TouchableOpacity>
-        </View>
+        </TouchableWithoutFeedback>
     );
 }
 
