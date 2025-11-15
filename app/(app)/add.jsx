@@ -294,35 +294,12 @@ const add = () => {
 
           <TextInput
             mode='outlined'
-            label='Last Name'
+            label='Last Name (Optional)'
             value={lastName}
             onChangeText={setLastName}
           />
-          <Text
-            style={{
-              alignSelf: 'center',
-              marginTop: 20,
-              color: '#5959B2',
-              fontWeight: '800'
-            }}
-            variant='titleLarge'
-          >
-            Credit Limit
-          </Text>
 
-
-          <TextInput
-            style={{ width: 100, alignSelf: 'center' }}
-            mode='outlined'
-            label='Limit'
-            value={limit}
-            keyboardType='numeric'
-            onChangeText={setLimit}
-          />
-
-          <Calindar />
-
-          <Button mode='contained' onPress={handleSavePress} style={{ backgroundColor: '#5959B2' }}>Save</Button>
+          <Button mode='contained' onPress={handleSavePress} style={{ backgroundColor: '#5959B2', marginTop: 10 }}>Save</Button>
         </View>
 
         <BottomSheet isOpen={isOpen} bottomSheetVisible={bottomSheetVisible}>

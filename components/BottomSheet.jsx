@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -13,6 +14,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import KeyBoardDismisView from './KeyBoardDismis';
 
 
 function BottomSheet({ isOpen, bottomSheetVisible, duration = 500, children }) {
@@ -41,6 +43,7 @@ function BottomSheet({ isOpen, bottomSheetVisible, duration = 500, children }) {
 
     const showTabBar = () => {
     navigation.setOptions({ tabBarStyle: { display: 'flex' } })
+    Keyboard.dismiss()
   }
 
   return (
