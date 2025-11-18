@@ -13,6 +13,12 @@ const AuthContext = createContext(undefined)
 export default AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [isLoadingUser, setIsLoadingUser] = useState(true)
+
+  useEffect(() => {
+    // Check if we're returning from OAuth
+    handleOAuthRedirect();
+    getUser();
+  }, []);
   
   const android_OAuth = async () => {
 
@@ -83,12 +89,6 @@ export default AuthProvider = ({ children }) => {
       return "Failed to get OAuth redirect URL";
     }
   }
-
-  useEffect(() => {
-    // Check if we're returning from OAuth
-    handleOAuthRedirect();
-    getUser();
-  }, []);
 
   const handleOAuthRedirect = async () => {
 

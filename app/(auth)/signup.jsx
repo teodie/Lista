@@ -35,8 +35,9 @@ const reducer = (state, action) => {
 
 const signup = () => {
     const { signUp } = useAuth()
-    const { height, width, scale, fontScale } = useWindowDimensions()
+    const { height, width } = useWindowDimensions()
     const styles = createStyles(height, width)
+    const [loading, setLoading] = useState(false)
 
     const [state, dispatch] = useReducer(reducer, initialValue)
 
@@ -111,6 +112,7 @@ const signup = () => {
 
     const handleSignUp = async () => {
         Keyboard.dismiss()
+        setLoading(true)
 
         const duration = 50
         offset.value = withSequence(
@@ -122,16 +124,17 @@ const signup = () => {
         dispatch({ type: 'CLEAR-ERROR' })
 
         // Check username 
-        if (!usernameIsValid(state.name)) return vibrate()
+        if (!usernameIsValid(state.name)) return vibrate() && setLoading(false)
         // Check email 
-        if (!emailIsValid(state.email)) return vibrate()
+        if (!emailIsValid(state.email)) return vibrate() && setLoading(false)
         // Check password 
-        if (!passwordIsValid(state.password)) return vibrate()
+        if (!passwordIsValid(state.password)) return vibrate() && setLoading(false)
 
         // Check if email is already registred
         if (await emailAlreadyRegitered(state.email)) {
             vibrate()
             toastCenter("Email already Exist. Please go back to login screen.")
+            setLoading(false)
             return dispatch({
                 type: 'SET-ERROR',
                 field: 'emailError',
@@ -143,6 +146,7 @@ const signup = () => {
         const response = await signUp(state.email, state.password, state.name)
 
         if (response.status === 'SUCCESS') return router.replace('/login')
+        setLoading(false)
     }
 
     return (
@@ -161,6 +165,7 @@ const signup = () => {
                         >
 
                             <TextInput
+                                disabled={loading}
                                 label='Username'
                                 autoCapitalize='none'
                                 keyboardType='text'
@@ -179,6 +184,7 @@ const signup = () => {
                             style={state.emailError !== '' && jiggleAnimation}
                         >
                             <TextInput
+                                disabled={loading}
                                 label='email'
                                 autoCapitalize='none'
                                 keyboardType='email-address'
@@ -197,6 +203,7 @@ const signup = () => {
                             style={state.passwordError !== '' && jiggleAnimation}
                         >
                             <TextInput
+                                disabled={loading}
                                 label='password'
                                 autoCapitalize='none'
                                 secureTextEntry={state.eyeIsOpen}
@@ -213,8 +220,8 @@ const signup = () => {
                         {state.error !== '' && <ErrorMessage errorMessage={state.error} />}
 
                         <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()}>
-                            <Button mode='contained' buttonColor='#5959B2' onPress={handleSignUp} >
-                                Sign up
+                            <Button loading={loading} mode='contained' buttonColor='#5959B2' onPress={handleSignUp} >
+                                {loading ? '' : 'Sign up'}
                             </Button>
                         </Animated.View>
 

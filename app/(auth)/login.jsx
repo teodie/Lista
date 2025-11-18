@@ -45,7 +45,7 @@ const reducer = (state, action) => {
 const login = () => {
     // return <Redirect href="/notif" />
     const router = useRouter()
-    const { logIn, googleSignUp, setIsLoadingUser } = useAuth()
+    const { logIn, googleSignUp, isLoadingUser } = useAuth()
     const { height, width, scale, fontScale } = useWindowDimensions()
     const styles = createStyles(height, width)
     const theme = useTheme()
@@ -169,6 +169,7 @@ const login = () => {
                     <View style={styles.lower}>
                         <Animated.View entering={FadeInUp.duration(1000).springify()} style={state.emailError !== '' && startAnimation}>
                             <TextInput
+                                disabled={isLoadingUser}
                                 label='email'
                                 autoCapitalize='none'
                                 keyboardType='email-address'
@@ -186,6 +187,7 @@ const login = () => {
 
                         <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} style={state.passwordError !== '' && startAnimation} >
                             <TextInput
+                                disabled={isLoadingUser}
                                 label='password'
                                 autoCapitalize='none'
                                 secureTextEntry={state.eyeIsOpen}
@@ -214,13 +216,13 @@ const login = () => {
                         </Animated.View>
 
                         <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()}>
-                            <Button mode='contained' buttonColor='#5959B2' onPress={handleLogin} >
-                                Log in
+                            <Button loading={isLoadingUser} mode='contained' buttonColor='#5959B2' onPress={handleLogin} >
+                                {isLoadingUser ? '' : 'Log in'}
                             </Button>
                         </Animated.View>
 
                         <Animated.View entering={FadeInUp.delay(800).duration(1000).springify()}>
-                            <Button mode='outlined' icon={googleIcon} labelStyle={{ color: '' }} onPress={async () => {
+                            <Button disabled={isLoadingUser} mode='outlined' icon={googleIcon} labelStyle={{ color: '' }} onPress={async () => {
 
                                 const error = await googleSignUp();
                                 if (error) return dispatch({ type: 'ERROR', errorMsg: error });
