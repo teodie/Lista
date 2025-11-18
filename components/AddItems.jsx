@@ -48,8 +48,9 @@ const AddItems = () => {
 
       console.log("total of items on database: ", totalOfItemsOnDatabase)
       // udpate the itemtotal of the person on the database
+      const date = new Date()
       items.forEach(async (element) => {
-        await createItem({ productName: element.productName, price: element.price }, element.id)
+        await createItem({ productName: element.productName, price: element.price, date: date }, element.id)
       });
 
       const grandTotal = totalOfCurrentItems + totalOfItemsOnDatabase

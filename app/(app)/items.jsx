@@ -12,10 +12,11 @@ import ItemList from '@/components/itemList';
 import vibrate from '@/utils/vibrate';
 import EditItemRow from '@/components/editItemRow';
 import { KeyboardAvoidingView, KeyboardStickyView } from 'react-native-keyboard-controller';
-import { formatDate_MM_DD_YYYY } from '@/utils/formatDate';
+import { formatDate_MM_DD_YYYY, formateDate_LongMM_DD_YYYY } from '@/utils/formatDate';
 import toast from '@/utils/toast';
 import Overlay from '@/components/Overlay';
 import TextScaled from '@/components/TextScaled';
+import ItemsGroup from '@/components/ItemsGroup';
 
 
 const items = () => {
@@ -27,6 +28,7 @@ const items = () => {
   const [filteredItems, setFilteredItems] = useState([])
   const [visible, setVisible] = useState(false)
   const [total, setTotal] = useState(0)
+  const [dates, setDates] = useState()
 
   const [editItemModalShow, setEditItemModalShow] = useState(false)
   const [selectedItem, setSelectedItem] = useState()
@@ -34,8 +36,6 @@ const items = () => {
   const router = useRouter()
 
   const [payment, setPayment] = useState(0)
-
-
 
   useEffect(() => {
     const fetchClientData = async () => {
@@ -60,7 +60,6 @@ const items = () => {
     fetchClientData()
   }, [personData])
 
-
   useEffect(() => {
     if (value === 'paid') {
       setFilteredItems(personData.filter((item) => item.paid === true))
@@ -71,6 +70,13 @@ const items = () => {
     }
 
   }, [value, personData])
+
+  useEffect(() => {
+    if (filteredItems !== null) {
+      setDates([...new Set(filteredItems.map(item => item.date))])
+    }
+
+  }, [filteredItems])
 
   const setItemsToPaid = () => {
     const response = personData.filter((item) => item.paid === false)
@@ -103,12 +109,6 @@ const items = () => {
     setPayment(0)
     setVisible(false)
     router.replace('/')
-  }
-
-  const hanldeLongPress = (item) => {
-    vibrate()
-    setSelectedItem(item)
-    setEditItemModalShow(true)
   }
 
   const confirmAlert = (title, message) => {
@@ -218,9 +218,9 @@ const items = () => {
                 : <Ionicons name="person-circle-sharp" size={55} color='#5959B2' />
             }
             <View>
-              <TextScaled 
-              style={{ color: 'black', fontWeight: 500, color: 'black' }} 
-              fontSize={25}
+              <TextScaled
+                style={{ color: 'black', fontWeight: 500, color: 'black' }}
+                fontSize={25}
               >{clientData.name}</TextScaled>
               <TextScaled style={{ color: 'black' }} >Balance: {clientData.balance}</TextScaled>
             </View>
@@ -254,27 +254,17 @@ const items = () => {
           ]}
         />
 
-        <View style={{ flex: 1 }}>
-
-          <View style={{
-            flexDirection: 'row', marginVertical: 8,
-          }}>
-            <TextScaled style={{ color: 'black', fontWeight: 700, flex: 3, textAlign: 'center' }} >Item</TextScaled>
-            <TextScaled style={{ color: 'black', fontWeight: 700, flex: 1, textAlign: 'center' }} >Amount</TextScaled>
-            <TextScaled style={{ color: 'black', fontWeight: 700, flex: 1, textAlign: 'center' }} >Date</TextScaled>
-          </View>
-
-          <Divider />
-
-          {
-            filteredItems.map((item, index) => <ItemList
-              key={index}
-              item={item}
-              onLongPress={() => hanldeLongPress(item)}
-            />)
-          }
-
-        </View>
+        {
+          dates && filteredItems &&
+          dates.map((date) => (
+            <ItemsGroup
+              items={filteredItems}
+              date={date}
+              setSelectedItem={setSelectedItem}
+              setEditItemModalShow={setEditItemModalShow}
+            />
+          ))
+        }
 
         {
           value === 'unpaid' &&

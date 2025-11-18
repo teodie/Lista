@@ -16,7 +16,6 @@ export const ClientProvider = ({ children }) => {
     const CLIENTS_TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_CLIENTS_TABLE_ID
 
     const fetchClientById = async () => {
-        console.log("fetching client data row")
         try {
             const response = await tablesDB.getRow(
                 DATABASE_ID,
