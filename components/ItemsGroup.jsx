@@ -15,7 +15,7 @@ const ItemsGroup = ({ items, date, setSelectedItem, setEditItemModalShow }) => {
   }
 
   return (
-    <View style={{ flex: 1, borderWidth: 1, paddingHorizontal: 10, marginVertical: 5, elivation: 4, borderRadius: 10, }}>
+    <View style={{ flex: 1, borderWidth: 1, paddingHorizontal: 10, marginVertical: 5, elivation: 4, borderRadius: 10, paddingVertical: 5, borderRadius: 5}}>
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text>{formateDate_LongMM_DD_YYYY(date)}</Text>
@@ -39,14 +39,14 @@ const ItemsGroup = ({ items, date, setSelectedItem, setEditItemModalShow }) => {
       }
 
       <View style={{ alignItems: 'flex-end' }}>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10}}>
           <Text>Total:</Text>
-          <Text>{ items.reduce((acc, item) => {
+          <TextScaled style={{ color: 'black', fontWeight: 700}} >{ items.reduce((acc, item) => {
             if(item.date === date){
               return acc + item.price
             }
             return acc 
-          }, 0)}</Text>
+          }, 0)}</TextScaled>
         </View>
 
       </View>

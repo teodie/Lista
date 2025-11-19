@@ -51,7 +51,6 @@ const BackIcon = () => (
 )
 
 export default function ScreenLayout() {
-  const router = useRouter()
 
   return (
     <SafeAreaProvider>

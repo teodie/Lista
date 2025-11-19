@@ -17,6 +17,7 @@ import toast from '@/utils/toast';
 import Overlay from '@/components/Overlay';
 import TextScaled from '@/components/TextScaled';
 import ItemsGroup from '@/components/ItemsGroup';
+import NoInternet from '@/components/NoInternet';
 
 
 const items = () => {
@@ -254,10 +255,13 @@ const items = () => {
           ]}
         />
 
+        <NoInternet />
+
         {
           dates && filteredItems &&
-          dates.map((date) => (
+          dates.map((date, index) => (
             <ItemsGroup
+              key={index}
               items={filteredItems}
               date={date}
               setSelectedItem={setSelectedItem}

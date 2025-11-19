@@ -7,8 +7,7 @@ import { useAuth } from '@/utils/auth-context'
 import { account } from '@/utils/appWrite'
 import { useRouter } from 'expo-router'
 import SettingList from '@/components/settingList'
-
-
+import NoInternet from '@/components/NoInternet'
 
 export default function Settings() {
   const { signOut, user } = useAuth()
@@ -67,6 +66,8 @@ export default function Settings() {
         </View>
       </View>
 
+      <NoInternet />
+
       <View style={{ flex: 1 }}>
         <View style={{
           backgroundColor: 'white',
@@ -86,7 +87,6 @@ export default function Settings() {
             )
           }
         </View>
-
       </View>
 
       <Button

@@ -11,7 +11,9 @@ import Animated, { LinearTransition } from 'react-native-reanimated';
 import { useData } from '@/utils/userdata-context';
 import { useClient } from '@/utils/client-context';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
-import TextScaled from '@/components/TextScaled';
+
+import NoInternet from '@/components/NoInternet';
+
 
 const explore = () => {
   const { mode, setMode, personData } = useData()
@@ -61,6 +63,9 @@ const explore = () => {
         </View>
 
         <View style={styles.cardContainer}>
+
+          <NoInternet />
+
           {filteredClients.length === 0 &&
             <Image
               style={{ height: 300, width: '100%', alignSelf: 'center', marginTop: 100 }}

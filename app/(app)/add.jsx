@@ -14,6 +14,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
 import BottomSheet from '@/components/BottomSheet';
 import Animated, { useSharedValue } from 'react-native-reanimated';
+import NoInternet from '@/components/NoInternet';
 
 const add = () => {
   const [cameraPermission, setCameraPermission] = useCameraPermissions();
@@ -267,7 +268,8 @@ const add = () => {
           </View>
         }
 
-
+        <NoInternet />
+        
         <View style={{ paddingHorizontal: 10 }}>
           <TouchableOpacity
             onPress={() => {
