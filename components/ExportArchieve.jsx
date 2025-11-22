@@ -1,25 +1,20 @@
-import { StyleSheet, Text, View, Pressable, Alert } from 'react-native'
-import { MaterialIcons, Feather } from '@expo/vector-icons'
-import React from 'react'
-import { exportToCSV } from '@/utils/jsonToCsv'
-import { fetchArchieveData } from '@/utils/fetchArchieveData'
-import NetInfo from "@react-native-community/netinfo";
+import { StyleSheet, Text, View } from 'react-native'
+import React, { useState } from 'react'
+import { IconButton } from 'react-native-paper'
+import * as Webrowser from 'expo-web-browser'
 
 const ExportArchieve = () => {
-    const { isConnected } = NetInfo.useNetInfo();
-    const handlePress = async () => {
-        // fetch all the archieve Data in the storage
-        const allArcieveData = await fetchArchieveData()
-        exportToCSV(allArcieveData, "Mga bayad na")
+    const HELPPAGE = 'https://690adc7100104c047198.syd.appwrite.run/help'
+
+    const handleHelpPress = async () => {
+        // open a browser with the linked for the instruction
+        let result = await Webrowser.openBrowserAsync(HELPPAGE)
     }
 
     return (
-        <View style={{ flexDirection: 'row', gap: 20, alignSelf: 'center', position: 'relative' }}>
-            <Pressable onPress={handlePress}>
-                <Feather name='download' size={30} color='#ffffff' />
-            </Pressable>
-            <MaterialIcons name="cloud" size={30} color="white" />
-            <View style={{height: 10, width: 10, backgroundColor: isConnected ? '#00FF01' : 'gray', borderRadius: 5, position: 'absolute', right: 0, top: 5,}}/>
+        <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
+            <IconButton icon="file-download-outline" iconColor='white' size={30} />
+            <IconButton icon="help-circle-outline" iconColor='white' size={30} onPress={handleHelpPress} />
         </View>
     )
 }

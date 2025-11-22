@@ -26,7 +26,6 @@ const explore = () => {
 
   const scrollRef = useRef(null);
 
-
   useEffect(() => {
     filterClient()
   }, [search, clients])
