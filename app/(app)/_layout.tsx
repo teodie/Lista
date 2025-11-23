@@ -9,7 +9,6 @@ import { ItemsProvider } from '@/utils/items-context';
 import { FontAwesome, MaterialIcons, Feather, Entypo } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function RouteGaurd({ children }: { children: React.ReactNode }) {
@@ -100,7 +99,7 @@ export default function ScreenLayout() {
               />
 
               <Tabs.Screen
-                name='(settings)'
+                name='settings'
                 options={{
                   title: 'Settings',
                   tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,

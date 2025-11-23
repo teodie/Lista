@@ -48,7 +48,7 @@ export const ItemsProvider = ({ children }) => {
                 ITEMS_TABLE_ID,
                 [
                     Query.equal('clientId', clientId),
-                    Query.limit(100),
+                    Query.limit(1000),
                 ]
             )
 

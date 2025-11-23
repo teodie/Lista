@@ -7,7 +7,7 @@ const SettingList = ({ icon, title, navigate, value }) => {
   const router = useRouter()
 
   const handlePress = () => {
-    router.push(`/(app)/(settings)/${navigate}`)
+    router.push(`/(app)/settings/${navigate}`)
   }
   return (
 

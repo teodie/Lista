@@ -1,6 +1,5 @@
 import { Stack } from 'expo-router';
 import 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function AuthLayout() {
 
@@ -8,6 +7,7 @@ export default function AuthLayout() {
     <Stack >
       <Stack.Screen name='index' options={{ headerShown: false }} />
       <Stack.Screen name='name' options={{ headerShown: false }} />
+      <Stack.Screen name='restore' options={{ headerShown: false }} />
       <Stack.Screen name='changepass' options={{
         title: 'Change Password',
       }} />

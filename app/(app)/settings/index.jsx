@@ -15,10 +15,10 @@ export default function Settings() {
   const sampleData = [
     { icon: 'person-outline', title: 'Name', navigate: 'name', value: user.name },
     { icon: 'lock-outline', title: 'Change Password', navigate: 'changepass', value: null },
+    { icon: 'settings-backup-restore', title: 'Restore', navigate: 'restore', value: null },
   ]
 
   const [list, setList] = useState([...sampleData])
-
 
 
   const firstName = user.prefs.given_name?.charAt(0).toUpperCase() + user.prefs.given_name?.slice(1)
@@ -43,9 +43,11 @@ export default function Settings() {
       flex: 1,
     }}>
       <View >
-        <Pressable onPress={() => { router.back() }} >
+        <TouchableOpacity onPress={() => { 
+          router.replace('/(app)/') 
+          }} >
           <Entypo name="chevron-left" size={40} color="black" />
-        </Pressable>
+        </TouchableOpacity>
         <View style={styles.avatarContainer} >
           {
             user.prefs.picture
