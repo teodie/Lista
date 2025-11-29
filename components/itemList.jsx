@@ -1,11 +1,6 @@
-import { Pressable, View, Alert, TextInput, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { FontAwesome } from '@expo/vector-icons'
-import { Text, Divider, Button } from 'react-native-paper';
-import { formatDate_MM_DD, formateDate_LongMM_DD_YYYY } from '@/utils/formatDate'
-
-
-
+import { Text, Divider } from 'react-native-paper';
 
 const ItemList = ({ item, onLongPress}) => {
 
