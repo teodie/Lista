@@ -22,7 +22,6 @@ const add = () => {
 
 
   const [image, setImage] = useState(null)
-  const [daySelected, setDaySelected] = useState([])
   const { createClient, clients } = useClient()
   const navigation = useNavigation()
   const { user } = useAuth()
@@ -30,7 +29,6 @@ const add = () => {
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [limit, setLimit] = useState("7000")
 
   const isOpen = useSharedValue(false);
 
@@ -102,7 +100,7 @@ const add = () => {
       avatar = await fetchClientAvatar(id)
     }
 
-    await createClient(name, id, parseInt(limit), daySelected, avatar)
+    await createClient(name, id, avatar)
     setLoading(false)
 
     navigation.navigate('index')
