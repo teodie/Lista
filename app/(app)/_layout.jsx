@@ -11,7 +11,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-function RouteGaurd({ children }: { children: React.ReactNode }) {
+function RouteGaurd({ children }) {
   const { user, isLoadingUser } = useAuth()
 
   useEffect(() => {
