@@ -13,7 +13,7 @@ import { storage } from '@/utils/appWrite';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import KeyBoardDismisView from '@/components/KeyBoardDismis';
 import BottomSheet from '@/components/BottomSheet';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import NoInternet from '@/components/NoInternet';
 
 const add = () => {
@@ -180,58 +180,6 @@ const add = () => {
     }
   }
 
-  const checkIfCanAskAgain = () => {
-    if (!cameraPermission.granted || !mediaPermission.granted) {
-      Alert.alert(
-        'Persmission needed',
-        'Please enable the permission in the app settings.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'ok',
-            style: 'default',
-            onPress: () => { Linking.openSettings() }
-          },
-        ]
-      )
-    }
-  }
-
-  const Calindar = () => {
-    const days = Array.from({ length: 31 }, (_, i) => i + 1);
-
-    return (
-      <View style={{ alignItems: 'center', alignSelf: 'center', borderWidth: 1, marginVertical: 20, borderRadius: 10 }}>
-        <View style={{ alignSelf: 'stretch', alignItems: 'center', paddingVertical: 10, backgroundColor: '#5959B2', borderTopLeftRadius: 9, borderTopRightRadius: 9 }}>
-          <Text variant='titleSmall' style={{ color: 'white' }}>Payment schedule</Text>
-        </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', width: 300 }}>
-
-          {days.map((day) => {
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  if (daySelected.includes(day)) {
-                    const filtered = daySelected.filter((number) => number !== day)
-                    console.log("filtered: ", filtered)
-                    return setDaySelected(filtered)
-                  }
-
-                  setDaySelected([...daySelected, day])
-                }}
-                key={day.toString()}
-                style={{ width: 30, height: 50, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                {daySelected.includes(day) &&
-                  <View style={{ height: 20, width: 20, borderRadius: 10, position: 'absolute', backgroundColor: '#5959B2' }}></View>
-                }
-                <Text style={{ color: daySelected.includes(day) ? 'white' : 'black' }}>{day}</Text>
-              </TouchableOpacity>
-            )
-          })}
-        </View>
-      </View>
-    )
-  }
 
   const handleUploadPress = () => {
     askMediaPermission()
