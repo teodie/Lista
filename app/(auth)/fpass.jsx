@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Text, Button, TextInput } from 'react-native-paper'
 import { account } from '@/utils/appWrite'
@@ -65,8 +65,8 @@ const fpass = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerTxt}>
+    <View style={{paddingHorizontal: 15}}>
+      <View style={{ marginVertical: 15, gap: 5}}>
         <Text variant='headlineSmall' style={{ fontWeight: '500' }}>{resetClicked ? "Enter new Password" : "Retrieve your account"}</Text>
         <Text variant='bodyMedium' >{resetClicked ? email : "Enter your email address"}</Text>
       </View>
@@ -75,10 +75,10 @@ const fpass = () => {
         mode='outlined'
         value={resetClicked ? password : email}
         onChangeText={resetClicked ? setPassword : setEmail}
-        style={styles.input}
+        style={{marginBottom: 20}}
       />
 
-      <Button mode='contained' buttonColor="#5959B2" style={styles.continueBtn}
+      <Button mode='contained' buttonColor="#5959B2"
         onPress={resetClicked ? handleSave : handleSend}
         disabled={buttonDisable}
       >{resetClicked ? "Save Password" : "Send Link"}</Button>
@@ -87,16 +87,3 @@ const fpass = () => {
 }
 
 export default fpass
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 15,
-  },
-  headerTxt: {
-    marginVertical: 15,
-    gap: 5,
-  },
-  input: {
-    marginBottom: 20,
-  }
-})
