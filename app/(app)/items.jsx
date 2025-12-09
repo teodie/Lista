@@ -8,8 +8,6 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Button, Text, PaperProvider, Divider, SegmentedButtons, TextInput, IconButton } from 'react-native-paper';
 import { CustomModal } from '@/components/ModalContainer';
 import { useRouter } from 'expo-router';
-import ItemList from '@/components/itemList';
-import vibrate from '@/utils/vibrate';
 import EditItemRow from '@/components/editItemRow';
 import { KeyboardAvoidingView, KeyboardStickyView } from 'react-native-keyboard-controller';
 import { formatDate_MM_DD_YYYY, formateDate_LongMM_DD_YYYY } from '@/utils/formatDate';
@@ -200,7 +198,7 @@ const items = () => {
     <PaperProvider style={{
       position: 'relative'
     }}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={{    paddingHorizontal: 10, flex: 1, backgroundColor: 'white'}}>
         <View
           style={{
             height: 90,
@@ -365,16 +363,3 @@ const items = () => {
 
 
 export default items
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 10,
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-});
