@@ -18,7 +18,7 @@ function RouteGaurd({ children }) {
     if (!user && !isLoadingUser) {
       router.replace("/login");
     } else if (user && !isLoadingUser) {
-      router.replace("/");
+      router.replace("/vtt");
     }
   }, [user, isLoadingUser]);
 
@@ -95,7 +95,6 @@ export default function ScreenLayout() {
                   headerStyle: { backgroundColor: '#5959B2' },
                   headerTitleAlign: 'center',
                 }}
-
               />
 
               <Tabs.Screen
@@ -106,6 +105,15 @@ export default function ScreenLayout() {
                   headerShown: false,
                   tabBarStyle: { display: 'none' },
                 }} />
+
+              <Tabs.Screen
+                name='vtt'
+                options={{
+                  title: 'Voice to Text',
+                  headerTitleAlign: 'center',
+                  tabBarIcon: ({ color }) => <FontAwesome size={28} name="microphone" color={color} />
+                }}
+              />
 
             </Tabs>
           </ItemsProvider>

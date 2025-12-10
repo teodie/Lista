@@ -50,7 +50,10 @@
           "photosPermission": "Allow $(Lista) to access your photos.",
           "savePhotosPermission": "Allow $(Lista) to save photos.",
           "isAccessMediaLocationEnabled": true,
-          "granularPermissions": ["audio", "photo"]
+          "granularPermissions": [
+            "audio",
+            "photo"
+          ]
         }
       ],
       [
@@ -69,6 +72,12 @@
         "expo-local-authentication",
         {
           "faceIDPermission": "Allow $(Lista) to use Face ID."
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(Lista) to access your microphone."
         }
       ]
     ],
