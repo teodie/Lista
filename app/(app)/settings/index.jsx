@@ -92,12 +92,14 @@ export default function Settings() {
       </View>
 
       <Button
+        style={{marginBottom: 15}}
         mode='contained'
         icon='logout'
         textColor='#DB5C72'
         buttonColor='#F7E4EA'
         onPress={signOut}
       >Log out</Button>
+
     </SafeAreaView>
   )
 }
