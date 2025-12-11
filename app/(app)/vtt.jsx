@@ -4,12 +4,11 @@ import { Button, IconButton } from 'react-native-paper'
 import {
   requestRecordingPermissionsAsync,
   useAudioRecorder,
-  AudioModule,
   RecordingPresets,
-  setAudioModeAsync,
   useAudioRecorderState,
   useAudioPlayer,
 } from 'expo-audio';
+import { useScribe } from "@elevenlabs/react";
 
 const vtt = () => {
   const [text, setText] = useState('')
@@ -32,7 +31,7 @@ const vtt = () => {
 
   const playSound = () => {
     console.log("Playing the sound")
-    if(audioPath) return player.play();
+    if (audioPath) return player.play();
   }
 
   const getSttToken = async (urlEndpoint) => {
@@ -42,7 +41,7 @@ const vtt = () => {
       })
 
       const token = await response.json()
-      console.log(token)
+      return token
     } catch (error) {
       console.log(error)
     }
@@ -58,7 +57,6 @@ const vtt = () => {
             multiline={true}
           />
         </View>
-
         <View style={{
           padding: 3,
           borderRadius: '50%',
