@@ -8,7 +8,6 @@ import { ClientProvider } from '@/utils/client-context';
 import { ItemsProvider } from '@/utils/items-context';
 import { FontAwesome, MaterialIcons, Feather, Entypo } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function RouteGaurd({ children }) {
@@ -65,7 +64,6 @@ export default function ScreenLayout() {
                   headerShown: false,
                 }}
               />
-
               <Tabs.Screen
                 name='items'
                 options={{
@@ -83,7 +81,6 @@ export default function ScreenLayout() {
                   href: null,
                   tabBarStyle: { display: 'none' }
                 }} />
-
               <Tabs.Screen
                 name='add'
                 options={{
@@ -96,7 +93,6 @@ export default function ScreenLayout() {
                   headerTitleAlign: 'center',
                 }}
               />
-
               <Tabs.Screen
                 name='settings'
                 options={{
@@ -114,7 +110,6 @@ export default function ScreenLayout() {
                   tabBarIcon: ({ color }) => <FontAwesome size={28} name="microphone" color={color} />
                 }}
               />
-
             </Tabs>
           </ItemsProvider>
         </ClientProvider>

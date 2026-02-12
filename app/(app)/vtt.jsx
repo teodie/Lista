@@ -1,79 +1,150 @@
-import React, { useState } from 'react'
-import { View, Text, TextInput, Alert } from 'react-native'
-import { Button, IconButton } from 'react-native-paper'
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import {
-  requestRecordingPermissionsAsync,
-  useAudioRecorder,
+  AudioModule,
   RecordingPresets,
+  useAudioRecorder,
   useAudioRecorderState,
-  useAudioPlayer,
 } from 'expo-audio';
-import { useScribe } from "@elevenlabs/react";
-
-const vtt = () => {
-  const [text, setText] = useState('')
-  const [audioPath, setAudioPath] = useState('')
-  const player = useAudioPlayer(audioPath);
+import { useEffect, useState } from 'react';
+import AudioPlayer from '@/components/AudioPlayer';
+import CustomButton from '@/components/CustomButton';
+import * as FileSystem from 'expo-file-system';
+export default function App() {
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
-  const recorderState = useAudioRecorderState(audioRecorder);
-  const tokenGenEndpoint = process.env.EXPO_PUBLIC_TOKEN_GENERATOR_END_POINT
+  // const status = useAudioRecorderState(audioRecorder);
 
-  const startRecording = async () => {
+  const [audioFileUri, setAudioFileUri] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcription, setTranscription] = useState('');
+
+  const [playbackPosition, setPlaybackPosition] = useState(0);
+
+  // console.log('status: ', status);
+  // console.log('audioRecorder: ', audioRecorder);
+
+  const handleStartRecording = async () => {
     await audioRecorder.prepareToRecordAsync();
     audioRecorder.record();
-  }
 
-  const stopRecording = async () => {
+    setIsRecording(true);
+    setAudioFileUri('');
+    setTranscription('');
+  };
+
+  const handleStopRecording = async () => {
     await audioRecorder.stop();
-    setAudioPath(audioRecorder.uri)
-    console.log(`Recording is available on ${audioRecorder.uri}`)
-  }
 
-  const playSound = () => {
-    console.log("Playing the sound")
-    if (audioPath) return player.play();
-  }
-
-  const getSttToken = async (urlEndpoint) => {
-    try {
-      const response = await fetch(urlEndpoint, {
-        method: 'GET',
-      })
-
-      const token = await response.json()
-      return token
-    } catch (error) {
-      console.log(error)
+    if (audioRecorder.uri) {
+      setAudioFileUri(audioRecorder.uri);
     }
-  }
+
+    setIsRecording(false);
+    console.log('audioRecorder: ', audioRecorder.uri);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const status = await AudioModule.requestRecordingPermissionsAsync();
+      if (!status.granted) {
+        Alert.alert('Permission to access microphone was denied');
+      }
+    })();
+  }, []);
+
+  const handleConvert = async () => {
+    console.log("This runs")
+    if (!audioFileUri) {
+      Alert.alert('No audio file to convert');
+      return;
+    }
+
+    const base64Audio = await FileSystem.readAsStringAsync(audioFileUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    const response = await fetch('https://69392d8300291995b0e0.syd.appwrite.run/stt', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ base64Audio }),
+    });
+
+    console.log({response})
+    const data = await response.json()
+    console.log('data: ', data);
+    setTranscription(data.transcription);
+  };
+
 
   return (
-    <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, paddingHorizontal: 24 }}>
-      <View style={{ width: '100%', alignItems: 'center', }}>
-        <View style={{ width: '100%', borderWidth: 1, borderColor: 'gray', borderRadius: 10 }}>
-          <TextInput
-            value={text}
-            onChangeText={setText}
-            multiline={true}
+    <View style={styles.container}>
+      {isRecording ? (
+        <Pressable
+          onPress={handleStopRecording}
+          style={{
+            width: 50,
+            aspectRatio: 1,
+            borderRadius: 100,
+            backgroundColor: 'crimson',
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+          }}
+        />
+      ) : (
+        <Pressable
+          onPress={handleStartRecording}
+          style={{
+            width: 50,
+            aspectRatio: 1,
+            borderRadius: 100,
+            backgroundColor: 'gainsboro',
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+          }}
+        />
+      )}
+
+      {audioFileUri && (
+        <View>
+          <AudioPlayer
+            uri={audioFileUri}
+            onPlaybackPositionChange={setPlaybackPosition}
           />
+          <CustomButton title='Convert to text' onPress={handleConvert} />
         </View>
-        <View style={{
-          padding: 3,
-          borderRadius: '50%',
-        }}>
-          <IconButton icon='microphone' mode={recorderState.isRecording ? 'contained' : ''} onPress={async () => {
-            const request = await requestRecordingPermissionsAsync()
-            // {"canAskAgain": true, "expires": "never", "granted": true, "status": "granted"}
-            if (request.status !== 'granted') return Alert.alert("Permission to record is needed")
-            recorderState.isRecording ? stopRecording() : startRecording()
-          }} />
+      )}
+
+      {transcription && (
+        <View>
+          {/* <Text>{transcription.text}</Text> */}
+          <Text>position: {playbackPosition}</Text>
+          <Text style={{ fontSize: 20, fontWeight: '600', lineHeight: 30 }}>
+            {transcription.words.map((word, index) => (
+              <Text
+                key={index}
+                style={{
+                  backgroundColor:
+                    playbackPosition > word.start && playbackPosition < word.end
+                      ? 'pink'
+                      : 'transparent',
+                }}
+              >
+                {word.text}
+              </Text>
+            ))}
+          </Text>
         </View>
-
-        {audioPath && <Button mode='contained' onPress={() => playSound()} >Play</Button>}
-
-      </View>
+      )}
     </View>
-  )
+  );
 }
 
-export default vtt
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 10,
+    gap: 10,
+  },
+});
